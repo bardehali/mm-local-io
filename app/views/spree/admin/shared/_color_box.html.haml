@@ -1,0 +1,92 @@
+:ruby
+  # Lone color button that represents a color to be selected.
+  # Required locals:
+  #   Either by one single
+  #     option_value [Spree::OptionValue]
+  #   or by this set
+  #     color_name or color_names [String]
+  #     color_values [String or Array of String]
+  #     var_ids [String or Array] Value to be place for attribute 'data' of the color.
+  # Optional locals:
+  #   wrapper_tag [String or Symbol] default is 'label'
+  #   input [String] create input to pair along w/ color button, either 'radio', 'checkbox'
+  #   selected [Boolean] default false
+  #   input_options [Hash] the options given to the input (radio)
+  wrapper_tag ||= :label
+  option_value = nil unless defined?(option_value)
+
+  color_name = '' unless defined?(color_name)
+  color_names = '' unless defined?(color_names)
+  color_values = '' unless defined?(color_values)
+  var_ids = '' unless defined?(var_ids)
+
+  colors = if option_value # how the hell this would be false: .is_a?(::Spree::OptionValue)
+    color_name = option_value.presentation
+    # var_ids ||= option_value.variant_ids.collect(&:to_s).join(',')
+    option_value.extra_value.to_s.split(',')
+  else
+    unless defined?(color_name) && color_name
+      color_name = color_names ? color_names : ''
+    end
+    color_values ? color_values.split(',') : []
+  end
+
+  input = nil unless defined?(input)
+  input_id_prefix = '' unless defined?(input)
+  input_id = ['option_values', option_value.try(:option_type_id), option_value.try(:id) ].compact.join('_')
+  link_path = nil unless defined?(link_path)
+  input_options = {} unless defined?(input_options)
+  input_options ||= {}
+  selected = (option_value&.selected == true || option_value&.one_value?) unless defined?(selected) && !selected.nil?
+  selection ||= selected ? 'selected' : ''
+
+%div(class="variant-one-box color-wrapper#{' d-none one-value-box' if option_value&.one_value?}")
+  - input_name = nil
+  - if option_value && input == 'radio'
+    - input_id = 'selected_' + input_id
+    - input_name = "selected_option_values_#{option_value.option_type_id}"
+    = radio_button_tag input_name, option_value.id, selected, input_options.merge(id: input_id)
+  - elsif option_value && input == 'checkbox'
+    - input_id = 'checked_' + input_id
+    - input_name = "#{input_id_prefix}option_value_id_#{option_value.id}"
+    = check_box_tag input_name, option_value.id, selected, input_options.merge(id: input_id)
+  - common_label_options = { class: "#{selection} color-box option-value-btn", for: input_name, data: var_ids, |
+    - 'data-name' => color_name, title: "#{color_name}#{' ' + var_ids.to_s}", 'data-value' => colors } |
+  - common_label_options.merge!(href: link_path) if link_path.present?
+  - if colors.length == 1
+    -# color1 = colors[0].upcase == '#FFFFFF' ? '#E2E2DF' : colors[0]
+    - color1 = colors[0].upcase
+    = content_tag wrapper_tag, common_label_options.merge('data-value' => "#{color1} #{option_value&.id}", 'id' => input_id + '_label') do
+      %svg(xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="isolation:isolate" viewBox="4.5 5 40 40" width="40pt" height="40pt" class="color-value-button" )
+        %defs
+          %clipPath(id="_clipPath_tb3pgmzt71gZgjRUMFz7kla7XsGZguKQ")
+            %rect(width="50" height="50")
+        %g(clip-path="url(#_clipPath_tb3pgmzt71gZgjRUMFz7kla7XsGZguKQ)")
+          %mask(id="_mask_oCFp9qrrrQeffIoCHuWrFndlIZ6tpd83")
+          %circle(vector-effect="non-scaling-stroke" cx="25" cy="25" r="25" fill="none" mask="url(#_mask_oCFp9qrrrQeffIoCHuWrFndlIZ6tpd83)" stroke-width="6" stroke="#{color1}" stroke-linejoin="miter" stroke-linecap="square" stroke-miterlimit="3")
+          %circle(vector-effect="non-scaling-stroke" cx="25" cy="25" r="25" fill="none")
+          %path(d=" M 35.432 11.739 C 32.56 9.476 28.937 8.125 25 8.125 C 15.686 8.125 8.125 15.686 8.125 25 C 8.125 28.937 9.476 32.56 11.739 35.432 L 35.432 11.739 Z  M 38.261 14.568 C 40.524 17.44 41.875 21.063 41.875 25 C 41.875 34.314 34.314 41.875 25 41.875 C 21.063 41.875 17.44 40.524 14.568 38.261 L 38.261 14.568 Z " fill-rule="evenodd" fill="#{ color1 }")
+          %circle(vector-effect="non-scaling-stroke" cx="24.999999999999996" cy="24.999999999999996" r="16.875000000000007" fill="#{ color1 }")
+  - elsif colors.length == 2
+    - color1 = colors[0].upcase == '#FFFFFF' ? '#E2E2DF' : colors[0]
+    - color2 = colors[1].upcase == '#FFFFFF' ? '#E2E2DF' : colors[1]
+    = content_tag wrapper_tag, common_label_options.merge('id' => input_id) do
+      %svg(xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="isolation:isolate" viewBox="5 5 40 40" width="40pt" height="40pt" class="color-value-button" )
+        %defs
+          %clipPath(id="_clipPath_JuHM8qzruj2aKf5MW2NorbnVxhGKkLBN")
+            %rect(width="50" height="50")
+        %g(clip-path="url(#_clipPath_JuHM8qzruj2aKf5MW2NorbnVxhGKkLBN)")
+          %mask(id="_mask_9uwPSRnBTIHwKN84BkS867cKeriONcUn")
+          %circle(vector-effect="non-scaling-stroke" cx="25" cy="25" r="25" fill="none" mask="url(#_mask_9uwPSRnBTIHwKN84BkS867cKeriONcUn)" stroke-width="6" stroke="#{color1 }" stroke-linejoin="miter" stroke-linecap="square" stroke-miterlimit="3")
+          %circle(vector-effect="non-scaling-stroke" cx="25" cy="25" r="25" fill="none")
+          %path(d=" M 35.432 11.739 C 32.56 9.476 28.937 8.125 25 8.125 C 15.686 8.125 8.125 15.686 8.125 25 C 8.125 28.937 9.476 32.56 11.739 35.432 L 35.432 11.739 Z  M 38.261 14.568 C 40.524 17.44 41.875 21.063 41.875 25 C 41.875 34.314 34.314 41.875 25 41.875 C 21.063 41.875 17.44 40.524 14.568 38.261 L 38.261 14.568 Z " fill-rule="evenodd" fill="#{ color2 }")
+          %path(d=" M 38.261 14.568 C 40.524 17.44 41.875 21.063 41.875 25 C 41.875 34.314 34.314 41.875 25 41.875 C 21.063 41.875 17.44 40.524 14.568 38.261 L 38.261 14.568 L 38.261 14.568 Z " fill-rule="evenodd" fill="#{ color1 }")
+  - if can? :manage, option_value
+    .variant-description.box-shadow
+      .variant-heading
+        %span=t('spree.variant_name')
+      .variant-body
+        - readonly = (can? :manage, option_value) ? nil : 'readonly'
+        = text_field_tag('option_value[presentation]', option_value.presentation, readonly: readonly, class:'variant-name instant-update', 'option-value-id' => option_value.id)
+      .variant-footer
+        .cover

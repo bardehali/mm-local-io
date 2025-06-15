@@ -1,0 +1,30 @@
+<% cache base_cache_key + [available_option_types_cache_key, filtering_params_cache_key, @taxons.to_a.collect(&:id) ] do %>
+  <div id="plp-filters-accordion" class="d-none d-lg-block col-lg-3 pr-5 position-sticky h-100 plp-filters" data-hook="taxon_sidebar_navigation">
+    <%= render partial:'spree/products/taxon_subcategory_links', locals:{ taxons: @taxons } %>
+
+    <div class="w-100 card plp-filters-card">
+      <div class="card-header text-capitalize <%= 'collapsed' if params[:filter_name].blank? %> px-1 plp-filters-card-header" id="filtersPrice" data-toggle="collapse" data-target="#collapseFilterPrice" aria-expanded="false" aria-controls="collapseFilterPrice" role="heading" aria-level="2">
+        <%= Spree.t('plp.price') %>
+        <%= icon(name: 'plus',
+                classes: 'mt-1 float-right arrow plp-filters-card-header-arrow--plus',
+                width: 16,
+                height: 16) %>
+        <%= icon(name: 'minus',
+                classes: 'mt-1 float-right arrow plp-filters-card-header-arrow--minus',
+                width: 16,
+                height: 16) %>
+      </div>
+      <div id="collapseFilterPrice" class="collapse <%= 'show' unless params[:price_filter].blank? %>" aria-labelledby="filtersPrice">
+        <div class="card-body px-0 pt-1">
+          <% price_filters.each do |filter| -%>
+            <%= link_to permitted_params.merge({ price_filter: filter[:name], filter: filter[:filter] }), class: "d-block" do %>
+              <div class="d-inline-block py-1 px-2 m-1 text-uppercase plp-filters-card-item <%= 'plp-filters-card-item--selected' if params[:price_filter] == filter[:name] %>">
+                <%= filter[:name] %>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

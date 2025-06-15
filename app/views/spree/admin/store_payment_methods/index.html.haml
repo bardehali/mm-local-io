@@ -1,0 +1,93 @@
+:css
+  body {
+    font-family: 'Roboto', sans-serif;
+  }
+
+  .payment-input {
+    margin-top: 0.5em;
+  }
+
+  .url-display{
+    font-weight: 500;
+    font-size: 12;
+    padding-left: 1em;
+    padding-right: 1em;
+    width: 210px;
+  }
+
+  .payment_display{
+    width: 225px;
+    display: inline-block;
+    text-align: center;
+  }
+
+  .payment_display > img {
+    height: 50px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .form-payment {
+    height: 62px;
+  }
+
+  .text-box-title{
+    font-weight: 500;
+    font-size: 12;
+  }
+
+  .submit_button{
+    margin-top: 4em;
+    width: 350px;
+    border-radius: 8px;
+    border: 0;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #3d4891;
+    font-size: 15px;
+    color: #fff;
+    line-height: 1.4;
+    min-width: 120px;
+    height: 40px;
+  }
+
+
+:ruby
+  aliexpress = Retail::Site.find_by_name 'aliexpress'
+  dhgate = Retail::Site.find_by_name 'dhgate'
+  transfer_suffix = [aliexpress.try(:name), dhgate.try(:name) ].compact.join(' and ')
+
+- content_for :head do
+  = stylesheet_link_tag 'ioffer/ioffer', media: 'all', 'data-turbolinks-track': 'reload'
+
+= form_tag(admin_payment_methods_and_retail_stores_path, method:'post') do
+  - if false # don't need this for now
+    .text-center
+      %h2.mt-3= t('spree.rating.title').gsub('{USERID}', spree_current_user.try(:username) || '')
+      - if spree_current_user.try(:legacy?) || spree_current_user&.test_or_fake_user? || spree_current_user&.rating_percentage > 0
+        = render partial: 'rating_box', locals: { user: spree_current_user }
+      - else
+        .div.mt-5
+    .text-center
+      %h2.mt-3= t('scraper.transfer_title')
+      %p.mb-3= t('scraper.transfer_subtitle')
+      - @retail_sites.each do|retail_site|
+        %div(id="retail_site_input_#{retail_site.id}" class="payment-input")
+          .input-group.input-group-newletter
+            .url-display= retail_store_input_label(retail_site)
+            = text_field_tag("retail_site_account_ids[#{retail_site.id}]", retail_site.retail_store.try(:retail_site_store_id), class:'form-control', 'aria-describedby'=>'basic-addon', 'aria-label'=>'Enter account', placeholder: retail_site_store_id_placeholder(retail_site) )
+    .mt-4.text-box-title
+      =t('store.accounts_on_other_site')
+      %br/
+      = text_area_tag("other_site_account[account_id]", @other_site_account.try(:account_id), class:'form-control')
+  - # Payments ##################
+  .text-center.mt-4
+    %h2.mt-5= t('spree.payments')
+    %p.mt-3= t('payment.how_will_collect_payments')
+    = render partial: 'spree/store_payment_methods/account_rows', locals:{ payment_methods: @payment_methods }
+
+  .mt-4.text-center
+    = submit_tag(t('form.submit'), disable_with: t('form.submitting'), class:'btn btn-primary btn-lg center-in-div' )
+  .mt-4.mb-5.text-right
+    = link_to(t('payment.other_payment_methods') + ' >>', payment_methods_provided_path)

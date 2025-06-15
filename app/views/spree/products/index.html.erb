@@ -1,0 +1,110 @@
+<% permitted_params = params.permit(*filtering_params)
+  products_empty = @products.is_a?(Elasticsearch::Model::Response::Records) ? @products.total.zero? : @products.empty?
+  hide_top_banner_section = true
+  #show_side_filters = spree_current_user&.admin? || spree_current_user&.approved_seller? || spree_current_user&.pending_seller? # &.seller?
+  show_side_filters = false
+  is_related = false
+-%>
+<% if spree_current_user.try(:admin?)
+  content_for :head do
+%>
+  <style type="text/css">
+    .card input { max-width: 100%; }
+    .card input[type='submit'] { width: auto; }
+    .hide-many-lines { height: 5em; overflow: hidden; cursor: s-resize; }
+  </style>
+<%
+  end
+
+  content_for :footer do -%>
+  <script type="text/javascript">
+    if (window.addEventListener) {
+      window.addEventListener("load", function(){
+        $('.hide-many-lines').click(function(){ $(this).css('height', 'auto') });
+      }, false);
+    }
+  </script>
+<% end
+else # not admin
+  params.delete(:script_score_source)
+  params.delete(:sort)
+  params.delete(:text_fields)
+  params.delete(:query_type)
+end
+-%>
+<% if params[:menu_open] && params[:option_value_ids].is_a?(Array)
+  content_for :footer do
+-%>
+<script type="text/javascript">
+  if (window.addEventListener) {
+    window.addEventListener("load", function(){
+    <% params[:option_value_ids].each do|option_value_id| -%>
+      var label = $("#option_value_label_<%= option_value_id -%>");
+      label.css('border-color', 'black');
+      $("#filters_card_"+ label.attr('data-option-type-id') +" .card-body").addClass('show');
+    <% end -%>
+    }, false);
+  }
+</script>
+<%  end
+end # menu_open -%>
+
+<div data-hook="search_results" class="clear-bg">
+  <% if spree_current_user&.admin? %>
+    <div class="container mb-3 d-md-flex">
+      <div class="row" data-hook="products_search_results_conditions">
+        <%= render partial: 'spree/shared/products_search_conditions' %>
+      </div>
+    </div>
+  <% end -%>
+
+  <% if products_empty %>
+    <% if permitted_params[:keywords].present? && permitted_params.to_h.one? %>
+      <%= render 'spree/products/no_results' %>
+    <% else %>
+      <%= render 'spree/products/no_results_with_filters', permitted_params: permitted_params %>
+    <% end %>
+
+  <% else %>
+    <% if hide_top_banner_section -%>
+    <% elsif params[:keywords].present? %>
+      <div class="container d-md-flex pt-md-5">
+        <div class="plp-results-text text-uppercase mx-md-auto py-md-5">
+          <%= "#{@products.total_count} #{Spree.t('plp.results_for')} '#{params[:keywords].upcase}'" %>
+        </div>
+      </div>
+    <% elsif not @taxon %>
+      <div id="no-taxon-banner">
+        <div class="container">
+          <%= lazy_image(
+            src: asset_path('homepage/products.jpg'),
+            alt: 'products-banner',
+            width: 1110,
+            height: 300,
+            class: 'w-100 d-none d-md-block'
+          ) %>
+        </div>
+      </div>
+    <% end %>
+    <div class="container mb-3 d-md-flex justify-content-center">
+      <% if show_side_filters -%>
+        <%= render 'spree/products/filters_desktop', permitted_params: permitted_params %>
+      <% elsif @taxons || params[:keywords].blank? -%>
+        <div id="plp-filters-accordion" class="d-none d-lg-block col-lg-3 pr-5 position-sticky h-100 plp-filters" data-hook="taxon_sidebar_navigation">
+          <%= render partial:'spree/products/taxon_subcategory_links', locals:{ taxons: @taxons } %>
+        </div>
+      <% end -%>
+      <% if spree_current_user&.admin? || spree_current_user&.seller? %>
+          <%= render 'spree/shared/products.html.haml', products: @products %>
+      <% else -%>
+          <%= render 'spree/shared/products_buyer.html.haml', products: @products, is_related: is_related %>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<% unless products_empty || @include_structed_data.nil? %>
+  <% cache simpler_cache_key_for_products(@products, 'json-ld') do %>
+    <%= products_structured_data(@products) %>
+  <% end %>
+<% end %>

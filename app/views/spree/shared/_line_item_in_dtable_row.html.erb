@@ -1,0 +1,30 @@
+<%
+  product_url = product_rep_url(line_item.product)
+-%>
+<div class="d-table-row checkout-line-item">
+  <div class="d-table-cell pr-3" data-hook="cart_item_image">
+    <%= link_to line_item.product do %>
+      <%= image_tag cdn_image_url(default_image_for_product_or_variant(line_item.product), :pdp_thumbnail), style: 'max-width: 100px;' %>
+    <% end %>
+  </div>
+  <div class="d-table-cell line-item-description p-1" data-hook="cart_item_description">
+    <div class="mb-2"><%= link_to line_item.name, product_url %></div>
+    <% if line_item.insufficient_stock? %>
+      <span class="out-of-stock">
+        <%= Spree.t(:out_of_stock) %>&nbsp;&nbsp;<br />
+      </span>
+    <% end %>
+    <ul class="item-details-list" data-hook="line_item_description">
+      <% line_item.variant.option_values_for_display do |ov| %>
+        <li class="text-secondary">
+          <%= "#{ov.option_type.presentation}: #{ov.name.titleize}" %>
+        </li>
+      <% end %>
+    </ul>
+    <span class="item-price"><%= line_item.single_money.to_html %></span>
+    <% if line_item.quantity > 1 %>
+      &nbsp;&nbsp;
+      <span class="text-secondary"><%= Spree.t('quantity') %>: <%= line_item.quantity %></span>
+    <% end -%>
+  </div>
+</div>

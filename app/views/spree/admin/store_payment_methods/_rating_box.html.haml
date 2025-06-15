@@ -1,0 +1,139 @@
+:css
+  .rating-box{
+    border-radius: 8px;
+    border-color: #e1e1e1;
+    border-style: solid;
+    border-width: 1px;
+    height: auto;
+    margin: 2em;
+    justify-content: center;
+    align-items: center;
+
+  }
+  .rating-col {
+    text-align: center;
+    padding-top: 2em;
+    padding-bottom: 2em;
+  }
+  .rating-col-shield {
+    width: 100%;
+    height: 100%
+    display: block;
+    text-align: center;
+  }
+  .rating-col-shield > img {
+    width: 165px;
+    height: auto;
+    margin-top: 1em;
+  }
+  .rating-col-shield {
+    font-weight: 500;
+  }
+  .star-row{
+    margin-left: auto;
+    margin-right: 0em;
+    margin-top: 0px;
+    text-align: right;
+    width: 100px;
+    font-weight: 500;
+  }
+  .rating-row{
+    margin-left: 0em;
+    margin-right: auto;
+    margin-top: 0px;
+    width: 60px;
+    text-align: right;
+    font-weight: 600;
+  }
+  .star{
+    color: #fdb714;
+  }
+  .star-off{
+    color: #E4E4E4;
+  }
+  .number-rating{
+    font-weight: 500;
+  }
+  .centered {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .rating-percent{
+    font-size: 28px;
+    font-weight: 600;
+    margin-top: -0.5em;
+  }
+  .rating-text{
+    font-weight: 600;
+    word-spacing: 125px;
+    line-height: 95%
+  }
+  .rating-left-text{
+    font-weight: 500;
+    font-size: 28px;
+  }
+  .stars-container{
+    margin-top: 2em;
+  }
+
+:ruby
+  rating_percentage = user ? '%2d%%' % [user.rating_percentage] : 0
+.rating-box.row
+  .col-sm-12.col-lg-5.rating-col.flex
+    - if user.try(:ioffer_user) && user.transactions_count > 0
+      .rating-left-text.mt-3= t('spree.rating.content').gsub('{RATING_PERCENTAGE}', rating_percentage.to_s).gsub('{TRANSACTIONS_COUNT}', user.transactions_count.to_s)
+    - else
+      .rating-left-text.mt-3= t('spree.rating.content_blank')
+  .col.rating-col-shield
+    = image_tag("icon/shield-stroke.png", :class => "rating-shield", :alt=>"Rating")
+    .centered
+      .rating-percent
+        = rating_percentage
+      .rating-text
+        = t('spree.rating.shield_label')
+  .col.stars-container
+    .row.flex-nowrap
+      .col-sm
+        .star-row
+          %i.glyphicon.glyphicon-star.star
+          %i.glyphicon.glyphicon-star.star
+          %i.glyphicon.glyphicon-star.star
+          %i.glyphicon.glyphicon-star.star
+          %i.glyphicon.glyphicon-star.star
+        .star-row
+          %i.glyphicon.glyphicon-star.star
+          %i.glyphicon.glyphicon-star.star
+          %i.glyphicon.glyphicon-star.star
+          %i.glyphicon.glyphicon-star.star
+          %i.glyphicon.glyphicon-star.star-off
+        .star-row
+          %i.glyphicon.glyphicon-star.star
+          %i.glyphicon.glyphicon-star.star
+          %i.glyphicon.glyphicon-star.star
+          %i.glyphicon.glyphicon-star.star-off
+          %i.glyphicon.glyphicon-star.star-off
+        .star-row
+          %i.glyphicon.glyphicon-star.star
+          %i.glyphicon.glyphicon-star.star
+          %i.glyphicon.glyphicon-star.star-off
+          %i.glyphicon.glyphicon-star.star-off
+          %i.glyphicon.glyphicon-star.star-off
+        .star-row
+          %i.glyphicon.glyphicon-star.star
+          %i.glyphicon.glyphicon-star.star-off
+          %i.glyphicon.glyphicon-star.star-off
+          %i.glyphicon.glyphicon-star.star-off
+          %i.glyphicon.glyphicon-star.star-off
+      .col-sm
+        .rating-row
+          = user.try(:ioffer_user) ? (user.positive * (user.rating_percentage / 100)).to_i : ''
+        .rating-row
+          = user.try(:ioffer_user) ? (user.positive * ((100-user.rating_percentage)*0.042)).to_i : ''
+        .rating-row
+          = user.try(:ioffer_user) ? (user.positive * ((100-user.rating_percentage)*0.012)).to_i : ''
+        .rating-row
+          = user.try(:ioffer_user) ? (user.positive * ((100-user.rating_percentage)*0.018)).to_i : ''
+        .rating-row
+          = user.try(:ioffer_user) ? (user.positive * ((100-user.rating_percentage)*0.031)).to_i : ''

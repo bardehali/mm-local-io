@@ -1,0 +1,34 @@
+:ruby
+  # Required locals
+  #   address [Spree::Address]
+  # Optional locals
+  #   row_attributes [Hash] the HTML attributes in the TR tag; keys as Symbol
+  row_attributes ||= {} unless defined?(row_attributes)
+-# %tr(id="#{full_info_id}" class="collapse #{order_row_class}")
+= tag.tr row_attributes do
+  %td(colspan="3")
+    %table.address-table
+      %tbody
+        %tr
+          %td= t('user.name')
+          %td
+            %strong= address.full_name  
+        %tr
+          %td
+            #{ t('user.address.street') } 
+            #{ t('user.address.apartment') } 
+          %td
+            %strong= [address.address1, address.address2].compact.join(' ')
+        %tr
+          %td= Spree.t('activerecord.attributes.spree/address.city')
+          %td
+            %strong= address.city
+        %tr
+          %td= t('user.address.state_or_providence')
+          %td
+            %strong= address.state&.abbr
+            %strong= address.zipcode
+        %tr
+          %td= Spree.t('activerecord.attributes.spree/address.country')
+          %td
+            %strong= address.country

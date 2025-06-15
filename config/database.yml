@@ -1,0 +1,20 @@
+default: &default
+  adapter: mysql2
+  encoding: utf8
+  pool: 5
+  username: root
+  password: root
+  host: host.docker.internal
+  port: 3306
+
+development:
+  <<: *default
+  database: mm-local-io-DB
+
+test:
+  <<: *default
+  database: mm-local-io-DB_test
+
+production:
+  <<: *default
+  database: mm-local-io-DB_production

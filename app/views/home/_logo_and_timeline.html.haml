@@ -1,0 +1,53 @@
+- content_for :head do
+  :css
+    .timeline-item h6, .timeline-item h5 {
+      font-weight: 700;
+      color: #666666;
+    }
+    .timeline-item.highlighted h6, .timeline-item.highlighted h5 {
+      color: #333333;
+    }
+    .timeline-number {
+      justify-content: center !important;
+      position: relative;
+      margin-bottom: 0.8em;
+    }
+    .timeline-number .number-badge {
+      text-align: center;
+      border: solid 2px #333333;
+      border-radius: 50%;
+      font-weight: 700;
+      background-color: white;
+      width: 2.4em;
+      height: 2.4em;
+      line-height: 2.2em;
+      z-index: 10;
+    }
+    .timeline-item.highlighted .number-badge {
+      color: white;
+      background-color: maroon;
+    }
+    .timeline-number .middle-bar-from-start-abs {
+      border-top: solid 1px #333333;
+      width: 50%;
+      height: 2px;
+      position: absolute;
+      left: 0;
+      top: 50%;
+      z-index: 0;
+    }
+    .timeline-number .middle-bar-to-end-abs {
+      border-top: solid 1px #333333;
+      width: 50%;
+      height: 2px;
+      position: absolute;
+      right: 0;
+      top: 50%;
+      z-index: 0;
+    }
+
+.row(id="ioffer_top_header")
+  .col-3
+    = image_tag('ioffer_logo_color_plain_w200.png', alt:'iOffer', title: spree_current_user.username_or_email.to_s)
+  .col-9.mt-3.timeline
+    = yield :timeline

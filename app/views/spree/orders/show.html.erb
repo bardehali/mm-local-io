@@ -1,0 +1,197 @@
+<%
+  show_bill_address = false unless defined?(show_bill_address)
+  show_shipping = false unless defined?(show_shipping)
+  one_payment = @order.payments.valid.last
+  show_pay_seller = !@order.buyer_claimed_already_paid?
+  store_payment_method = store_payment_method(current_order, one_payment.payment_method)
+  pm_instruction = store_payment_method&.instruction
+  payment_method = @order.payments.valid.first&.payment_method
+  payment_service_url = payment_method ? payment_method.forward_payment_url : '#'
+  still_goto_help = !@order.seller&.phantom_seller? # (spree_current_user&.id == @order.user_id && @order.messages.complaint_or_higher_level.count == 0)
+-%>
+<% content_for :head do -%>
+  <%= render partial:'spree/admin/orders/assets_inline.html.haml' %>
+<% end -%>
+
+<div class='order-show container mt-2 d-flex flex-column align-items-center flex-lg-wrap flex-lg-row justify-content-center' id="order_summary" data-hook>
+  <% if @order.messages.size > 0 -%>
+    <div class="row w-100 mb-1">
+      <div class="col-0 col-md-2"></div>
+      <%= render partial:'messages_list', locals:{ order: @order, image_link_content: (spree_current_user&.admin? ? :product : :thumbnail) } %>
+    </div>
+  <% end # if messages -%>
+  <div class="row w-100">
+    <div class="col col-12 col-sm-12 col-md-7">
+      <% unless @order.cart? %>
+        <% if @order.paid? -%>
+          <div class="row">
+            <div class="text-right col col-sm-4 col-md-3 p-1">
+              <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52"> <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/> <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/></svg>
+            </div>
+            <div class="col pt-2">
+              <h4><%= t('order.order_complete') %></h4>
+              <h4><%= t('thank_you') %></h4>
+            </div>
+          </div>
+          <% if @order.ship_address
+              # @order.ship_address.geocode
+          -%>
+            <div class="row mt-5 pl-5 pr-5">
+              <%= render partial:'address_and_pay_status', locals:{ order: @order, address: @order.ship_address } %>
+            </div>
+          <% end # ship_address -%>
+        <% else # not paid ====================== -%>
+          <% if @order.seller.test_or_fake_user? # ------------------- -%>
+              <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52" width="40" height="40">
+                <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
+                <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+              </svg>
+              <h5 class="mt-2 mb-0 text-center ml-2 text-bold">
+                <%= t('order.thank_you_for_your_order') %>, <%= @order.ship_address.first_name.capitalize %>!
+              </h5>
+              </br>
+            <p class='h5 text-plain'><%= t('order.we_will_let_you_know_seller') %></p>
+          <% else # ---------------------- -%>
+            <% if show_pay_seller -%>
+              <div class="row mb-1">
+                <div class="col-12 d-flex align-items-center justify-content-center">
+                  <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52" width="40" height="40">
+                    <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
+                    <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                  </svg>
+                  <h5 class="mt-2 mb-2 text-center ml-3">
+                    <%= t('order.thank_you_for_your_order') %>, <%= @order.ship_address.first_name.capitalize.strip %>!
+                  </h5>
+                </div>
+                <% if false # header takes up space -%>
+                  <div class="col-5 text-right text-uppercase">
+                    <% if still_goto_help -%>
+                    <%= link_to(t('help'), order_help_path(order_id: @order.number), class: '') %>
+                    <% end -%>
+                  </div>
+                <% end -%>
+              </div>
+
+              <% if @order.seller&.store&.whatsapp.present? -%>
+                <div class="confirm-card text-center mt-4 mb-4">
+                  <div class="justify-left mt-2 mb-3 text-bold">
+                    <span>
+                      <%= Spree.t('contact_seller') %>
+                    </span>
+                  </div>
+                  <%= link_to draft_whatsapp_url_if_needed(@order), target: "_blank", data: { order_id: @order.number }, onclick: "updateChannel(this.dataset.orderId, 'whatsapp')" do %>
+                    <%= image_tag "whatsapp/WhatsAppButtonGreenLarge.png", alt: "Chat with us on WhatsApp", class: "whatsapp-button" %>
+                  <% end %>
+                  <div class="d-flex justify-content-end pr-4 pt-1 mb-2">
+                    <%= link_to t('email_seller_instead').titleize, draft_mailto_url_if_needed(nil, @order), data: { order_id: @order.number }, onclick: "updateChannel(this.dataset.orderId, 'email')" %>
+                  </div>
+                </div>
+              <% else -%>
+
+                <div class='mb-3 mt-3 text-plain'>
+                <strong><%= store_payment_method&.account_id_in_parameters || t('user.seller') %></strong>
+                  <br/>
+                <%= t('user.name') %>: <%= @order.seller.username || @order.seller.login %>
+                <br/>
+                </div>
+
+                <div class="text-center mt-4 mb-4">
+                    <%= link_to t('user.contact_seller').titleize, draft_mailto_url_if_needed(nil, @order), data: { order_id: @order.number }, onclick: "updateChannel(this.dataset.orderId, 'email')" %>
+                </div>
+                <% if pm_instruction.present? # on email only -%>
+                  <div class="mt-1 mb-3" style="">
+                    <div class="h6 w-100 text-plain">
+                      <%= t('order.payment_instructions_header') %>:
+                      <i><%= pm_instruction %></i>
+                    </div>
+                  </div>
+                <% end -%>
+              <% end # payment_to_seller -%>
+            <% end -%>
+          <% end # normal seller -%>
+          <br/>
+
+          <% if show_shipping -%>
+          <dl class="w-100 d-lg-flex mt-2 p-3">
+            <div>
+              <dt class="text-uppercase text-center text-lg-left"><%= Spree.t(:shipping) %></dt>
+              <% @order.shipments.valid.each do |shipment| %>
+                <dd class="text-center text-lg-left">
+                  <%= shipment.shipping_method.name %>
+                  <%= link_to_tracking(shipment) if shipment.shipped? %>
+                </dd>
+              <% end %>
+            </div>
+          </dl>
+          <% end # show_shipping -%>
+        <% end # not paid -%>
+      <% end # not cart %>
+    </div>
+
+    <div class="col col-12 col-sm-12 col-md-5">
+      <div id="checkout-summary" class="w-100 mt-0" data-hook="checkout_summary_box">
+        <div class="confirm-card">
+          <div class="p-0">
+            <%= render partial: 'spree/checkout/summary_compact', locals: { order: @order } %>
+            <div class="mt-2 pl-2 pr-2">
+              <%= render collection: @order.payments.valid, partial: 'spree/shared/payment', locals:{ show_payment_instruction: false } %>
+              <% if (Time.now - @order.completed_at) > 5.years -%>
+                <p class='text-secondary text-center'>
+                  <%= t('order.if_seller_unresponsive') %>
+                </p>
+                <a name="help_button"/>
+                <% if still_goto_help # buyer -%>
+                <div class="mt-1 mb-3 w-100 text-center">
+                  <%= link_to(t('order.help_with_this_order'), order_help_path(order_id: @order.number), class: 'btn btn-primary text-uppercase') %>
+                </div>
+                <% end -%>
+              <% end # follow up check order again -%>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center mt-3">
+        <% if @order.line_items.first && @order.line_items.first.variant.option_values.present? # how da heck some orders could be completed w/o line item
+          option_values_string = @order.line_items.first.variant.option_values_for_display.join('%0A')
+        end -%>
+        <div class="small-d-none"><br/></div>
+        <% if @order.channel != "spree" %>
+          <% if @order.buyer_requested_help? -%>
+            <div class="text-center text-uppercase mt-3 mb-2">
+              <a href="<%= order_help_path(order_id: @order.number) -%>"><%= t('order.need_help_with_this_order') %></a>
+            </div>
+          <% else -%>
+            <% if still_goto_help -%>
+              <div class="text-center text-uppercase mb-2">
+                <% if @order.buyer_claimed_already_paid? -%>
+                  <a href="<%= order_help_path(order_id: @order.number) %>"><%= t('order.order_help') %></a>
+                <% else -%>
+                  <a href="<%= order_help_path(order_id: @order, type:'order_help_with_payment') %>"><%= t('order.help_with_payment') %></a>
+                <% end -%>
+              </div>
+            <% end -%>
+          <% end -%>
+          <% unless @order.requested_tracking? || @order.claimed_broken_tracking? -%>
+            <div class="text-center text-uppercase mb-2">
+              <a href="<%= order_help_path(id: @order, type:'order_need_tracking_number') -%>"><%= t('order.tracking_info') %></a>
+            </div>
+          <% end # need_tracking_number -%>
+        <% end #channel check -%>
+        <br/>
+      </div>
+    </div>
+  </div>
+  <% if false # old email help -%>
+  <div valign="middle" style="text-align:right; padding: 3.0em 2.5em 5em 2.5em;">
+    <p><a href="mailto:orderhelp@ioffer.com?subject=Order Help (Order - <%= @order.store.id %>-<%= @order.number %>)" class="btn btn-primary mt-2"><%= t('order.cant_pay_btn_text') %></a></p>
+  </div>
+  <% end -%>
+
+  <div id="share-button-container" class="share-button-container d-none">
+    <button id="share-button" class="share-button">
+      <i class="fas fa-share-alt"></i> Share what you got!
+    </button>
+  </div>
+
+</div>

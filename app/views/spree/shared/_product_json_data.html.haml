@@ -1,0 +1,69 @@
+:ruby
+  # Required locals:
+  #   product [Spree::Product]
+  # Option locals:
+  #   json [Hash] the data from as_indexed_json.  Pass over if already prepared
+  #   highlight_matched_words [String]
+  json = product.as_indexed_json unless defined?(json) && !json.nil?
+  extra_css_style = product.indexable? ? 'background-color: #d9d9d9;' : 'opacity: 50%;'
+  highlight_matched_words = '' unless defined?(highlight_matched_words) && highlight_matched_words
+%div(class='p-1' style="#{extra_css_style}")
+  - unless product.indexable?
+    %div(style="background-color: #cccccc; padding: 0.3em;") 
+      %strong Should Not Be in Search Index
+      &nbsp;&nbsp;Admin Reviewed at: #{product.last_review_at.try(:to_s, :short)}
+  %strong ID:
+  = product.id
+  %br/
+  %strong Retail Site:
+  = product.retail_site_id ? product.retail_site&.name : ''
+  %br/
+  %strong View Count:
+  = product.view_count
+  %br/
+  %span
+    %strong TRX Count:
+    = json[:transaction_count]
+  %br/
+  %span
+    %strong Recent TRX Count:
+    = json[:recent_transaction_count]
+  %span.text-right(style="position: absolute; right: 0.6em;" title="View Count / Recent TRX")
+    %strong V2T:
+    = '%-.1f' % [ product.view_count.to_f / [json[:recent_transaction_count].to_i, 1].max ]
+  %br/
+  - if json[:recent_transaction_count].to_i > 0
+    - last_o = product.last_completed_order
+    - this_item_of_last_o = last_o && (line_item = last_o.line_item_of_product(product.id))
+    - if this_item_of_last_o
+      %strong Last TRX: 
+      = link_to("#{last_o.number} - #{((Time.now - last_o.completed_at) / 1.day).round} days ago - $#{line_item.price.to_f}", admin_order_path(last_o), title:"Completed at #{last_o.completed_at.to_s}")
+    = ' / '
+    = link_to('All Sales', admin_sales_path(with_product_id: product.id))
+    - if this_item_of_last_o && last_o.seller
+      %br/
+      = admin_user_link_with_status(last_o.seller).html_safe
+    %br/
+  %strong brand
+  = highlight_keywords json[:brand], highlight_matched_words, { prefix:"<span class='text-highlight'>", postfix:'</span>'}
+  %br/
+  %strong taxons
+  = highlight_keywords json[:taxons], highlight_matched_words, { prefix:"<span class='text-highlight'>", postfix:'</span>'}
+  %br/
+  %strong taxon_ids
+  = json[:taxon_ids]
+  %br/
+  %strong option_value_ids 
+  = json[:option_value_ids] ? json[:option_value_ids].collect(&:to_a) : ''
+  %br/
+  %strong option_values
+  = json[:option_values]
+  %br/
+  %strong predicate_text:
+  = highlight_keywords json[:predicate_text], highlight_matched_words, { prefix:"<span class='text-highlight'>", postfix:'</span>'}
+  %br/
+  %strong created:
+  %span(title="#{ product.created_at.to_s(:db) }")= time_ago_in_words(product.created_at)
+  %br/
+  %strong best_price
+  = json[:best_price]

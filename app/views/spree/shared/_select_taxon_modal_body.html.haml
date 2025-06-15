@@ -1,0 +1,41 @@
+:ruby
+  # Optional locals
+  #   category_link_proc [Proc] the process to product link w/ base URL of the link when selected taxon is passed to proc
+  #   current_taxon [Spree::Taxon] already selected taxon that would highlight matching taxon
+  #   recent_category_taxon_ids [Array of Integer, the IDs of Spree::Taxon]
+  # Example link
+  current_taxon = nil unless defined?(current_taxon)
+  recent_category_taxon_ids = nil unless defined?(recent_category_taxon_ids)
+  category_link_proc = nil unless defined?(category_link_proc)
+  category_link_proc ||= Proc.new{|category_taxon| 
+    link_to(category_taxon.name, '#', class: "btn-category #{ ' btn-category-selected' if current_taxon&.id == category_taxon.id}", id:"btn_category_#{category_taxon.id}", title:"#{category_taxon.breadcrumb}", 'data-toggle'=>'tooltip')
+  }
+- if current_taxon
+  %p
+    %strong Current Category:
+    #{current_taxon.breadcrumb}
+%div
+  = form_tag('#', id:"search_categories_form") do
+    .input-group
+      = text_field_tag('name', '', class: 'form-control', placeholder: 'Search by name', id: 'name_for_search_categories')
+      .input-group-append
+        %button(type='button' class='dropdown-toggle border-0 fa fa-angle-down' data-toggle='collapse' data-target='#recently_selected_categories' aria-expanded="false" aria-controls="" title='Recent Categories') &nbsp;
+- if recent_category_taxon_ids.present?
+  .collapse.container.mt-2(id="recently_selected_categories")
+    .card
+      %h6.card-header Recently picked categories
+      .card-text
+        %ol(id="recent_selected_categories_list")
+          - recent_cat_map = ::Spree::Taxon.where(id: recent_category_taxon_ids).to_a.group_by(&:id)
+          - recent_category_taxon_ids.each do|cat_id|
+            - cat = recent_cat_map[cat_id].try(:first)
+            - next if cat.nil?
+            %li
+              = category_link_proc.call(cat)
+    %br/
+- if resource
+  #modal_category_taxon_selectors
+    - Spree::CategoryTaxon.root.children.includes(:children).each do|top_category_taxon|
+      = category_taxon_selector(top_category_taxon, category_link_proc)
+    %br/
+  %br/

@@ -1,0 +1,24 @@
+:ruby
+  cur_order_stats = order_stats
+  is_active = !request.path.match(/\/admin\/(stats|sales|messages|payment|delivery|paid_need_tracking|complete|comments|reports)\b/i).nil?
+%ul(id="sidebar-order" class="bg-white collapse in nav nav-pills nav-stacked" data-hook="admin_order_sub_tabs")
+  - if spree_current_user&.admin?
+    = tab :trx_stats, url: ::Spree::Core::Engine.routes.url_helpers.admin_stats_path, label: 'Transaction Stats', match_path:/\A\/admin\/stats\b/, class:'icon icon-stats' do
+      = ' '
+  - %w(messages payment paid_need_tracking complete).each do|state_name|
+    - link_count_s = cur_order_stats[state_name].to_i > 0 ? " (#{cur_order_stats[state_name]})" : ''
+    -# path_method = (browser.device.mobile? ? :admin_mobile_sales_path : :admin_sales_in_state_path)
+    -#= link_to Spree.t('admin.order_state_name.'+ state_name) + link_count_s, ''
+    = tab "sales_#{state_name}".to_sym, url: ::Spree::Core::Engine.routes.url_helpers.admin_sales_in_state_path(state: state_name), label: Spree.t('admin.order_state_name.'+ state_name) + link_count_s, css_class: "sales_state_#{state_name}", match_path:/\A\/admin\/sales\/#{state_name}\Z/
+  - if spree_current_user&.admin?
+    = tab :mobile_sales, url: ::Spree::Core::Engine.routes.url_helpers.admin_mobile_sales_path, label: 'Mobile Sales', match_path:/\A\/admin\/msales\b/, class:'icon icon-stats' do
+      = ''
+    = tab :top_selling_products, url: ::Spree::Core::Engine.routes.url_helpers.admin_products_top_selling_path, label: 'Top Selling Items', match_path:/\A\/admin\/products\/top_selling\b/, class:'icon icon-stats' do
+      = ''
+- if is_active
+  :javascript
+    window.addEventListener('load', function(){
+      if ( !$("#wrapper").hasClass('sidebar-minimized') ) {
+        $('#sidebar-order').collapse('show'); $('#sidebar-order').siblings().find('.icon-chevron-left').removeClass('icon-chevron-left').addClass('icon-chevron-down')
+      }
+    })

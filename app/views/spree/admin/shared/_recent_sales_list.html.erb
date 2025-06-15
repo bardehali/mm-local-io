@@ -1,0 +1,38 @@
+<% if line_items.present? %>
+  <% line_items[0..2].each do |line_item| %>
+    <% order = line_item.order %>
+    <% user = order&.user %>
+    <% ship_address = order&.ship_address %>
+    <% country_code = user&.country_code&.downcase %>
+    <% country_name = ship_address&.country %>
+
+    <% if order.present? && user.present? && ship_address.present? && country_code.present? %>
+      <div class="order-row" style="display: flex; align-items: center; margin-bottom: 1em;">
+        <div
+          class="flag-circle"
+          style="
+            width: 35px; height: 35px; border-radius: 50%; overflow: hidden; margin-right: 0.5em;
+            background-image: url('/flags/4x3/<%= country_code %>.svg');
+            background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"
+          title="<%= country_name.presence || 'Unknown Country' %>"
+        >
+        </div>
+
+        <div style="text-align: left;">
+          <span style="font-weight: bold; font-size: 1.1em;">
+            <% first_name = ship_address.first_name %>
+            <% location_country = user&.country_code&.upcase || 'Unknown Location' %>
+            <%= "#{first_name&.capitalize || 'Buyer'} from #{location_country}" %>
+          </span>
+          <br>
+          <% city = ship_address.city %>
+          <span style="color: gray; font-size: 0.9em;">
+            In <%= city.presence.titleize || 'Unknown City' %>
+          </span>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+<% else %>
+  <p>No recent transactions available.</p>
+<% end %>

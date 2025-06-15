@@ -1,0 +1,82 @@
+<div style="max-width: 600px; margin: 0 auto;" class="email-container">
+	<!-- BEGIN BODY -->
+  <table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: auto;">
+  	<tr>
+      <td valign="top" class="bg_white" style="padding: .5em 2.5em 1em 2.5em;">
+      	<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+      		<tr>
+      			<td class="logoimage">
+	            <a href="#"><img src="<%= URI.join(@host, asset_path('logo/iOffer_logo_color.png') ) -%>" alt="" style="width: 100%; max-width: 400px; height: auto; display: block;"></a>
+	          </td>
+      		</tr>
+      	</table>
+      </td>
+    </tr><!-- end tr -->
+    <tr>
+      <td valign="top" class="bg_white" style="padding: 0;">
+      	<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+      		<tr>
+      		</tr>
+      	</table>
+      </td>
+    </tr><!-- end tr -->
+    <tr>
+      <td valign="middle" class="hero bg_white bg-hero-sizing" style="background-image: url(<%= URI.join(@host, asset_path('email/seller_onboarding/ioffer_globe_boxes_device.jpg')) -%>);">
+      </td>
+    </tr><!-- end tr -->
+    <tr>
+    	<td class="bg_white email-section">
+    		<div class="heading-section" style="text-align: center; padding: 0 30px;">
+        	<h2><%= @user.username -%>, you are missing sales!</h2>
+        	<h2>Reach Millions of Buyers Around the World</h2>
+          <h3>List your products and start selling now!</h2>
+      	</div>
+      <br/>
+      <a href="https://www.ioffer.com/seller_onboarding" class="btn btn-primary btn-center">Start Selling</a>
+      <br/>
+      <br/>
+      <div class="heading-section" style="text-align: center;">
+        <h2>Buyers are loving the NEW iOffer</h2>
+      </div>
+      <table role="presentation" border="0" cellpadding="10" cellspacing="0" width="100%">
+        <tr>
+          <td valign="top" style="width: 100%;">
+            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+              <tr>
+                <td valign="top" width="100%">
+                  <div class="topic">
+                    <div class="img">
+                      <img src="<%= URI.join(@host, asset_path('email/seller_onboarding/ioffer_avatar_3.jpg') ) -%>" alt="" style="width: 100%; max-width: 100px; height: auto; margin: auto; margin-bottom: 20px; border-radius: 50px; display: block;">
+                    </div>
+                    <div class="text">
+                      <p>"I Love It! there are so many good sellers and I have had no problems at all."</p>
+                      <h3><img src="<%= URI.join(@host, asset_path('email/seller_onboarding/um.svg') ) -%>"/>Louisd23 (34 Purchases)</h3>
+                    </div>
+                  </div>
+                  <div class="topic">
+                    <div class="img">
+                      <img src="<%= URI.join(@host, asset_path('email/seller_onboarding/ioffer_avatar_2.jpg') ) -%>" alt="" style="width: 100%; max-width: 100px; height: auto; margin: auto; margin-bottom: 20px; border-radius: 50px; display: block;">
+                    </div>
+                    <div class="text">
+                      <p>"I love the SAVINGS and Quality of my purchases here at iOffer! GREAT site. Thank you!"</p>
+                      <h3><img src="<%= URI.join(@host, asset_path('email/seller_onboarding/gb.svg') ) -%>"/>fashionista4eva (27 Purchases)</h3>
+                    </div>
+                  </div>
+                  <div class="topic">
+                    <div class="img">
+                      <img src="<%= URI.join(@host, asset_path('email/seller_onboarding/ioffer_avatar_1.jpg') ) -%>" alt="" style="width: 100%; max-width: 100px; height: auto; margin: auto; margin-bottom: 20px; border-radius: 50px; display: block;">
+                    </div>
+                    <div class="text">
+                      <p>"I love shopping on iOffer because its so addictive and so nice !!"</p>
+                      <h3><img src="<%= URI.join(@host, asset_path('email/seller_onboarding/es.svg') ) -%>"/>xxbrybryyxx (47 Purchases)</h3>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr><!-- end: tr -->
+      </table>
+      <br/>
+      <a href="https://www.ioffer.com/seller_onboarding" class="btn btn-primary btn-center">Start Selling</a>
+</div>

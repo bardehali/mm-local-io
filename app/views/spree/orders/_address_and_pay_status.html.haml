@@ -1,0 +1,63 @@
+:ruby
+  # Required locals
+  #   address [Spree::Address]
+  #   order [Spree::Order]
+- content_for :head do 
+  - if order.ship_address
+    %script(async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBT-GS1k_2Q1SBQiRrirMFL9Ru8E0366WQ&callback=initMap")
+
+    :javascript
+      let geocoder;
+      let addressMap;
+      let shipAddress = "#{order.ship_address.full_address}";
+
+      function initMap() {
+        geocoder = new google.maps.Geocoder();
+        addressMap = new google.maps.Map(document.getElementById("address_map"), {
+            center: { lat: -34.397, lng: 150.644 },
+            zoom: 8, mapTypeControll: false, navigationControl: false
+          });
+
+        geocoder.geocode( { 'address': shipAddress}, function(results, status) {
+        if (status == google.maps.GeocoderStatus.OK) {
+          if (status != google.maps.GeocoderStatus.ZERO_RESULTS) {
+            addressMap.setCenter(results[0].geometry.location);
+
+            var infowindow = new google.maps.InfoWindow(
+                { content: '<b>'+ shipAddress +'</b>',
+                  size: new google.maps.Size(150,50)
+                });
+    
+            var marker = new google.maps.Marker({
+                position: results[0].geometry.location,
+                map: addressMap, 
+                title: shipAddress
+            }); 
+            google.maps.event.addListener(marker, 'click', function() {
+                infowindow.open(addressMap,marker);
+            });
+
+          } else {
+            conole.log("No results found");
+          }
+        } else {
+          console.log("Geocode was not successful for the following reason: " + status);
+        }
+      });
+      }
+    
+.card.w-100#address_card
+  .card-body#address_map
+.card.w-100
+  .card-body    
+    .row
+      .col
+        = render('spree/shared/address', address: address)
+      - if order.paid? && (payment = order.payments.first)
+        .col.text-right.p-1
+          .card(id="paid_via_card")
+            .card-header.text-center
+              %h4 Paid via #{payment.payment_method.description}
+.card.w-100
+  .card-body.p-5.text-center
+    = link_to(t('product.find_more_great_deals'), products_path, class:'btn btn-primary btn-lg')

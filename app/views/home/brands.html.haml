@@ -1,0 +1,81 @@
+:ruby
+  brand_names = ['gucci', 'louis vuitton', 'nike', 'the north face', 'coach', 'adidas', 'off white', 'prada', 'yves saint laurent', 'tiffany', 'chanel', 'michael kors', 'burberry', 'jordan', 'cartier', 'hermes', 'bulgari', 'yeezy', 'bape', 'rayban']
+
+- content_for :footer do
+  :javascript
+    function categoryChecking() {
+      var wrapper = $(this).parent();
+      if ( !wrapper.hasClass('category-card-wrapper')) { wrapper = wrapper.parent(); }
+      if ( this.checked ) {
+        wrapper.addClass('category-selected');
+        wrapper.find("input[type='checkbox']").prop('checked', true);
+      }
+      else {
+        wrapper.removeClass('category-selected');
+        wrapper.find("input[type='checkbox']").prop('checked', false);
+      }
+    }
+
+    function brandChecking() {
+      var wrapper = $(this).parent();
+      if ( !wrapper.hasClass('brand-card-wrapper')) { wrapper = wrapper.parent(); }
+      if ( this.checked ) {
+        wrapper.addClass('brand-selected');
+      }
+      else {
+        wrapper.removeClass('brand-selected');
+      }
+    }
+
+    $(function() {
+      $(".category-card-wrapper input[type=checkbox]").change(categoryChecking);
+      $(".brand-card-wrapper input[type=checkbox]").change(brandChecking);
+    });
+
+= image_tag('i-offer-logo.png', alt:'iOffer')
+
+= form_tag(ioffer_select_brands_path, method: 'post', remote: true, authenticity_token: true) do
+  .container
+    .row
+      .col-8.my-auto.title-container
+        .center-title
+          .py-5.py-md-0
+            %h1.mb-3= t('store.what_categories_do_you_supply')
+            %h5.mb-5= t('store.select_all_that_apply')
+
+  .container
+    .row
+      = category_taxon_card("Women's Clothing", '/categories/dress.svg')
+      = category_taxon_card("Men's Clothing", '/categories/shirt.svg')
+      = category_taxon_card("Sneakers", '/categories/sneakers.svg')
+      = category_taxon_card("Handbags", '/categories/handbag.svg', '', name: 'Bags & Purses')
+      = category_taxon_card("Jewelry", '/categories/necklace.svg', '', name: "Jewelry & Watches")
+    .row
+      = category_taxon_card("Watches", '/categories/watch.svg', '', name: 'Jewelry & Watches')
+      = category_taxon_card("Sunglasses", '/categories/sunglasses-2.svg', '', |
+        permalink:['categories/womens-clothing/accessories/eyewear-accessories', |
+        'categories/mens-clothing/accessories/sunglasses'])
+      = category_taxon_card("Makeup", '/categories/make-up.svg')
+      = category_taxon_card("Women's Shoes", '/categories/shoe.svg')
+      = category_taxon_card("Accessories", '/categories/hat.svg', '', |
+        permalink:['categories/womens-clothing/accessories', |
+        'categories/mens-clothing/accessories'])
+  %br/
+  %br/
+  - if spree_current_user&.full_seller?
+    .container
+      .row
+        %div(class="col-8 my-auto title-container")
+          .center-title
+            %div(class="py-5 py-md-0")
+              %h1.mb-3= t('store.what_brands_do_you_have')
+              %h5.mb-5= t('store.select_all_that_apply')
+
+    .container
+      - make_brand_option_value_cards(:name, brand_names)
+      = submit_tag(t('store.submit_brands'), class:'btn btn-primary btn-center')
+  - else
+    .container
+      = submit_tag(t('store.submit_categories'), class:'btn btn-primary btn-center')
+%br/
+%br/

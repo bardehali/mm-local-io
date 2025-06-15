@@ -1,0 +1,38 @@
+:ruby
+  # user [Spree::User]
+%div(data-hook="admin_selection_info" class="card")
+  .card-header
+    %h1(class="card-title mb-0 h5")
+      = 'Seller Selections'
+  .card-body
+    %table(class="table table-borderless")
+      %tbody
+        %tr
+          %th.text-right Brands:
+          %td
+            = list_of_values( user.selling_option_values.with_names(%w(brand)).collect(&:presentation) )
+        %tr
+          %th.text-right Categories:
+          %td
+            = list_of_values( user.selling_taxons.order('position asc').collect(&:breadcrumb) )
+        %tr
+          %th.text-right Payment Methods:
+          %td
+            - user.store_payment_methods.includes(:payment_method).each do|spm|
+              - account_id = spm.account_id_in_parameters
+              - if (account_id.present? || spm.instruction.present?)
+                %span.dropdown
+                  %button(class="btn btn-secondary dropdown-toggle" type="button" id="dropdown_button_#{spm.id}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
+                    = spm.payment_method.display_name
+                  .dropdown-menu(aria-labelledby="dropdown_button_#{spm.id}")
+                    - if account_id.present?
+                      %p.dropdown-item
+                        %strong Account ID: 
+                        #{account_id}
+                    - if spm.instruction.present?
+                      %p.dropdown-item
+                        %strong Instruction
+                        %br/
+                        = spm.instruction
+              - else
+                %button(class="btn btn-light" type="button" id="store_payment_method_#{spm.id}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")= spm.payment_method.display_name

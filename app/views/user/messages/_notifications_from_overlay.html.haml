@@ -1,0 +1,37 @@
+:ruby
+  # Much simpler modal without modal-header and modal-body to skip some CSS settings.
+  # Optional locals:
+  #   user_messages [Collection of User::Message] if not set, would be @user_notifications
+  #   sender [Spree::User]
+  sender = Spree::User.fetch_admin unless defined?(sender) && sender
+  user_messages = @user_notifications unless defined?(user_messages) && user_messages.present?
+
+:css
+  .user-messages-container { background-color: #FFFFFF; }
+
+.modal(tabindex="-1" role="dialog" id="user_notifications_modal" aria-labelledby="#user_notifications_modal")
+  .modal-dialog(role="document" style="max-width: none !important; width: 70%; margin-left: 15%;")
+    .modal-content.container.user-messages-container
+      .row
+        .col-4
+          - if sender && sender.admin?
+            = image_tag(asset_path('logo/iOffer_logo_color_plain_h50.png'))
+        .col-4.text-center.pt-3
+          %h6.font-weight-bold
+            - if spree_current_user&.login
+              = t('message.message_to')
+              = spree_current_user.login
+            - else
+              - if sender.admin?
+                = t('message.new_message_from_ioffer')
+              - else
+                #{ t('message.message_from') } #{sender.try_display_name}
+        .col-4.text-right
+          %button(type="button" class="close" data-dismiss="modal" aria-label="Close")
+            %span(aria-hidden="true")
+              &times;
+      .row
+        .col-12
+          - if spree_current_user.present? && spree_current_user.store.present? && spree_current_user.store.meta_keywords.to_i > 0
+            = render partial:'user/messages/credit_message'
+          = render partial:'user/messages/list', locals:{ user_messages: @user_notifications }

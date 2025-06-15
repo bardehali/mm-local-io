@@ -1,0 +1,24 @@
+:ruby
+  ##
+  # Similar style settings like _gallery_modal to show content in full size, no header or footer,
+  # and body content set by caller instead of images.
+  # Required locals: 
+  #   either content or partial [String] 
+  #     content: the HTML to print out
+  #     partial: path of the partial to render
+  target = 'basic_modal' unless target.present?
+  content = '' unless defined?(content)
+  partial = nil unless defined?(partial)
+.modal.fade(tabindex="-1" role="dialog" id="#{target}" aria-labelledby="#{target}")
+  %div(class="modal-dialog--zoom modal-dialog mw-100 vh-100 mt-0 mb-0" role="document")
+    .modal-content.h-100
+      .modal-body.h-100
+        %button(type="button" class="close" data-dismiss="modal" aria-label="Close")
+          %span(aria-hidden="true")
+            = icon(name: 'close', classes: 'd-block d-lg-none', width: 16, height: 16)
+            = icon(name: 'close', classes: 'd-none d-lg-block', width: 30, height: 30)
+        %div(class="d-flex justify-content-center align-items-center product-details-images h-100")
+          - if content.present? # && content =~ /^\s*</
+            =content.html_safe
+          - if partial && partial.present?
+            = render partial: partial

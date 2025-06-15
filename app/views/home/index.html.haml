@@ -1,0 +1,29 @@
+.bg-img1.size1.flex-w.flex-c-m.p-t-0.p-b-55.p-l-15.p-r-15
+  .logo-c
+    = image_tag('i-offer-logo.png', alt:'iOffer')
+  .div
+    .row.p-t-50
+      .col
+        .wsize1.bor1.bg1.p-t-25.p-b-25.p-l-15.p-r-15.respon1.respon2
+          = image_tag("blocked_homepage/homepage-user-signup.png", :class => "header-icon center-in-div", :alt=>"User")
+          %p.txt-center.m-t-10
+            I want to be notified of iOffer updates.
+          = form_for(@email_subscription || Ioffer::EmailSubscription.new, as:'email_subscription', remote: true, html:{ id:'email_subscription_form', class:'flex-w flex-c-m contact100-form validate-form p-t-10 p-b-40'} ) do|f|
+            .wrap-input100.validate-input.where1{"data-validate" => "Email is required: ex@abc.xyz"}
+              = f.text_field(:email, placeholder:'Your Email', class:'s1-txt2 placeholder0 input100' )
+              %span.focus-input100
+            = f.submit('Get Notified', class:'flex-c-m s1-txt3 size3 how-btn trans-04 where1', id:'email_subscription_submit')
+            - if need_to_captcha_verify?
+              .m-t-10
+                = recaptcha_wrapper(f.object)
+      .col
+        .wsize1.bor1.bg1.p-t-25.p-b-25.p-l-15.p-r-15.respon1.respon2
+          = image_tag("blocked_homepage/homepage-store-signup.png", :class => "header-icon center-in-div", :alt=>"Vendor")
+          %p.txt-center.m-t-10
+            I want to sell my products on iOffer.
+          %h6.center
+            .button.how-btn.trans-04.size3.s1-txt3.m-t-25.center-in-div
+              = link_to "Contact us to apply for a seller account", "mailto:apply@ioffer.com", class: "apply-link" 
+            -#= button_to("I want to sell on iOffer", ioffer_seller_signup_path, :id => "seller_signup_path-btn", :class => "button how-btn trans-04 size3 s1-txt3 m-t-25 center-in-div", :method => :get)
+      .vl
+%h6.language-picker

@@ -1,0 +1,76 @@
+:ruby
+  ##
+  # Required locals
+  #   variant [Spree::Variant] the variant that's selected
+  #   order [Spree::Order]
+  # Optional %locals: 
+  #   show_cart_details [Boolean] default false; whether show Added to Cart msg and product image & title
+  show_cart_details = false unless defined?(show_cart_details)
+
+  product = variant.product
+  image = variant.images.first || product.master.images.first
+  seller_ids = Set.new
+  payment_method_ids = Set.new
+  current_variant_payment_method_id = nil
+
+%div(class="modal variant-added-modal" tabindex="-1" role="dialog" aria-hidden="true")
+  = form_tag spree.populate_orders_path, id: 'add-to-cart-form', class: 'add-to-cart-form' do
+    .modal-dialog.modal-lg(role="document")
+      .modal-content
+        .modal-header.pb-0.px-4.pt-4.border-0
+          %button(type="button" class="close" data-dismiss="modal" aria-label="Close")
+            %span(aria-hidden="true")
+              = icon(name: 'close', classes: 'd-block d-lg-none', width: 16, height: 16) 
+              = icon(name: 'close', classes: 'd-none d-lg-block', width: 30, height: 30)
+        .modal-body.p-4
+          .container-fluid
+            - if show_cart_details
+              = render partial: 'spree/shared/added_to_cart_message'
+            .row.mb-3
+              %h4= t('payment.pay_with')
+            .row
+              %ul.list-unstyled
+                - already_selected_pm = false # same variant would select later instance
+                - payment_method_to_variant_map = payment_method_for_variant(variant, 'seller_based_sort_rank')
+                - payment_method_to_variant_map.keys.sort_by(&:position).each do|payment_method|
+                  - selected_variant = payment_method_to_variant_map[payment_method]
+                  - seller_ids << selected_variant.user_id
+                  - payment_method_ids << payment_method.id
+                  - should_be_selected = !already_selected_pm && variant.id == selected_variant.id || current_variant_payment_method_id.nil?
+                  - if should_be_selected
+                    - current_variant_payment_method_id = payment_method.id
+                    - already_selected_pm = true
+                  %li
+                    %label(for="payment_method_#{payment_method.id}_to_variant" title="#{"#{selected_variant.user} for $#{selected_variant.price}" if Rails.env.development? }")
+                      = radio_button_tag('variant_id', selected_variant.id, should_be_selected, id:"payment_method_#{payment_method.id}_to_variant", data:{ payment_method_id: payment_method.id, price: selected_variant.price })
+                      %strong= payment_method.description
+                    %span.text-secondary 
+                      (#{selected_variant.display_price.to_html})
+                      - if (respond_to?(:debugging?) && debugging? ) || spree_current_user&.admin?
+                        &nbsp;&nbsp; 
+                        = link_to("rank #{selected_variant.seller_based_sort_rank}", | 
+                          edit_admin_user_path(selected_variant.user), |
+                          title: "#{selected_variant.user&.username_or_email}, seller_rank #{selected_variant.user&.seller_rank}, last active #{selected_variant.days_inactive} days ago") if selected_variant.user |
+            - if show_cart_details
+              %div(class="row pt-5 justify-content-center align-items-center product-added-modal-product")
+                - if image
+                  %div(class="col-md-2 col-sm-3 text-center")
+                    = link_to image_tag(main_app.url_for(image.url(:small)), class:'' ), main_app.rails_blob_url(image.attachment)
+                %div(class="col py-1 pl-3 product-added-modal-product-details")
+                  .product-added-modal-product-details-name
+                    = product.name
+                  .product-added-modal-product-details-price
+                    = ( variant.display_price || product.display_price ).to_html
+        .modal-footer.p-4.pb-5.border-0
+          .container-fluid
+            %div(class="row pb-4 justify-content-center")
+              .col-12.col-lg-8
+                - if payment_method_ids.size > 1
+                  = submit_tag(Spree.t('confirm'), name:'step', class:'btn btn-primary w-100 text-uppercase font-weight-bold add-to-cart-button')
+                - else
+                  - checkout_params = (spree_current_user) ? { id: order.id } : { order_token: order.token }
+                  = link_to spree.checkout_path(checkout_params), class: 'btn btn-primary w-100 font-weight-bold text-uppercase product-added-modal-button', method: :get do
+                    = Spree.t('confirm')
+      = hidden_field_tag('payment_method_id', current_variant_payment_method_id)
+      - if current_variant_payment_method_id.nil? # happens when this seller of this variant has no payment methods
+        = hidden_field_tag('variant_id', variant.id)

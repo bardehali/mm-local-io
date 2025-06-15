@@ -1,0 +1,28 @@
+<title><%= title %> - iOffer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-PBSCVV6D');</script>
+<!-- End Google Tag Manager -->
+<%== meta_data_tags %>
+<%= stylesheet_link_tag 'spree/frontend/all', media: 'screen', 'data-turbolinks-track': 'reload' %>
+<%= csrf_meta_tags %>
+<%= render 'spree/shared/paths' %>
+<%= javascript_include_tag 'spree/frontend/all', defer: true, 'data-turbolinks-track': 'reload' %>
+<script type="text/javascript">
+  if (typeof(feather) != 'undefined') {
+    feather.replace();
+  }
+</script>
+<% if @user_notifications.present? || (spree_current_user.present? && spree_current_user.store.present? && spree_current_user.store.meta_keywords.to_i > 0) -%>
+<%= render partial: 'user/messages/notifications_from_overlay', locals:{ user_messages: @user_notifications }  %>
+<script type="text/javascript">
+  window.addEventListener('load', function() {
+    $('#user_notifications_modal').modal('show');
+  });
+</script>
+<% end -%>
+<%= yield :head %>

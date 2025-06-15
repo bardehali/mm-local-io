@@ -1,0 +1,137 @@
+:ruby
+  # Out of entire list @line_items,
+  # Required locals
+  #   line_items [Array of Spree::LineItem]
+  # Optional locals
+  #   carousel_id [String] default 'line_item_carousel_scroller'
+  #   per_page [Integer] default 4
+
+  carousel_id = 'line_item_carousel_scroller' unless defined?(carousel_id) && carousel_id.present?
+  per_page = 4 unless defined?(per_page) && per_page.to_i > 0
+
+- content_for :head do
+  :css
+    .carousel {
+      height: 200px;
+      display: flex;
+    }
+    .carousel > div {
+      display: flex;
+    }
+    .carousel .inline-carousel-item {
+      display: inline-block;
+      width: 320px;
+      height: 180px;
+      vertical-align: middle;
+      border: solid 1px #ccc;
+      box-shadow: 0 0 5px rgba(0,0,0,.2);
+      border-radius: 12pt;
+      position: relative;
+      background: white;
+      padding: 10px;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    .carousel .inline-carousel-item .left-half {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: start;
+    }
+
+    .carousel .inline-carousel-item .image-container {
+      width: 100%;
+      margin-left: 0.1em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .carousel .inline-carousel-item .item-title {
+      font-size: 0.75rem;
+      color: lightgray;
+      white-space: normal;
+      overflow: hidden;
+      bottom: 0.2em;
+      margin-right: 0.1em;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+    }
+
+    .carousel .inline-carousel-item .seller-info {
+      color: gray;
+      font-size: 0.75rem;
+      margin-top: 2em;
+    }
+
+    .carousel .inline-carousel-item .btn-pill {
+      font-size: 0.8rem;
+      border-radius: 10rem;
+      position: absolute;
+      bottom: 0.2em;
+      width: 100%;
+      text-align: center;
+    }
+
+    .carousel .product-thumbnails-carousel-previous, .carousel .product-thumbnails-carousel-next {
+      font-size: 1.2em;
+      position: absolute;
+      top: 50%;
+      margin: auto;
+    }
+
+%div(id="#{carousel_id || 'default_carousel_scroller'}" class="carousel slide justify-content-center" data-ride="carousel" data-interval="false" data-wrap="true" data-page="1")
+  %div(class="p-1 mr-2")
+    %a(class="product-thumbnails-carousel-previous" href="##{carousel_id || 'default_carousel_scroller'}" role="button" data-slide="prev")
+      %span(aria-hidden="true")
+        %i.icon.icon-chevron-left
+      %span(class="sr-only")= Spree.t(:previous)
+
+  %div(class="carousel-inner")
+    - slice_index = 0
+    - line_items.each_slice(per_page) do |slice|
+      %div(class="carousel-item#{' active' if slice_index == 0}" data-slice-index="#{slice_index || 0}")
+        .d-flex.flex-row
+          - slice.each do |line_item|
+            - product = line_item.product
+            - image = default_image_for_product_or_variant(product)
+            - next if image.nil?
+            - url = admin_list_same_item_path(product, rid: line_item.order.find_or_create_guest_token,  return_url: CGI.escape(request.fullpath), utm_source: 'scroller', utm_medium: 'card', utm_campaign: spree_current_user&.id)
+
+            %a(href="#{url}" class="inline-carousel-item m-2 p-1")
+              .d-flex(style="width: 100%; height: 100%;")
+                // Left half for the image and title stacked
+                .left-half.d-flex.flex-column(style="width: 55%; display: flex; flex-direction: column; align-items: start;")
+                  // Image container with a fixed size
+                  .image-container
+                    = image_tag(cdn_image_url(image, :pdp_thumbnail), alt: image.alt || product&.name, style: "max-width: 100%; max-height: 100%; object-fit: contain;")
+
+                // Right half for seller info and button aligned to the right
+                .right-half.d-flex.flex-column.justify-content-between.align-items-end(style="width: 45%; position: relative;")
+                  - order = line_item.order
+                  - user = order.user
+
+                  // Seller information text with 2em from the top
+                  .seller-info(style="color: gray; font-size: 0.75rem; width: 100%; margin-top: 1.5em; text-align: center; display: flex; align-items: center; justify-content: center;")
+                    - if user&.country_code.present?
+                      .flag-circle{ title: line_item.order.ship_address.country, style: "width: 35px; height: 35px; border-radius: 50%; overflow: hidden; margin-right: 0.5em; background-image: url('/flags/4x3/#{user.country_code.downcase}.svg'); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; flex-shrink: 0;" }
+
+                    - if order&.ship_address.present? && user&.country_code.present?
+                      %div{style: "text-align: left;"}
+                        = "#{order.ship_address.first_name.capitalize} <br> wants this".html_safe
+
+
+                  // Pill style button aligned to the bottom right
+                  .d-flex.justify-content-end(style="position: absolute; bottom: 1.2em; width: 100%; right: 0;")
+                    %button.btn.btn-pill.btn-primary(style="font-size: 0.8rem; border-radius: 10rem; text-weight: 500;") Get This Sale
+
+          - slice_index += 1
+
+  %div(class="p-1")
+    %a(class="product-thumbnails-carousel-next" href="##{carousel_id || 'default_carousel_scroller'}" role="button" data-slide="next")
+      %span(aria-hidden="true")
+        %i.icon.icon-chevron-right
+      %span(class="sr-only")= Spree.t(:next)

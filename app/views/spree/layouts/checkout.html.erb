@@ -1,0 +1,61 @@
+<!doctype html>
+<!--[if lt IE 7 ]> <html class="ie ie6" lang="<%= I18n.locale %>"> <![endif]-->
+<!--[if IE 7 ]>    <html class="ie ie7" lang="<%= I18n.locale %>"> <![endif]-->
+<!--[if IE 8 ]>    <html class="ie ie8" lang="<%= I18n.locale %>"> <![endif]-->
+<!--[if IE 9 ]>    <html class="ie ie9" lang="<%= I18n.locale %>"> <![endif]-->
+<!--[if gt IE 9]><!--><html lang="<%= I18n.locale %>"><!--<![endif]-->
+<head data-hook="inside_head">
+  <%= render partial: 'spree/shared/head' %>
+  <%= yield :head_extra -%>
+
+  <!--<style> I don't think this css as actually needed and it returns other css after visiting the cart.
+    a { text-decoration: underline; }
+    a.btn { text-decoration: none; }
+    .checkout-line-item { border-bottom: solid 1px #cccccc; margin: 1em 0.5em; }
+    .checkout-line-item:last-child { border-bottom: none;}
+    .checkout-line-item img { max-width: 160px; }
+    .checkout-line-item .line-item-description { vertical-align: top !important; }
+    .checkout-line-item .item-title { font-size: 1.2em; }
+    .checkout-line-item .item-details-list { list-style-type: none; padding: 0; font-size: 1.1em; color: #cccccc; }
+    .checkout-line-item .item-price { font-size: 1.4em; font-weight: 700; }
+    .checkout-content-save-continue-button { margin: 0.5em 0; padding: 0.5em 2.0em; }
+    @media screen and (max-width: 575px) {
+      .checkout-line-item .item-details-list { font-size: 0.9em; }
+      .checkout-line-item .item-price { font-size: 1.1em; font-weight: 500; }
+    }
+    .payment-method-icon { max-width: 80px; margin-right: 0.5em; }
+    .spree-icon { color: #004f75; }
+    .btn-primary { color: white; background-color: #004f75; border: 0; border-radius: 0.2em; }
+    .text-success { color: #28a745 !important; }
+    .text-danger { color: #dc3545!important; }
+    .text-plain { font-weight: 350 !important; }
+    .text-plain > strong { font-weight: 600; }
+    .drop-shadow { box-shadow: 0 5px 12px rgba(50, 50, 50, 0.12); }
+    #address_map { width: auto; height: 320px; }
+  </style>-->
+</head>
+<body class="<%= body_class %>" id="<%= @body_id || 'default' %>" data-hook="body">
+<% content_for :main_nav_link do -%>
+  <div class="container mt-4">
+    <% if @order && !@order.completed? %>
+    <h3 class="checkout-header-link-text"><%= Spree.t('checkout') %></h3>
+    <% end %>
+  </div>
+<% end # main_nav_link -%>
+    <%= render partial: 'spree/shared/header' %>
+    <div id="overlay" class="overlay"></div>
+
+    <div data-hook>
+      <main id="content" data-hook>
+        <%= flash_messages %>
+        <%= yield %>
+      </main>
+
+      <%= yield :templates %>
+    </div>
+
+    <%= render 'spree/shared/copyright' %>
+    <%= render 'spree/shared/translations' %>
+    <%= yield :footer %>
+  </body>
+</html>

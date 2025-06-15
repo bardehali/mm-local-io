@@ -1,0 +1,30 @@
+:ruby
+  # scraper [some implementation of Scraper::Base]
+  # mechanize_page [Mechanize::Page]
+%h4 Product Links
+%ul
+  - existing_product_links = Set.new
+  - scraper.find_product_links(mechanize_page).each do|link|
+    - next unless link.href.present?
+    - page_url = scraper.class.url_of_page(link.href )
+    - next if existing_product_links.include?(page_url)
+    - existing_product_links << page_url
+    %li
+      %i(class="#{page_type_icon_css_class('detail') }" title="Page type: Detail") 
+      = link_to( page_url, link.href, target:'_blank' )
+%h4 Seller Links
+%ul
+  - existing_seller_links = Set.new
+  - scraper.find_seller_links(mechanize_page).each do|link|
+    - page_url = scraper.class.url_of_page(link.href )
+    - next if existing_seller_links.include?(page_url)
+    - existing_seller_links << page_url
+    %li
+      %i(class="#{page_type_icon_css_class('store') }" title="Page type: Store") 
+      = link_to( page_url, link.href, target:'_blank' )
+%h4 Index Links
+%ul
+  - scraper.find_index_links(mechanize_page).each do|link|
+    %li
+      %i(class="#{page_type_icon_css_class('index') }" title="Page type: Index") 
+      = link_to( scraper.class.url_of_page(link.href ), link.href, target:'_blank' )

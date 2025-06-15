@@ -1,0 +1,110 @@
+<style>
+  .review-body-text {
+    position: relative;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out;
+  }
+
+  .truncated {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    max-height: 4.5em; /* Approx 3 lines */
+  }
+
+  .expanded {
+    -webkit-line-clamp: unset;
+    max-height: none !important; /* Expand fully */
+  }
+</style>
+
+<div class="ioffer-new-review">
+    <div class="d-flex justify-content-between align-items-center">
+      <div class="d-flex align-items-center mb-1">
+        <% if review.avatar.present? %>
+          <img src="<%= review.avatar %>" alt="<%= review.name %>" class="rounded-circle mr-2 item-review-avatar-size" width="40" height="40">
+        <% end %>
+
+        <span class="font-weight-bold item-review-body-text-size">
+          <%= review.name %>
+        </span>
+
+        <span class="ml-1 item-reivew-text-muted item-review-text-size"> In </span>
+
+        <% if review.country_code.present? %>
+          <span><%= inline_svg_tag "flags/4x3/#{review.country_code.downcase}.svg", class: 'item-review-flag-size'%></span>
+        <% end %>
+
+        <% if review.city.present? || review.state.present? || review.country_code.present? %>
+          <span class="ml-1 item-reivew-text-muted item-review-text-size">
+            <% if review.city.present? %> <%= review.city %>, <% end %>
+            <% if review.state.present? %>
+              <%= review.state %>
+            <% else %>
+              <%= review.country_code %>
+            <% end %>
+          </span>
+        <% end %>
+      </div>
+      <div class="review-title text-right font-weight-normal item-review-text-size item-review-p-link">
+        <%= link_to "#{review.purchase_count} Purchases", item_review_path(review.code) + "?utm_source=pur&utm_term=VP-#{review.variant_adoption.code}" %>
+      </div>
+    </div>
+    <div class="reviews-rating title="<%= txt_stars(review.rating) %>">
+      <%= render 'spree/reviews/stars', stars: review.rating %>
+    </div>
+    </br>
+    <div class="review-title mt-2 item-reivew-text-muted font-weight-normal item-review-text-size">
+      Purchased:
+      <% if review.size.present? %>
+        Size <%= review.size %>
+      <% end %>
+      on <%= review.reviewed_at.strftime('%B %d, %Y') %>
+    </div>
+    <div class="review-body-text item-review-body-text-size">
+      <span class="review-body-content"><%= review.body %></span>
+      <a href="javascript:void(0);" class="read-more-link item-review-p-link" style="display: none;" onclick="toggleReviewBody(this)"> Read more</a>
+    </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+      document.querySelectorAll(".review-body-text").forEach(container => {
+          let content = container.querySelector(".review-body-content");
+          let readMoreLink = container.querySelector(".read-more-link");
+
+          if (!content || !readMoreLink) return;
+
+          let computedStyle = window.getComputedStyle(content);
+          let lineHeight = parseFloat(computedStyle.lineHeight);
+          let maxLines = 3;
+          let maxHeight = lineHeight * maxLines; // Calculate max height for 3 lines
+
+          if (content.offsetHeight > maxHeight) {
+              // If content is taller than 3 lines, show "Read more"
+              readMoreLink.style.display = "inline";
+              container.style.maxHeight = maxHeight + "px";
+              container.style.overflow = "hidden";
+              container.classList.add("truncated");
+          } else {
+              readMoreLink.style.display = "none"; // Hide Read More if text fits
+          }
+      });
+  });
+
+  function toggleReviewBody(element) {
+      let container = element.parentElement;
+
+      if (container.classList.contains("expanded")) {
+          // Collapse back to 3 lines
+          container.classList.remove("expanded");
+          container.classList.add("truncated");
+          element.textContent = " Read more";
+      } else {
+          // Expand fully
+          container.classList.add("expanded");
+          container.classList.remove("truncated");
+          element.textContent = " Show less";
+      }
+  }
+</script>

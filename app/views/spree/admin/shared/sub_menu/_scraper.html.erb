@@ -1,0 +1,5 @@
+<ul id="sidebar-scraper" class="bg-white collapse nav nav-pills nav-stacked" data-hook="admin_scraper_sub_tabs">
+  <% if can? :admin, Scraper::Page %>
+    <%= tab :scraper_pages, url: Rails.application.routes.url_helpers.scraper_pages_path, label: t('scraper.pages'), match_path: '/scraper/pages' %>
+  <% end %>
+</ul>

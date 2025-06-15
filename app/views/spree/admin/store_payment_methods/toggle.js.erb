@@ -1,0 +1,5 @@
+<% if @store_payment_method_new -%>
+$("#payment_card_<%= @store_payment_method.payment_method_id -%>").addClass('payment-card-selected');
+<% else -%>
+$("#payment_card_<%= @store_payment_method.payment_method_id -%>").removeClass('payment-card-selected');
+<% end # store_payment_method_new %>

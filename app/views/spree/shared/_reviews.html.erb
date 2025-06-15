@@ -1,0 +1,72 @@
+<div id="reviews" class="">
+  <% if reviews_viewable? -%>
+    <% content_for :head do %>
+      <% review = @product.reviews.find { |review| review.rating == 4 || review.rating == 5 } %>
+      <script type="application/ld+json">
+      {
+        "@context": "https://schema.org/",
+        "@type": "Product",
+        "name": "<%= @product.name %>",
+        "image": [
+          <% @product.images.each_with_index do |image, index| %>
+            "<%= main_app.url_for(image.url(:product)) %>"<%= ',' unless index == @product.images.size - 1 %>
+          <% end %>
+        ],
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "<%= @product.stars %>",
+          "reviewCount": "<%= @product.reviews_count %>"
+        },
+        "description": "<%= @product.description %>",
+        <% if review %>
+        "review": [{
+          "@type": "Review",
+          "reviewRating": {
+            "@type": "Rating",
+            "ratingValue": "<%= review.rating %>"
+          },
+          "author": {
+            "@type": "Person",
+            "name": "<%= review.name %>"
+          }
+        }],
+        <% end %>
+        "offers": {
+          "@type": "Offer",
+          "url": "<%= request.base_url + product_rep_url(@product) %>",
+          "priceCurrency": "USD",
+          "price": "<%= sprintf('%.2f', @product.best_price_record&.price) %>",
+          "itemCondition": "NewCondition",
+          "availability": "InStock"
+        }
+      }
+      </script>
+    <% end %>
+
+    <h3 class="product-section-title font-weight-bold text-uppercase product-details-subtitle"><%= !spree_current_user&.seller? ? Spree.t(:reviews) : Spree.t('review.recent_transactions')%></h3>
+    <% if Spree::Reviews::Config[:include_unapproved_reviews] == false and @product.reviews.approved.count == 0 && !spree_current_user&.seller? %>
+      <p class="reviews-none"><%= Spree.t(:no_reviews_written) %></p>
+    <% else %>
+      <% if !spree_current_user&.seller? %>
+        <div class="mb-2">
+          <%= render 'spree/shared/rating', product: @product, review: 0, shortened: false %>
+        </div>
+      <% end %>
+      <% all_reviews = ((@variant_adoption&.item_reviews || []) + (Spree::Reviews::Config[:track_locale] ? @product.reviews.includes(:user).localized(I18n.locale) : @product.reviews.includes(:user)).default_approval_filter.preview).first(Spree::Reviews::Config[:preview_size]) %>
+        <% all_reviews.each do |review| %>
+          <% if review.is_a?(Spree::ItemReview) %>
+            <%= render 'spree/shared/item_review', review: review %>
+          <% elsif review.is_a?(Spree::Review) %>
+            <% if !spree_current_user&.seller? %>
+              <%= render 'spree/shared/review', review: review %>
+            <% else %>
+              <%= render 'spree/shared/buyer_waiting', review: review %>
+            <% end %>
+          <% end %>
+        <% end %>
+    <% end %>
+    <% if !spree_current_user&.seller? %>
+      <%= link_to Spree.t(:read_all_reviews), product_reviews_path(@product), class: 'mt-2', rel: 'nofollow', style: 'color: black;' %>
+    <% end -%>
+  <% end -%>
+</div>

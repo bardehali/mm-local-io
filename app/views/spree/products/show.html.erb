@@ -1,0 +1,192 @@
+<% @body_id = 'product-details'
+  should_cache = params[:skip_cache].nil? && !debugging?
+  ip_country = Rails.env.development? ? '127.0.0.1' : find_country
+  show_cart_form_variants_to_guest = true
+-%>
+
+<style>
+  .share-button:active, .copy-link-button:active {
+    transform: scale(0.9); /* Press-down effect */
+    transition: transform 0.1s ease-in-out;
+  }
+
+  .share-button:active .custom-icon,
+  .copy-link-button:active .custom-icon {
+  }
+
+</style>
+
+<% content_for :head do -%>
+<script type="text/javascript">
+  function shareFunction(event) {
+    event.stopPropagation();
+    event.preventDefault();
+
+    let productId = event.currentTarget.dataset.productId;
+    let productCode = event.currentTarget.dataset.code; // Fix reference
+    console.log("Share button clicked! Product ID: " + productId);
+
+    if (productCode) {
+      logShareClick(productCode); // Correct function call
+    }
+
+    let shareUrl = event.currentTarget.dataset.url;
+    let category = event.currentTarget.dataset.category || "Deals";
+
+    if (navigator.share) {
+      navigator.share({
+        title: `Check Out These ${category} on iOffer!`,
+        url: shareUrl
+      }).catch(error => console.error("Error sharing:", error));
+    } else {
+      alert("Sharing not supported on this device.");
+    }
+  }
+
+  function logShareClick(productCode) {
+    let trackingUrl = `/shared/${productCode}`;
+
+    // Backup: Create a hidden image request (ensures it logs in nginx without console errors)
+    let img = document.createElement("img");
+    img.src = trackingUrl;
+    img.style.display = "none"; // Prevents it from affecting UI
+    img.onerror = function () {
+      this.remove(); // Clean up the DOM if 404 occurs
+    };
+    document.body.appendChild(img);
+  }
+
+  document.addEventListener('turbolinks:load', function() {
+    document.querySelectorAll('.share-button').forEach(btn => {
+      btn.removeEventListener('click', shareFunction);
+      btn.addEventListener('click', shareFunction);
+    });
+  });
+
+  function getRelatedItems() {
+    $("#related_items").html("<div class='w-100 text-center'><span class='icon icon-repeat loading-animation m-5'></span></div>");
+    $("#related_items").show();
+    $.get('/products/<%= @product.id %>/related.js?container=<%= CGI.escape('#related_products') %>&authenticity_token=<%= spree_current_user.try(:spree_api_key) %>');
+  }
+  window.addEventListener('load', function() {
+    getRelatedItems()
+    $('.hide-many-lines').click(function(){ $(this).css('height', 'auto') });
+  });
+
+</script>
+
+  <% if @product.variant_images.present? %>
+     <meta property="og:image" content="<%= cdn_image_url(@product.variant_images.first, :large) %>" />
+  <% else %>
+      <meta property="og:image" content="https://www.ioffer.com/assets/logo/iOffer_logo_color_plain-a6ffbffb3ae1d5f4e41fcfd4180710fc68e487d0dd2be5c3ec4ae59074e8dff2.png" />
+  <% end %>
+
+<% end # global non-cached-head -%>
+
+<% cache_if should_cache, "product_page/#{@product.id}/#{@product.updated_at.to_i}.show" do -%>
+<div class="container mobile-padding-delete">
+    <%= spree_breadcrumbs(@taxon, '', @product) %>
+</div>
+  <div class="container pt-lg-4 product-details">
+    <div class="row" data-hook="product_show">
+      <div class="col-12 col-md-7 col-lg-7" data-hook="product_left_part">
+        <div class="gallery-container position-relative">
+        <%= render partial: 'gallery' %>
+          <div class="rating-container position-absolute">
+            <%#= render 'spree/shared/rating', product: @product, review: 0, shortened: true %>
+          </div>
+
+          <div class="share-button-container position-absolute" style="top:12px; right: 0px; z-index: 2;">
+            <%
+            uri = URI(request.url.to_s)
+            uri.query = URI.encode_www_form(utm_source: "shared") # Clears all params, keeps only utm_source=shared
+            %>
+              <%= button_tag type: "button",
+                             class: "share-button btn p-0 d-flex align-items-center justify-content-center",
+                             data: { product_name: @product.name.to_s, url: uri.to_s, code: @product.display_variant_adoption_code },
+                             style: "width: 42px; height: 42px; cursor: pointer; display: none;" do %>
+                <%= inline_svg_tag("icon/instacons/heart-comment-hollow-red.svg", width: 36, height: 36, class: "custom-icon", style: "color: black;") %>
+              <% end %>
+          </div>
+
+
+
+        </div>
+        <br/>
+      </div>
+      <div class="col-12 col-md-5" data-hook="product_right_part">
+        <div id="product-description" data-hook="product_right_part_wrap">
+          <h1 class="mt-lg-3 mt-md-0 text-md-left product-details-title">
+            <%= @product.name %>
+          </h1>
+
+          <% if source_country?(spree_current_user&.country) ############################ -%>
+            <%= render partial:'list_same_item_form' %>
+
+          <% elsif spree_current_user || show_cart_form_variants_to_guest || !params[:show_cart_form].nil? #################### -%>
+            <div id="cart-form" data-hook="cart_form">
+              <% cache_if should_cache, "product.#{@product.id}.cart_form#{'.for_others' unless @product.user_id==spree_current_user&.id}", skip_digest: true do -%>
+                <%= render 'cart_form', variant_change_identifier: 'productCarousel' %>
+              <% end -%>
+            </div>
+          <%  else ########################### -%>
+            <%= render 'spree/shared/rating', product: @product, review: 0, shortened: true %>
+            <div id="product-price" class="mb-2 text-center text-md-left add-to-cart-form-price" data-hook="product_price">
+              <span class="price selling" content="<%= display_variant_or_master_price(@product.best_price_record) %>">
+                <%= t('product.from') %>
+                <%= display_variant_or_master_price(@product.best_price_record) %>
+              </span>
+              <span content="<%= current_currency %>"></span>
+            </div>
+            <a href="<%= signup_path(return_to: request.url) %>">
+              <%= button_tag class: 'btn btn-primary w-100 text-uppercase font-weight-bold add-to-cart-button', id: '', type: :submit do %>
+                <%= Spree.t(:add_to_cart) %>
+              <% end %>
+            </a>
+          <%  end -%>
+          <% if ['united states', 'united states of america'].exclude?(ip_country&.downcase) -%>
+            <%= image_tag(asset_path('payment_methods/secured_payments.png'), class:'product-detail-secure-payments mt-2', title: '') %>
+          <% end %>
+          <br/>
+        </div>
+        <% if @product.description.present? && @product.description.length > 0 %>
+          <div data-hook="product_description">
+            <%= render partial: 'description', locals:{ show_short: @product.description.length > 450 } %>
+          </div>
+        <% end -%>
+      </div>
+    </div>
+    <div class="pb-4 mt-3 row" data-hook="product_related">
+      <% cols_to_use = 'col-12 col-lg-7' -%>
+      <div class="<%= cols_to_use %>">
+        <div class="mb-4" data-hook="product_properties">
+          <%= render partial: 'properties' %>
+          <%= render partial: 'promotions' %>
+        </div>
+      </div>
+      <div id="related_products_wrapper" class="mt-4 col-12">
+        <h5 style='display: none;'><%= t('product.related_items') %></h5>
+        <div id="related_products" class="row"></div>
+      </div>
+    </div>
+
+    <div id="no-product-available" class="no-product-available-dropdown">
+      <%= render partial: 'spree/shared/no_product_available' %>
+    </div>
+
+    <%= render partial: 'gallery_modal' %>
+  </div>
+
+  <%= render 'spree/shared/product_added_modal' %>
+  <div id="variant_added_wrapper">
+    <%# = render partial: 'spree/shared/variant_added_modal', locals:{ variant: @product.variants.last } if @product.variants.last -%>
+  </div>
+
+
+<div
+  data-related-products
+  data-related-products-id="<%= @product.slug %>"
+  data-related-products-enabled="<%= @product.respond_to?(:has_related_products?) %>"
+/>
+
+<% end # whole page cache -%>

@@ -1,0 +1,161 @@
+:ruby
+  # Builds a row of columns containing list of line items, w/ 1st having buyer info, payment.
+  # Required locals
+  #   order [Spree::Order]
+  # Optional locals
+  #   show_full_info [Boolean] whether to show other products in order.line_items
+  #   show_actions_in_order_info [Boolean] default true; the links and tracking buttons in order-info-table
+  #   image_link_content [Symbol] to be passed _messages_list
+  #   specific_user_id [Integer] this helps skip need of seller info for each order
+  #   specific_product_id [Integer] this would only show certain product
+  full_info_id = "full_user_info_#{order.id}" unless defined?(full_info_id) && full_info_id
+  show_full_info = false unless defined?(show_full_info)
+  show_actions_in_order_info = true unless defined?(show_actions_in_order_info) && show_actions_in_order_info == false
+  image_link_content = :icon unless defined?(image_link_content)
+  has_warning = nil unless defined?(has_warning)
+
+  is_viewer_admin = is_admin?
+  is_viewer_seller = (spree_current_user&.id == order.seller_user_id)
+  can_view_seller_info = (is_viewer_admin || is_viewer_seller)
+  specific_user_id = nil unless defined?(specific_user_id)
+  specific_product_id = nil unless defined?(specific_product_id)
+  right_side_cols = is_viewer_seller && show_actions_in_order_info ? ['col-6 col-md-3', 'col-6 col-md-3'] :
+    ['col-10 col-md-3', 'col-2 col-md-3']
+
+  paypal_store_pm = order.seller&.store&.paypal_store_payment_method
+  @cached_counts_of_paid_need_tracking ||= {}
+  count_of_paid_need_tracking ||= @cached_counts_of_paid_need_tracking[order.seller&.id]
+  if count_of_paid_need_tracking.nil?
+    count_of_paid_need_tracking = paypal_store_pm&.orders_with_paid_need_tracking_of_same_payment_method_account&.count.to_i
+    @cached_counts_of_paid_need_tracking[order.seller&.id] = count_of_paid_need_tracking
+  end
+
+- order.line_items.includes(:product, variant:[:option_values =>[:option_type] ]).sort{|x,y| y.price <=> x.price }.each_with_index do|line_item, index|
+  - next if specific_product_id && line_item.product_id != specific_product_id
+  - product = line_item.product
+  %div(class="container order-info-table" id="#{index > 0 ? full_info_id : "first_row_of_#{order.id}"}")
+    .row
+      .col-2.col-md-1
+        - if index == 0
+          %strong= '$%.2f' % [order.total]
+          %br/
+          .text-secondary
+            - payment_payment_method = order.payments.first&.payment_method
+            - if is_viewer_admin && (store_pm = order.seller&.store&.store_payment_methods.to_a.find{|spm| spm.payment_method_id == payment_payment_method&.id })
+              = link_to payment_payment_method&.description, admin_all_sellers_path(q:{ payment_method_id_eq: store_pm.payment_method_id, store_store_payment_methods_account_parameters_cont: store_pm.account_id_in_parameters })
+            - else
+              = payment_payment_method&.description
+        - if is_viewer_admin
+          %small(title='Current view count when added to cart') #{line_item.current_view_count || '--'} Views
+      .col-9.col-md-5
+        .row
+          .col-3
+            - if product && (default_image = default_image_for_product_or_variant(product) )
+              = link_to product_path(product), target:'_blank' do
+                = image_tag cdn_image_url(default_image, :pdp_thumbnail), style:'max-width: 100%;'
+          .col-9.p-0
+            - if index == 0
+              %strong
+                - if show_actions_in_order_info
+                  = link_to order.number, admin_order_path(order), title:"Order ID #{order.id} at #{order.completed_at&.to_mid_s}"
+                - else
+                  = order.number
+              %br/
+            - if product
+              - size_option_types = line_item.variant.option_values.collect(&:option_type).find_all(&:size?)
+              - uniq_cont_of_option_types = line_item.variant.option_values.collect(&:option_type_id).uniq.size
+              %strong
+                - if show_actions_in_order_info
+                  = link_to product.name, product_path(product), target:'_blank'
+                - else
+                  = product.name
+              %br/
+              - if is_viewer_admin && product.retail_site
+                #{product.retail_site&.name}
+                %br/
+              - if line_item.variant.present? && variant_options_text(line_item.variant, present_with_option_type: false, exclude_option_types_anyway: true).present?
+                %span.variant-size-pill
+                  = variant_options_text(line_item.variant, present_with_option_type: false, exclude_option_types_anyway: true)
+              %br/
+            %span.text-secondary(title="At #{order.completed_at&.to_mid_s}")= distance_of_time_in_abbr(order.completed_at) + ' ago'
+      - if index == 0
+        %div(class="#{right_side_cols[0] }")
+          - if order.user&.country_code.present?
+            %span.country-icon(title="#{order.user.country}")
+              = inline_svg_tag "flags/4x3/#{order.user.country_code.downcase}.svg", size: '2.6em*1.3em'
+          - else
+            %span.country-name= order.user&.country
+          %span
+            %strong
+              - if is_viewer_admin && show_actions_in_order_info
+                = link_to order.user.email, spree.items_admin_user_path(order.user)
+              - else
+                = order.user.email
+            %br/
+            - if (address = order.ship_address)
+              %span #{address.full_name}
+              - if is_viewer_admin && order.channel == "whatsapp"
+                = image_tag "icon/whatsapp/Digital_Glyph_Green.svg", alt: "WhatsApp", class: "whatsapp-icon ml-1", style: "width: 24px; height: 24px;"
+              - elsif is_viewer_admin && order.channel == "email"
+                = image_tag "icon/backend-envelope.svg", alt: "Emailed", class: "ml-1", style: "width: 24px; height: 20px;"
+              %br/
+              = is_viewer_admin ? '' : address.full_address(',<br/>').html_safe
+            - if is_viewer_admin
+              - if line_item.referer_url.present?
+                = link_to parse_referer_url(line_item.referer_url), line_item.referer_url, title: line_item.referer_url, target:'_blank'
+              %br/
+              %span{ id: "copy-ip", style: "cursor: pointer; position: relative;", onclick: "copyToClipboard(this)" }
+                = line_item.request_ip.presence || order.user.current_sign_in_ip
+                %span{ class: "copy-tooltip", style: "visibility: hidden; background-color: black; color: white; text-align: center; border-radius: 5px; padding: 5px; position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%); font-size: 12px; white-space: nowrap;" }
+                  Copied!
+
+        %div(class="#{right_side_cols[1] } text-right")
+          - if is_viewer_seller
+            - if !show_actions_in_order_info
+            - elsif order.claimed_broken_tracking?
+              %strong(class="text-dark-warning")
+                #{ t('order.tracking_broken') }:
+                %a(href="http://www.google.com/search?q=#{order.latest_tracking_number}" target='_blank' rel="noreferrer")= order.latest_tracking_number
+              = render partial:'spree/admin/shared/modal', locals:{ target:"order_message_thread_add_tracking_#{order.id}", show_footer: false, partial:'spree/admin/orders/add_tracking_number', partial_locals:{ order: order, add_or_correct:'correct' } }
+            - elsif order.requested_tracking?
+              %button(class='btn bg-dark-warning' data-toggle='modal' data-target="#order_message_thread_add_tracking_#{order.id}")= t('order.add_tracking_number')
+              = render partial:'spree/admin/shared/modal', locals:{ target:"order_message_thread_add_tracking_#{order.id}", show_footer: false, partial:'spree/admin/orders/add_tracking_number', partial_locals:{ order: order, add_or_correct:'add' } }
+          - elsif is_viewer_admin
+            - if specific_user_id == order.seller_user_id # Tracking info
+              - if order.latest_tracking_number.present?
+                .text-small
+                  Tracking:
+                %strong= link_to order.latest_tracking_number, "https://www.google.com/search?q=#{order.latest_tracking_number}", target:'_blank', rel:'noreferrer'
+                %br/
+                - if order.claimed_broken_tracking?
+                  %strong.text-small.text-dark-warning Broken Tracking Number
+              - elsif order.requested_tracking?
+                %strong.text-small.text-dark-warning Tracking Needed
+            - elsif order.seller
+              .text-small
+                = render partial:'spree/admin/users/payment_service_complaint_info', locals:{ user: order.seller, show_paypal_info: false, show_complaint_ratio: false }
+                %br/
+                = user_id_link_with_roles_stylized(order.seller).html_safe
+                = country_icon_or_name(order.seller)
+              %div(style="font-size: 2.0em; margin-right: 0.5em;")
+                - if count_of_paid_need_tracking == 0
+                  %span(class='text-secondary' title='Paid Neeed Tracking of Same Paypal Account')= count_of_paid_need_tracking
+                - else
+                  = link_to(count_of_paid_need_tracking, paypal_store_pm ? admin_sales_in_state_path(state: 'paid_need_tracking', store_payment_method_id: paypal_store_pm.id) : '#', title:'Paid Neeed Tracking of Same Paypal Account', style:"color: #{count_of_paid_need_tracking > 5 ? 'red' : '#666666'};")
+
+%div(id="order_messages_#{order.id}" class="container order-messages-table")
+  = render partial:'spree/orders/messages_list', locals:{ order: order, show_user_and_timestamp: true, image_link_content: image_link_content, has_warning: has_warning }
+
+:javascript
+  function copyToClipboard(element) {
+    var text = element.innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      let tooltip = element.querySelector(".copy-tooltip");
+      tooltip.style.visibility = "visible";
+      setTimeout(() => {
+        tooltip.style.visibility = "hidden";
+      }, 1000); // Hide after 1 second
+    }).catch(err => {
+      console.error('Error copying text: ', err);
+    });
+  }

@@ -1,0 +1,136 @@
+<% content_for :head do -%>
+  <style>
+    .danger-shadow { -webkit-box-shadow: 0 0 5px red; box-shadow: 0 0 5px red; }
+  </style>
+<% end -%>
+
+<div class="container">
+  <div class="h4 text-center mt-2 mb-2" style="color:green; font-weight:600;">
+    <%= t('listing_policy.title') %>
+  </div>
+  <hr/>
+  <div class="row mt-4">
+    <div class="col-3">
+        <div class="pricing-style-one m-0" style="">
+            <div class="pricing-icon text-center" style="max-height: 240px">
+                <img src="https://ioffer.com/rails/active_storage/representations/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBeEYyQ3c9PSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--bfc3442a7d451fbd7516fa4fd6c10ad183079098/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaDdCam9MY21WemFYcGxTU0lOTmpVd2VEZzNNRDRHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6InZhcmlhdGlvbiJ9fQ==--f742933d0b386540fca97a367c47c785cfb0efe9/1955-horsebit-leather-tote-bag-73135.1.png" alt="">
+            </div>
+            <div class="pricing-header text-center">
+                <h5 class="sub-title">Black Leather Purse</h5>
+            </div>
+            <div class="text-right">
+                <h3 class="sub-title">$68.00</h3>
+            </div>
+            <div class="text-right">
+                <div class="sub-title">Shipping included</div>
+            </div>
+            <div class="pricing-btn rounded-buttons text-center">
+                <div class="main-btn rounded-three white-text icon-btn green-btn-bg" style="width: 52px !important; line-height: 62px !important;"><img src="<%= asset_path('backend-ok.svg')%>" alt=""></div>
+            </div>
+
+        </div> <!-- pricing style one -->
+    </div>
+    <div class="col-9">
+      <div class="wrap-collabsible"> <input id="collapsible1" class="toggle" type="checkbox" > <label for="collapsible1" class="lbl-toggle number-icon content-1"><%= t('listing_policy.steps.first_step.title') %></label><div class="collapsible-content"><div class="content-inner"><p><%= t('listing_policy.steps.first_step.body')%></p></div></div></div>
+      <div class="wrap-collabsible"> <input id="collapsible2" class="toggle" type="checkbox" > <label for="collapsible2" class="lbl-toggle number-icon content-2"><%= t('listing_policy.steps.second_step.title') %></label><div class="collapsible-content"><div class="content-inner"><p><%= t('listing_policy.steps.second_step.body')%></p></div></div></div>
+      <div class="wrap-collabsible"> <input id="collapsible3" class="toggle" type="checkbox" > <label for="collapsible3" class="lbl-toggle number-icon content-3"><%= t('listing_policy.steps.third_step.title') %></label><div class="collapsible-content"><div class="content-inner"><p><%= t('listing_policy.steps.third_step.body')%></p></div></div></div>
+      <div class="wrap-collabsible"> <input id="collapsible4" class="toggle" type="checkbox" > <label for="collapsible4" class="lbl-toggle number-icon content-4"><%= t('listing_policy.steps.forth_step.title') %></label><div class="collapsible-content"><div class="content-inner"><p><%= t('listing_policy.steps.forth_step.body')%></p></div></div></div>
+    </div>
+  </div>
+  <div class="row">
+  </div>
+  <div class="h4 text-center mt-5" style="color:#bf3a3a; font-weight:600;">
+    <%= t('listing_policy.violations.heading') %>
+  </div>
+  <hr/>
+  <div class="text-center mb-5 mt-2" style="color:#bf3a3a;">
+    <%= t('listing_policy.violations.disclaimer') %>
+  </div>
+  <div class="row my-3">
+    <div class="col-4">
+      <h5 class="text-right" style="color:#bf3a3a; text-decoration:underline; font-weight:600;">
+        <%= t('listing_policy.violations.do_not_include') %>
+      </h5>
+    </div>
+    <div class="col-8">
+      <h5 class="text-left">
+        <ul style="list-style-type: none;">
+          <li class="number-icon content-1 red-dot mt-1"><%= t('listing_policy.violations.do_not_include_reason_one') %></li>
+          <li class="number-icon content-2 red-dot mt-1"><%= t('listing_policy.violations.do_not_include_reason_two') %></li>
+          <li class="number-icon content-3 red-dot mt-1" style="color:#bf3a3a;"><%= t('listing_policy.violations.do_not_include_reason_three') %></li>
+        </ul>
+      </h5>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-3">
+      <div class="pricing-style-one m-0" style="border: 2px solid #bf3a3a;">
+          <div class="pricing-icon text-center" style="max-height: 180px">
+              <img src="https://ioffer.com/rails/active_storage/representations/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBOHNRRFE9PSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--d6174ef81abb4263f5705a40b882de0e652d90d9/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaDdCam9MY21WemFYcGxTU0lOTmpVd2VEZzNNRDRHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6InZhcmlhdGlvbiJ9fQ==--f742933d0b386540fca97a367c47c785cfb0efe9/QQ%E6%88%AA%E5%9B%BE20220118094530.png" alt="">
+          </div>
+          <div class="pricing-btn rounded-buttons text-center">
+             <div class="main-btn rounded-three white-text icon-btn red-btn-bg"  style="width: 52px !important; line-height: 62px !important;"><img src="<%= asset_path('backend-void.svg')%>" style="margin-left: -1em; fill: #fff;" alt=""></div>
+         </div>
+      </div>
+    </div>
+    <div class="col-3">
+      <div class="pricing-style-one m-0" style="border: 2px solid #bf3a3a;">
+          <div class="pricing-icon text-center" style="max-height: 180px">
+              <img src="https://ioffer.com/rails/active_storage/representations/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBL0lVRFE9PSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--d5f4a595bdd3b5a99ecd29652c7acd850007f718/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaDdCam9MY21WemFYcGxTU0lOTmpVd2VEZzNNRDRHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6InZhcmlhdGlvbiJ9fQ==--f742933d0b386540fca97a367c47c785cfb0efe9/107.jpg" alt="">
+          </div>
+          <div class="pricing-btn rounded-buttons text-center">
+             <div class="main-btn rounded-three white-text icon-btn red-btn-bg"  style="width: 52px !important; line-height: 62px !important;"><img src="<%= asset_path('backend-void.svg')%>" style="margin-left: -1em;" fill="#fff" alt=""></div>
+         </div>
+      </div>
+    </div>
+    <div class="col-3">
+      <div class="pricing-style-one m-0" style="border: 2px solid #bf3a3a;">
+          <div class="pricing-icon text-center" style="max-height: 180px">
+              <img src="https://ioffer.com/rails/active_storage/representations/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBNm9YRFE9PSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--432daa849b4908cf3a8890e8f049593b722e328c/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaDdCam9MY21WemFYcGxTU0lOTmpVd2VEZzNNRDRHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6InZhcmlhdGlvbiJ9fQ==--f742933d0b386540fca97a367c47c785cfb0efe9/82309-lv-women-s-shoulder-bag-handbag-100096.jpeg" alt="">
+          </div>
+           <div class="pricing-btn rounded-buttons text-center">
+              <div class="main-btn rounded-three white-text icon-btn red-btn-bg"  style="width: 52px !important; line-height: 62px !important;"><img src="<%= asset_path('backend-void.svg')%>" style="margin-left: -1em; fill:white;" alt=""></div>
+          </div>
+      </div>
+    </div>
+    <div class="col-3">
+      <div class="pricing-style-one m-0" style="border: 2px solid #bf3a3a;">
+          <div class="pricing-icon text-center" style="max-height: 180px">
+              <img style="max-height: 180px" src="https://ioffer.com/rails/active_storage/representations/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBMW9lRFE9PSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--f8a79ac3e8dc66f018d60bd13e36b1b2cc15874a/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaDdCam9MY21WemFYcGxTU0lOTmpVd2VEZzNNRDRHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6InZhcmlhdGlvbiJ9fQ==--f742933d0b386540fca97a367c47c785cfb0efe9/40156-lv-women-s-shoulder-bag-handbag-100282.png" alt="">
+          </div>
+          <div class="pricing-btn rounded-buttons text-center">
+             <div class="main-btn rounded-three white-text icon-btn red-btn-bg"  style="width: 52px !important; line-height: 62px !important;"><img src="<%= asset_path('backend-void.svg')%>" style="margin-left: -1em; fill:white;" alt=""></div>
+         </div>
+      </div>
+    </div>
+  </div>
+  <div class="mt-2 mb-5 text-center">
+    <%= t('listing_policy.violations.do_not_include_disclaimer') %>
+  </div>
+
+  <div class="tacbox text-center mb-4">
+    <%= form_tag(admin_update_item_listing_policy_path, name:'agree_to_listing_policy_form', id:'agree_to_listing_policy_form', method:'put') do -%>
+      <input id="checkbox" name="checkbox" type="checkbox" />
+      <label for="checkbox"> I agree to iOffer's listing policy.</label>
+      <div class="pricing-btn rounded-buttons text-center mb-2">
+          <button type="submit" class="main-btn rounded-three mt-4 px-5 cta-btn" style="border-radius: 8px; padding-left: 50px; padding-right: 50px;" href="">Start Posting</button>
+      </div>
+    <% end -%>
+  </div>
+</div>
+
+<script>
+  function pageLoaded() 
+  {
+    $('form#agree_to_listing_policy_form').submit(function(){
+      if ( this['checkbox'].checked != true ) {
+        event.preventDefault();
+        $(this).children('#checkbox').addClass('danger-shadow');
+      }
+    });
+  }
+  if (typeof(jQuery) == 'function') { jQuery(pageLoaded); }
+  else if (typeof(Spree) == 'function') { Spree.ready(pageLoaded); }
+  else { window.onload = pageLoaded; }
+  
+</script>

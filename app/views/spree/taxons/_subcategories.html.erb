@@ -1,0 +1,34 @@
+<% unless spree_current_user&.admin?
+    params.delete(:script_score_source)
+    params.delete(:sort)
+    params.delete(:text_fields)
+    params.delete(:query_type)
+  end
+-%>
+<% cache([base_cache_key, taxon, 'subcategories', permitted_product_params]) do %>
+  <% subcategories = [taxon] %>
+  <% unless taxon.children.any? %>
+    <% subcategories.unshift(taxon.parent) %>
+  <% end %>
+  <% subcategories.compact.each do |current_taxon| %>
+    <% child_taxons = [current_taxon, *current_taxon.children.where(hide_from_nav: false)] %>
+    <% if current_taxon.level > 0 && child_taxons.size > 1 %>
+      <div class="d-flex justify-content-center position-sticky io-subcategory-menu pb-1 pt-md-2">
+        <div class="py-1 px-1 text-uppercase d-flex d-xl-flex overflow-x taxon-subcategories">
+          <% child_taxons.each_with_index.map do |subcategory, index| %>
+            <%=
+              link_to_unless subcategory == taxon,
+                            index.zero? ? Spree.t(:all) : subcategory.name,
+                            spree.nested_taxons_path(subcategory, params: permitted_product_params.merge(utm_medium: 'subcat')),
+                            class: "taxon-subcategories-unselected #{index.zero? ? 'ml-2' : 'ml-2'}" do
+            %>
+                <span class="taxon-subcategories-selected <%= index.zero? ? 'ml-2' : 'ml-2' %>">
+                  <%= index.zero? ? Spree.t(:all) : subcategory.name %>
+                </span>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>

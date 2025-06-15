@@ -1,0 +1,42 @@
+<% # Instead of a buyer's cart_form, this would be for sellers.
+  # Required instance variables:
+  #   @product
+  #   @product_price
+-%>
+<div class="seller-item-detail-container">
+  <%= render 'spree/shared/rating', product: @product, review: 0, shortened: true %>
+  <hr/>
+  <table>
+    <tbody>
+      <% if @product.view_count > 0 -%>
+        <tr>
+          <td><span class='selling'>
+            <svg class="feather-icon"><use href="/assets/feather-sprite.svg#shopping-bag"/></svg>
+          </span></td>
+          <td><span class='selling ml-2'><%= t('store.sell.count_of_sold', count: @product.view_count) %></span></td>
+        </tr>
+      <% end -%>
+      <% count_in_cart = count_in_cart(@product)
+      if count_in_cart > 0 -%>
+        <tr>
+          <td><span class='selling'>
+            <svg class="feather-icon"><use href="/assets/feather-sprite.svg#users"/></svg>
+          </span></td>
+          <td><span class='selling ml-2'><%= t('store.sell.count_of_waiting_buyers', count: count_in_cart) %></span></td>
+        </tr>
+      <% end -%>
+    </tbody>
+  </table>
+  <div class="mt-4 mb-4 pr-3">
+    <% if spree_current_user %>
+      <%= link_to t('store.adopt.list_same_item'), admin_list_same_item_path(@product, return_url: params[:return_url]), class:'btn btn-primary rounded-new-ioffer-button w-100 list-same-item-button' %>
+    <% elsif source_country?(spree_current_user&.country) %>
+      <%= link_to t('store.adopt.list_same_item'), '/seller_onboarding', class:'btn btn-primary rounded-new-ioffer-button w-100 list-same-item-button' %>
+    <% end %>
+  </div>
+  <h4 class="text-center">
+    <%= t('store.adopt.spam_not_tolerated') %>
+    </br>
+    <%= t('store.adopt.spam_not_tolerated_chinese') %>
+  </h4>
+</div>

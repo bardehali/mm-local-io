@@ -1,0 +1,11 @@
+%html
+  %head
+    %title= title || 'iOffer'
+    = render partial: 'spree/admin/shared/head'
+
+  %body
+    - if spree_current_user&.admin?
+      = render partial:'spree/shared/only_main_content_navbar'
+    = yield
+  %footer
+    = yield :footer

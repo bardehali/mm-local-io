@@ -1,0 +1,29 @@
+:ruby
+  is_admin = spree_current_user&.admin?
+  specific_product_or_seller = [params[:with_product_id], params[:q].try(:[], :seller_user_id_eq)].compact.present? 
+
+= render partial:'spree/admin/orders/assets_inline'
+
+- content_for :page_title do
+  Top Selling Items
+- if is_admin
+  %div.mb-2
+    = render 'spree/admin/shared/daily_transactions_complaints_stats'
+
+- if @search.result.count > 0
+  .orders-table
+    - date_label = ''
+    - order_index = 0
+    - @products.each do |product|
+      :ruby
+        order = product.associated_completed_orders.first
+        order_row_class = (order_index % 2 == 0) ? 'even' : 'odd'
+        order_index += 1
+      %div(class="state-#{order.state.downcase} #{order_row_class} mb-3 order-in-list")
+        = render partial:'spree/admin/orders/product_with_order_in_list', locals:{ product: product, order: order, is_admin: is_admin, has_warning: false }
+- else
+  .mt-5
+    No items found
+
+= render 'spree/admin/shared/index_table_options', collection: @products, simple: true
+%br/

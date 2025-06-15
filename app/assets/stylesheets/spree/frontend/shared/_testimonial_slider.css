@@ -1,0 +1,135 @@
+<style>
+  body, div, p, span, a, h1, h2, h3 {
+  	-webkit-font-smoothing: antialiased;
+  }
+
+  $testimonials: 3;
+  $testimonials-width: 380px;
+  $next: 10 / $testimonials;
+  $fade-speed: 8;
+
+  @for $i from 1 through $testimonials {
+  	$min: ((100/$testimonials)*$i);
+  	$max: (100/$testimonials);
+  	$left: 0;
+  	@if $i > 1 {
+  		$left: -($testimonials-width * $i) + $testimonials-width;
+  	}
+
+  	@keyframes testimonials-fade-in-out#{$i} {
+  		#{$min - $max}% { opacity: 0; left: $left; }
+  		#{($min - ($max / $fade-speed)*3)}%	{ opacity: 1; }
+  		#{$min - ($max / $fade-speed)}%	{ opacity: 1; }
+  		#{min(($min + $next - 0.00001), 99.99999)}% { opacity: 0; left: $left; }
+  		#{min(($min + $next), 100)}% { opacity: 0; left: -($testimonials-width * $testimonials); }
+  	}
+  }
+
+  .testimonials {
+  	position: relative;
+  	text-align: center;
+  	display: block;
+  	padding: 10px 0;
+  	margin: 0;
+  	width: $testimonials-width; // adjust with media queries
+  	overflow: hidden;
+
+  	> li {
+  		position: relative;
+  		text-align: justify;
+  		width: $testimonials-width - 5;
+  		font-family: 'Oswald', sans-serif;
+  		color: #444;
+  		display: block;
+  		list-style: none;
+  		margin: 0 0 30px 0;
+  		padding: 0;
+
+  		> p {
+  			text-align: right;
+  			margin: 8px 0 0;
+  		}
+  	}
+  }
+
+  #testimonials-checkbox {
+  	display: none;
+
+  	+label {
+  		display: inline-block;
+  		cursor: pointer;
+  		line-height: 22px;
+  		border-radius: 11px;
+  		background-color: #FF5722;
+  		padding: 0 10px;
+  		font-size:0.8em;
+  		color: #fff;
+  		margin-bottom:20px;
+
+  		&:before {
+  			content: 'Back';
+  		}
+  	}
+
+  	&:not(:checked)
+  	+label {
+
+  		&:before {
+  			content: 'Read all my testimonials';
+  		}
+
+  		+ ul.testimonials {
+  			overflow: hidden;
+  			white-space: nowrap;
+  			vertical-align: middle;
+
+  			> li {
+  				margin: 0;
+  				opacity: 0;
+  				display: inline-block;
+  				white-space: normal;
+
+  				@for $i from 1 through $testimonials {
+  					&:nth-of-type(#{$i}) {
+  						animation: testimonials-fade-in-out#{$i} $testimonials*8s infinite;
+  					}
+  				}
+  			}
+  		}
+  	}
+  }
+
+  .testimonials-icon {
+  	display: inline-block;
+  	margin: 0 4px 4px 0;
+  	font-family: 'Coustard', serif;
+  	font-weight: 900;
+  	font-size: 72px;
+  	height: 46px;
+  	line-height: 109px;
+  	overflow: hidden;
+  	color: #ddd;
+  }
+</style>
+
+<input type="checkbox" id="testimonials-checkbox">
+<label for="testimonials-checkbox"></label>
+<ul class="testimonials">
+	<li>
+		<span class="testimonials-icon">&quot;</span>
+		The site looks great. Thank you for your hard work and patience, especially throughout the design phase.
+		<p>Mr Smith</p>
+	</li>
+	<li>
+		<span class="testimonials-icon">&quot;</span>
+		Really pleased with the site and all the work you have done. I will be recommending you to my friends and family. Thank you.
+		<p>James Cook</p>
+	</li>
+	<li>
+		<span class="testimonials-icon">&quot;</span>
+		Thank you for your help in getting my business on-line, I am really pleased with my website which presents my companies identity perfectly.
+		<p>Andy Jones</p>
+	</li>
+</ul>
+
+<link href='https://fonts.googleapis.com/css?family=Oswald:400|Coustard:900' rel='stylesheet' type='text/css'>

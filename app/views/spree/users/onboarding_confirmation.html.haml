@@ -1,0 +1,50 @@
+:ruby
+  password_error = @spree_user ? @spree_user.errors[:password] : nil
+  password_conf_error = @spree_user ? @spree_user.errors[:password_confirmation] : nil
+
+.row.mx-5.curated-menu
+  .col-xl-3.categories-side-bar
+    .source-country-title-header.mb-3
+      = t('spree.start_selling_now')
+    .benefit-list-item.mb-3
+      = t('user.update_your_account')
+    = form_for @spree_user, as: :spree_user, url: onboarding_change_password_path(passcode: params[:passcode]), html:{ method: :put } do |f|
+      = f.hidden_field :reset_password_token
+      .form-group
+        = f.password_field :password, class:"reset-password-box form-control#{ ' border-danger shadow' if password_error.present?}", placeholder: t('user.password.enter_password')
+      .form-group.input-group
+        = f.password_field :password_confirmation, class:"reset-password-box form-control#{' border-danger shadow' if password_conf_error.present?}", placeholder: t('user.password.reenter_password')
+        .input-group-append
+          = f.submit Spree.t(:update), class: 'btn rounded-new-ioffer-button'
+      - if password_error.present? || password_conf_error.present?
+        %div.text-danger= password_error.join('   ')
+        %div.text-danger= password_conf_error.join('   ')
+    .source-country-title-header.mt-5
+      = Spree.t('homepage.top_sellers')
+    = render partial: 'home/source_country/visual_category_list'
+    .source-country-title-header
+    = Spree.t('homepage.trending_header')
+    = render partial: 'home/trending_searches'
+  .col-xl-9.col-sm-12
+    .seller-landing-title.center-text.mt-3.mb-5
+      = t('spree.seller_landing_title').gsub('{USERID}', @spree_user.try(:username) || '')
+    .row.ml-5
+      .col-4
+        .source-country-title-header
+          = Spree.t('homepage.benefits.benefits_list_header')
+        = render partial: 'home/source_country/benefits_list', locals: { remove_link: false } 
+      .col-8
+        = render partial: 'spree/shared/rating_box', locals: { user: @spree_user }
+    .source-country-title-header.mt-5.center-text
+      = Spree.t('homepage.praises')
+    .review-wrapper
+      .outer{:style => "height:320px;"}
+        - fetch_happy_buyer_messages().each_with_index do|message_attr, index|
+          .card{:style => "--delay:#{index <= 3 ? index - 1 : 2};"}
+            .bubble
+              = message_attr['message']
+              %div{:style => "font-weight: 700"}
+                = inline_svg_tag "flags/4x3/#{message_attr['country_code'].downcase}.svg", size: '2.6em*1.3em'
+                = message_attr['user'].censored_middle
+                (#{message_attr['purchases']} Purchases) from #{message_attr['country']}
+                .source-country-title-header

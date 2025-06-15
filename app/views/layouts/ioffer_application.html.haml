@@ -1,0 +1,61 @@
+%html(lang="en")
+  %head
+    / Google Tag Manager
+    :javascript
+      (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+      })(window,document,'script','dataLayer','GTM-PBSCVV6D');
+    / End Google Tag Manager
+
+
+    %meta(charset="utf-8")/
+    %meta(http-equiv="x-ua-compatible" content="ie=edge")
+    %meta(content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport")/
+    %meta(content="" name="description")/
+    %meta(content="" name="author")/
+
+    %title #{title || I18n.t('site_name') }
+
+    %link(rel="shortcut icon" href="/favicon.ico" type="image/ico")
+
+    / Bootstrap core CSS
+    = stylesheet_link_tag('ioffer/bootstrap.min')
+    / Custom fonts for this template
+    %link(href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,200i,300,300i,400,400i,600,600i,700,700i,900,900i" rel="stylesheet")/
+    %link(href="https://fonts.googleapis.com/css?family=Merriweather:300,300i,400,400i,700,700i,900,900i" rel="stylesheet")/
+    %link(href="https://fonts.googleapis.com/css?family=Barlow" rel="stylesheet")/
+
+    / Custom styles for home template
+    = stylesheet_link_tag('ioffer/ioffer_landing')
+    / Custom styles for home template
+    = stylesheet_link_tag('ioffer/util')
+    / Custom styles for home template
+    = stylesheet_link_tag('ioffer/select2')
+
+    = stylesheet_link_tag('ioffer/font-awesome-all.min')
+    / Custom styles for this template
+    = stylesheet_link_tag('ioffer/ioffer')
+
+    / Global site tag (gtag.js) - Google Analytics
+    %script{:async => "", :src => "https://www.googletagmanager.com/gtag/js?id=UA-166264208-1"}
+    :javascript
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-166264208-1');
+
+    / Bootstrap core JavaScript
+    = javascript_include_tag('ioffer/jquery.min')
+    = javascript_include_tag('ioffer/bootstrap.min')
+    / Custom scripts for this template
+    = javascript_include_tag('ioffer/coming-soon.js')
+
+
+    = yield :head
+  %body
+    = yield
+
+    = yield :footer

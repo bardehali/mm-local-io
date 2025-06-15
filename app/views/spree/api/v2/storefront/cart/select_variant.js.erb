@@ -1,0 +1,14 @@
+Spree.fetchCart();
+  $(ADD_TO_CART_SELECTOR).prop('disabled', false);
+
+  $('#variant_added_wrapper').html("<%= escape_javascript(render(partial: 'spree/shared/select_variant_adoption_modal', locals:{ variant: @variant }) ) %>");
+
+  $(".variant-added-modal input[name='variant_id']").change(function(){
+    var pm_id = $(this).attr('data-payment-method-id');
+    $(".variant-added-modal input[name='payment_method_id']").val(pm_id);
+  });
+
+  $('.variant-added-modal').modal('show');
+
+  $(".dropdown-toggle").dropdown();
+

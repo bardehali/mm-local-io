@@ -1,0 +1,75 @@
+<%
+  show_payment_options = false
+  first_payment_source_method_id = @payment_sources&.first&.payment_method_id
+  last_checkout_payment_method = @order.payments.checkout.last&.payment_method
+  last_checkout_payment_method_id = last_checkout_payment_method&.id
+  available_pms = @order.available_payment_methods(current_store)
+  first_available_payment_method = last_checkout_payment_method || available_pms&.first
+-%>
+<div class="card mb-5">
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item"><h4><%= t('payment.pay_with') %></h4></li>
+    <li class="list-group-item">
+      <table>
+        <tbody>
+          <% if first_available_payment_method
+            icon = payment_method_icon(first_available_payment_method, 'mini')
+          -%>
+          <td style="vertical-align: top;"><%= image_tag(icon, id:'payment_method_icon', class:'payment-method-icon') -%></td>
+          <% end # if first_available_payment_method -%>
+
+          <td id="payment_method_name" class="payment-method-name">
+            <%= first_available_payment_method&.name&.titleize -%>
+              <br/>
+              <h5 data-currency="<%= Money::Currency.find(@order.currency).symbol %>">
+                <%= @order.display_total.to_html %>
+              </h5>
+              <% if spree_current_user.try(:admin?) -%>
+                &nbsp;&nbsp;
+                <span id="payment_method_account_id" class="payment-method-account-id text-secondary"><%= store_payment_method(@order, first_available_payment_method).try(:account_id_in_parameters) %></span>
+              <% end -%>
+            </td>
+        </tbody>
+      </table>
+    </li>
+    <% unless last_checkout_payment_method && !show_payment_options -%>
+      <li class="list-group-item">
+        <a href="#store_payment_methods_list" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="store_payment_methods_list">
+          <%= t('payment.show_payment_options') %>
+          <i class="glyphicon glyphicon-triangle-bottom"> </i>
+        </a>
+        <br/>
+        <br/>
+        <ul id="store_payment_methods_list" class="list-unstyled position-relative collapse" data-hook>
+          <% available_pms.each do |method|
+              account_id_param = store_payment_method(@order, method).try(:account_id_in_parameters)
+              icon = payment_method_icon(method, 'mini')
+          -%>
+            <li class="radio">
+              <%= label_tag '', class: "form-check-label spree-radio-label payment-option", data: { type: method.id == first_payment_source_method_id ? 'card' : nil } do %>
+                <%= form.radio_button 'payments_attributes[][payment_method_id]',
+                                    method.id,
+                                    { checked: method.id == last_checkout_payment_method_id || method ==  first_available_payment_method,
+                                      id: "order_payment_method_id_#{method.id}",
+                                      data: { 'method-name' => method.name, 'account-id'=> account_id_param, icon: icon }
+                                    } %>
+                <span class="spree-radio-label-custom-input"></span>
+                <%# = image_tag(icon, id:'payment_method_icon', class:'payment-method-icon') if icon.present? -%>
+                <%= Spree.t(method.name, scope: :payment_methods, default: method.description) -%>
+              <% end %>
+              <% if spree_current_user&.admin? && account_id_param.present? -%>
+                &nbsp;&nbsp;&dash;&nbsp;&nbsp;
+                <span class="text-secondary"><%= account_id_param %></span>
+              <% end -%>
+            </li>
+          <% end %>
+        </ul>
+      </li>
+    <% end # last_checkout_payment_method -%>
+  </ul>
+</div>
+<div class="card">
+  <div class="card-body">
+    <%= render 'address', form: form, billing_same_as_shipping_address: true %>
+  </div>
+</div>

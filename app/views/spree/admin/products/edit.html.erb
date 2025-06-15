@@ -1,0 +1,35 @@
+<% content_for :head do %>
+  <%= stylesheet_link_tag 'spree/record_reviews' %>
+<% end %>
+<% content_for :page_actions do %>
+  <% if spree_current_user&.admin?
+      dropdown_menu_id = "product_status_menu_#{@product.id}"
+  -%>
+    <span class="dropdown btn-grp record-review mr-3">
+      <button type="button" class="btn btn-warning dropdown-toggle" aria-expanded="false" aria-haspopup="true"  data-toggle="dropdown" id="<%= dropdown_menu_id -%>_link" role="button" title="Remove Item Options">Review
+      </button>
+      <%= render(partial:'spree/admin/record_reviews/status_dropdown_menu', locals:{ product: @product, dropdown_menu_id: dropdown_menu_id, show_good_status_options: true }) %>
+    </span>
+  <% end -%>
+  <%= product_preview_link(@product) if @product.available? %>
+  <% if can?(:create, Spree::Product) %>
+    <%= button_link_to Spree.t('admin.products.new'), new_object_url, { class: "btn-success", icon: 'add', id: 'admin_new_product' } %>
+  <% end %>
+<% end %>
+
+<%= render partial: 'spree/admin/shared/product_tabs', locals: {current: :details } %>
+<%= render partial: 'spree/admin/shared/error_messages', locals: { target: @product } %>
+
+<%= hidden_field_tag('product_id', @product.id, id:'product_id') %>
+<%= form_for [:admin, @product], method: :put, html: { multipart: true } do |f| %>
+  <fieldset>
+    <% if params[:form] == 'multi' -%>
+      <%= render partial: 'form_simplified', locals: { f: f, product: @product } %>
+    <% elsif params[:form] == 'form_in_one' -%>
+      <%= render partial: 'form_in_one', locals: { f: f, product: @product } %>
+    <% else -%>
+      <%= render partial: 'form_with_option_types', locals: { f: f, product: @product } %>
+    <% end -%>
+    <%= render partial: 'spree/admin/shared/edit_resource_links' %>
+  </fieldset>
+<% end %>

@@ -1,0 +1,10 @@
+<%
+link_id = "product_exists_in_search_#{@product.id}"
+if @exists_in_search -%>
+  $("#<%= link_id %>").css('color', 'rgba(0,204,0)');
+  $("#<%= link_id %> .icon").removeClass('icon-search').addClass('icon-ok');
+<% else -%>
+  $("#<%= link_id %>").css('opacity', '0.4');
+  $("#<%= link_id %>").css('text-decoration', 'line-through');
+  $("#<%= link_id %>").attr('disabled', 'disabled');
+<% end -%>

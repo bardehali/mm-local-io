@@ -1,0 +1,24 @@
+<%
+	record_name = @record_review.record_type.gsub('Spree::', '').downcase
+	card_id = "#{record_name}_card_#{@record_review.record_id}"
+	Spree::RecordReview.logger.info "record name #{record_name} (#{@record_review.record_id}) => card_id #{card_id}, version #{params[:version]}, new_curation_score #{@record_review.new_curation_score}"
+-%>
+$("#<%= card_id -%>").addClass('success-shadow');
+
+<% if true # @record_review.new_curation_score # requested to all just hide away: @record_review.record_removeable? -%>
+	$("#<%= card_id -%>").fadeOut(1000);
+	$("#iqs_<%= @record_review.record_id -%>").html("<%= @record_review.record&.iqs -%>");
+	$("#status_code_<%= @record_review.record_id -%>").html("<%= @record_review.status_code -%>");
+	<% if (product = @next_product) -%>
+		if ( $("#<%= "#{record_name}_card_#{product.id}" %>").length == 0 )
+		{
+			$("#record_reviews").append("<%= escape_javascript( render(partial:"spree/admin/record_reviews/#{record_name}_for_review_#{params[:version]=='old' ? 'list_with_status_actions' : params[:view] || 'list'}", locals:{ record_name.to_sym => product }, is_admin: spree_current_user.try(:admin?) ) ) -%>");
+		}
+	<% end -%>
+<% else # not record_removeable ###################### -%>
+	$("#<%= card_id -%>").replaceWith("<%= escape_javascript( render(partial:"spree/admin/record_reviews/#{record_name}_for_review_#{params[:version]=='old' ? 'list_with_status_actions' : params[:view] || 'list'}", locals:{ record_name.to_sym => @record_review.record }, is_admin: spree_current_user.try(:admin?) ) ) -%>");
+
+	$('#<%= card_id -%> *[data-toggle="dropdown"]').dropdown();
+	$('#<%= card_id -%> .small-status-action-inline a[data-remote]').removeClass('glowing-animation').click(reviewLinkStart);
+	$("#status_code_<%= @record_review.record_id -%>").val("<%= @record_review.status_code -%>");
+<% end -%>

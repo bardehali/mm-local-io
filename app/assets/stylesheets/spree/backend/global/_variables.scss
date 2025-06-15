@@ -1,0 +1,52 @@
+/*------------------------------------------
+  Colors
+  -----------------------------------------*/
+  $primary: #00567F;
+  $success: darken(#00567F, 2);
+  $info:    #48B0F7;
+  $warning: #F8D053;
+  $danger:  #F55753;
+  $input-border-color:  darken(#EDEDED, 5);
+
+/*------------------------------------------
+  Basic color palette for admin (from solidus_market)
+  -----------------------------------------*/
+  $color-1:                        #FFFFFF !default;    // White
+  $color-2:                        #000000 !default;    // Black
+  $color-3: #000000 !default;    // Light Blue
+  $color-4: #0837a2 !default;    // Dark Blue
+  $color-5:                        #C60F13 !default;    // Red
+  $color-6:                        #FF9300 !default;    // Yellow
+  $color-7:                        #E8E8E8 !default;    // Med Gray
+  $color-8:                        #F5F5F5 !default;    // Light Gray
+  $color-9:                        #F8F8F8 !default;    // Very Light Gray
+  $color-10:                       #181818 !default;    // Dark Light Gray
+
+/*------------------------------------------
+  Components
+  -----------------------------------------*/
+  $border-radius: 6px;
+
+/*------------------------------------------
+  Fonts
+  -----------------------------------------*/
+  $headings-font-weight: 300;
+
+/*------------------------------------------
+  Buttons
+  -----------------------------------------*/
+
+/*------------------------------------------
+  Navbar
+  -----------------------------------------*/
+  $navbar-inverse-bg: darken($primary, 15);
+
+/*------------------------------------------
+  Forms
+  -----------------------------------------*/
+  $label-margin-bottom: 0;
+
+/*------------------------------------------
+  Plugins
+  -----------------------------------------*/
+  $select2-icon-size: 0.8rem;

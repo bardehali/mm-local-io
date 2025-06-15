@@ -1,0 +1,133 @@
+:ruby
+  ##
+  # Optional locals:
+  #   hide_price [Boolean] default false
+  is_owner = product.id.nil? || spree_current_user.try(:id) == product.user_id || spree_current_user.admin?
+  prices = product.master.try(:prices).try(:order, 'id asc') || []
+  # left_over_isos = Spree::Config.available_currencies.map(&:iso_code) - prices.collect{|p| p.country_iso }
+  show_text_field_tags_of_categories = true
+  hide_price = false unless defined?(hide_price)
+
+- content_for :head do
+  = javascript_include_tag asset_path('spree/backend/images/jquery.paste_image_reader.js')
+  = javascript_include_tag 'spree/backend/products/editor'
+  = javascript_include_tag 'spree/backend/components/colorpicker'
+
+  - unless debugging?
+    :css
+      .option-types-container { visibility: hidden; height: 0px; }
+
+  :css
+    .scrollable {
+      overflow-x:auto;
+    }
+    .btn-fixed-size{
+      width: 75px;
+      height: 65px;
+    }
+
+- if (taxon = Spree::Taxon.where(id: product.taxon_ids).first )
+  - content_for :footer do
+    :javascript
+      $(document).ready(function () {
+        $('#product_taxon_ids').val("#{taxon.id }")
+        $('#select2-chosen-2').html("#{ taxon.breadcrumb }")
+        $('#s2id_product_taxon_ids a.select2-default').removeClass('select2-default')
+        fetchRelatedOptionoTypes( $('#product_taxon_ids') )
+      })
+
+
+= hidden_field_tag(:id, product.try(:id), id:'product_id')
+= hidden_field_tag(:form, params[:form])
+= hidden_field_tag(:tab, 'details')
+= f.hidden_field(:master_product_id)
+= f.hidden_field(:shipping_category_id, value: ::Spree::ShippingCategory.default.try(:id) || 1 )
+= f.hidden_field(:tax_category_id, value: ::Spree::TaxCategory.default.try(:id) || 1 )
+= f.hidden_field(:available_on, value: DateTime.now.strftime('%Y/%m/%d')  ) if product.try(:available_on).nil?
+
+%div(data-hook="admin_product_form_fields")
+  .row
+    %div(class="left col-12" data-hook="admin_product_form_left")
+      - if (@master_product)
+        .box-shadow.box-body
+          %center
+            %h1
+              Can you beat
+              %span.yellow='$' + @master_product.price.to_s
+              shipped?
+            %span='392 buyers will be notified of this listing if you beat that price!'
+      .row
+        %div(class="col-12 col-md-8" data-hook="admin_product_form_left")
+          %div(data-hook="admin_product_form_name")
+            = f.field_container :name, class: ['form-group'] do
+              = f.label :name, raw(Spree.t(:name) + required_span_tag), class:'font-weight-bold'
+              = f.text_field :name, class: 'form-control title', disabled: !is_owner
+              = f.error_message_on :name
+        %div(class="col-12 col-md-4")
+          %div(data-hook="admin_product_form_price")
+            = f.field_container :price, class: ['form-group'] do
+              = f.label :price, raw(Spree.t(:master_price) + required_span_tag), class:'font-weight-bold'
+              = f.text_field :price, value: number_to_currency(product.price, unit: ''), class: 'form-control', disabled: (!is_owner && cannot?(:update, product.master.default_price) )
+              = f.error_message_on :price
+
+      %div(data-hook="admin_product_form_taxons")
+        = f.field_container :taxons, class: ["form-group#{' withError' if f.object.errors[:taxon_ids].present?}"] do
+          = f.label :taxon_ids, Spree.t(:taxons), class:'font-weight-bold'
+          - if can? :modify, Spree::Classification || is_owner
+            = f.hidden_field :taxon_ids, value:''
+          - elsif product.taxons.any?
+            %ul(class="text_list")
+              - product.taxons.each do |taxon|
+                %li= taxon.name
+          - else
+            %div(class="alert alert-info")= Spree.t(:no_resource_found, resource: :taxons)
+          = f.error_message_on :taxon_ids
+          %br/
+      .row
+        %div(class="col-12 col-md-12" data-hook="admin_product_form_description")
+          = f.field_container :description, class: ['form-group'] do
+            = f.label :description, Spree.t(:description), class:'font-weight-bold'
+            = f.text_area :description, { rows: "#{unless product.has_variants? then '10' else '8' end}", class: 'form-control', disabled: !is_owner }
+            = f.error_message_on :description
+
+      %div(class="option-types-container" data-hook="admin_product_form_option_types")
+        = f.field_container :option_types, class: ['form-group'] do
+          = f.label :option_type_ids, Spree.t(:option_types), class:'font-weight-bold'
+          - if can? :modify, Spree::ProductOptionType || is_owner
+            = f.hidden_field :option_type_ids, value: product.option_type_ids.join(',')
+          - elsif product.option_types.any?
+            %ul(class="text_list")
+              - product.option_types.each do |type|
+                %li #{type.presentation} (#{type.name})
+          - else
+            %div(class="alert alert-info")= Spree.t(:no_resource_found, resource: :option_types)
+      = render partial: 'spree/admin/products/product_variant', locals: { f: f, show_row_of_colors: can?(:manage, @product) && @product.option_types.includes(:option_values).find(&:color?) }
+
+    - if defined?(show_meta_fields) && show_meta_fields
+      %div(data-hook="admin_product_form_meta" class="hidden")
+        %div(data-hook="admin_product_form_meta_title")
+          = f.field_container :meta_title do
+            = f.label :meta_title
+            = f.text_field :meta_title, class: 'fullwidth'
+        %div(data-hook="admin_product_form_meta_keywords")
+          = f.field_container :meta_keywords do
+            = f.label :meta_keywords
+            = f.text_field :meta_keywords, class: 'fullwidth'
+        %div(data-hook="admin_product_form_meta_description")
+          = f.field_container :meta_description do
+            = f.label :meta_description
+            = f.text_field :meta_description, class: 'fullwidth'
+
+    - if defined?(show_shipping_fields) && show_shipping_fields
+      .box-shadow.mt-4.pt-3.pr-3.pl-3(data-hook="admin_product_form_shipping")
+        %div(data-hook="admin_product_shipping_standard")
+          = f.field_container :shipping_standard do
+            %label(for="product_shipping_standard")= 'Approximate Standard Shipping Time'
+            %input#shipping_standard.fullwidth(type="text")
+        %div(data-hook="admin_product_shipping_expedite")
+          = f.field_container :shipping_expedite do
+            %label(for="shipping_standard_expedite")= 'Approximate Expedite Shipping Time'
+            %input#shipping_standard_expedite.fullwidth(type="text")
+
+  %br/
+  -#= render partial: 'upload_images_section', locals:{ f: f, product: product }

@@ -1,0 +1,12 @@
+%h3 #{@page_title || 'Product Manager' }
+- if params[:variant_ids].present? || params[:variant_adoption_ids].present?
+  .alert.alert-success.mt-3.mb-3
+    Updated #{params[:variant_ids].to_a.size + params[:variant_adoption_ids].to_a.size } products
+= form_tag(spree.admin_preview_takedown_path, method:'post') do
+  .row
+    .col-12
+      = text_area_tag('products_list', params[:products_list], class:'form-control', rows: 20)
+
+  .row.mt-3
+    .col-8.text-right
+      = submit_tag('Preview', 'data-disable-with'=> 'Sending ...')

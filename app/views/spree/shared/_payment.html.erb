@@ -1,0 +1,37 @@
+<% ##
+  # Required locals
+  #   current_order [Spree::Order]
+  #   payment [Spree::Payment]
+  source = payment.source
+  show_payment_instruction = true unless defined?(show_payment_instruction)
+  pm_instruction = payment_method_instruction(current_order, payment.payment_method)
+-%>
+
+<% if source.is_a?(Spree::CreditCard) %>
+  <span class="cc-type">
+    <% if source.last_digits %>
+      <%= Spree.t(:ending_in) %> <%= source.last_digits %>
+    <% end %>
+  </span>
+  <br />
+  <span class="full-name"><%= source.name %></span>
+<% else %>
+  <%# = content_tag(:span, payment.payment_method.description) %>
+<% end %>
+
+<% if current_order.paid? %>
+
+<% else -%>
+  <% if has_pay_form?(payment.payment_method) && (store_payment_method = store_payment_method_of(current_order.store, payment.payment_method) ) -%>
+
+    <%= render partial:"spree/payments/#{payment.payment_method.name.to_underscore_id}", locals:{ order: current_order, store_payment_method: store_payment_method } %>
+
+  <% end -%>
+
+  <% if show_payment_instruction && pm_instruction.present? -%>
+  <br />
+  <strong>Instruction:</strong>
+  <p><%= pm_instruction %></p>
+  <% end -%>
+
+<% end # not paid -%>

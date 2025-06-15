@@ -1,0 +1,83 @@
+:ruby
+  # Builds a row of columns containing list of line items, w/ 1st having buyer info, payment.
+  # Required locals
+  #   order [Spree::Order]
+  # Optional locals
+  #   show_full_info [Boolean] whether to show other products in order.line_items
+  #   show_actions_in_order_info [Boolean] default true; the links and tracking buttons in order-info-table
+  #   image_link_content [Symbol] to be passed _messages_list
+  #   specific_user_id [Integer] this helps skip need of seller info for each order
+  #   specific_product_id [Integer] this would only show certain product
+  full_info_id = "full_user_info_#{order.id}" unless defined?(full_info_id) && full_info_id
+  show_full_info = false unless defined?(show_full_info)
+  show_actions_in_order_info = true unless defined?(show_actions_in_order_info) && show_actions_in_order_info == false
+  image_link_content = :icon unless defined?(image_link_content)
+  has_warning = nil unless defined?(has_warning)
+  inline = false unless defined?(inline)
+
+  is_viewer_admin = is_admin?
+  is_viewer_seller = (spree_current_user&.id == order.seller_user_id)
+  can_view_seller_info = (is_viewer_admin || is_viewer_seller)
+  specific_user_id = nil unless defined?(specific_user_id)
+  specific_product_id = nil unless defined?(specific_product_id)
+  right_side_cols = is_viewer_seller && show_actions_in_order_info ? ['col-6 col-md-3', 'col-6 col-md-3'] :
+    ['col-10 col-md-3', 'col-2 col-md-3']
+
+  paypal_store_pm = order.seller&.store&.paypal_store_payment_method
+  @cached_counts_of_paid_need_tracking ||= {}
+  count_of_paid_need_tracking ||= @cached_counts_of_paid_need_tracking[order.seller&.id]
+  if count_of_paid_need_tracking.nil?
+    count_of_paid_need_tracking = paypal_store_pm&.orders_with_paid_need_tracking_of_same_payment_method_account&.count.to_i
+    @cached_counts_of_paid_need_tracking[order.seller&.id] = count_of_paid_need_tracking
+  end
+
+- order.line_items.includes(:product, variant:[:option_values =>[:option_type] ]).sort{|x,y| y.price <=> x.price }.each_with_index do|line_item, index|
+  - next if specific_product_id && line_item.product_id != specific_product_id
+  - product = line_item.product
+  %div{ class: "container order-info-table", id: "#{index > 0 ? full_info_id : "first_row_of_#{order.id}"}", style: ("border: 3px solid #94392F; border-radius: 8px; margin-top: 4px; padding: 0.5em;" if inline) }
+    .row.text-bold{ style: "color: #94392F; #{'margin-left: 20px;' if inline}" }
+      You Missed This Sale!
+    .row
+      .col-2.col-md-1
+        - if index == 0
+          %strong= '$%.2f' % [order.total]
+          %br/
+          .text-secondary
+            - payment_payment_method = order.payments.first&.payment_method
+            = payment_payment_method&.description
+      .col-10.col-md-5
+        .row
+          .col-4
+            .orders-info-table-image-container
+              - if product && (default_image = default_image_for_product_or_variant(product) )
+                = link_to admin_list_same_item_path(product, rid: order.find_or_create_guest_token, return_url: CGI.escape(request.fullpath), utm_source: 'missed', utm_medium: 'image', utm_campaign: spree_current_user&.id), target:'_blank' do
+                  = image_tag cdn_image_url(default_image, :pdp_thumbnail), style:'max-width: 100%;'
+          .col-8.p-0
+            - if product
+              - size_option_types = line_item.variant.option_values.collect(&:option_type).find_all(&:size?)
+              - uniq_cont_of_option_types = line_item.variant.option_values.collect(&:option_type_id).uniq.size
+              %strong
+                - if show_actions_in_order_info
+                  = link_to product.name, admin_list_same_item_path(product, rid: order.find_or_create_guest_token ,return_url: CGI.escape(request.fullpath), utm_source: 'missed', utm_medium: 'link', utm_campaign: spree_current_user&.id), target:'_blank'
+                - else
+                  = product.name
+                %br/
+              - if line_item.variant.present? && variant_options_text(line_item.variant, present_with_option_type: false, exclude_option_types_anyway: true).present?
+                %span.variant-size-pill
+                  = variant_options_text(line_item.variant, present_with_option_type: false, exclude_option_types_anyway: true)
+              %br/
+      - if index == 0
+        %div(class="#{right_side_cols[0] }")
+          - if order.user&.country_code.present?
+            %span.country-icon(title="#{order.user.country}")
+              = inline_svg_tag "flags/4x3/#{order.user.country_code.downcase}.svg", size: '2.6em*1.3em'
+          - else
+            %span.country-name= order.user&.country
+          %span
+            %strong
+              = order.user.email.censor_email(order.user.email)
+          %br/
+          = link_to "Get Contact Info", admin_list_same_item_path(product, rid: order.find_or_create_guest_token, return_url: CGI.escape(request.fullpath), utm_source: 'missed', utm_medium: 'button', utm_campaign: spree_current_user&.id), class: "btn btn-primary", style: "font-size: 1.0rem; line-height: 2.0rem; border-radius: 8px; font-weight: 600; background-color: #94392F; width: 180pt; height: 34pt; margin-top: 0.5em; border: 0px;"
+    -if !inline
+      .top-right-corner
+        %span !

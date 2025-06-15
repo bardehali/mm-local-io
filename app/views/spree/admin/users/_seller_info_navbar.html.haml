@@ -1,0 +1,32 @@
+:ruby
+  # Require locals:
+  #   user
+  paypal = Spree::PaymentMethod.paypal unless defined?(paypal) && paypal
+  paypal_store_pm = user.store ? user.store.store_payment_methods.where(payment_method_id: paypal.id).last : nil
+  highlight_matched_words = ( params[:keywords] || '')
+  other_hl_args = [ highlight_matched_words, { prefix:"<span class='text-highlight'>", postfix:'</span>'} ]
+
+%div(class="row pb-1" data-user-id="#{user.id}")
+  .col-12.mb-2
+    %h5
+      -#= link_to 'Users / ', admin_users_path
+      %strong= user.email
+      - if user.username.present?
+        = '/'
+        %strong= user.username
+      &nbsp;&nbsp;
+      - if request.path == admin_sales_path
+        %strong= "Sales"
+      - else
+        = link_to "Sales", admin_sales_path('q[seller_user_id_eq]'=> user.id)
+      &nbsp;&nbsp;
+      - if request.path == admin_sales_in_state_path(state:'comments')
+        %strong= "Comments"
+      - else
+        = link_to "Comments", admin_sales_in_state_path(state:'comments', 'q[seller_user_id_eq]'=> user.id )
+      &nbsp;&nbsp;
+      - if request.path == admin_sales_in_state_path(state:'reports')
+        %strong= "Reports"
+      - else
+        = link_to "Reports", admin_sales_in_state_path(state:'reports', 'q[seller_user_id_eq]'=> user.id )
+= render partial:'spree/admin/users/seller_row', locals:{ user: user }

@@ -1,0 +1,9 @@
+:ruby
+  ##
+  # Required locals
+  #   image [Spree::Image]
+%div(class="gallery-image-item" id="image_#{image.id}")
+  %span(class="gallery-image-bg modal-image-trigger" data-toggle="modal" data-target="#modal-image-#{image.id}")
+    = image_tag cdn_image_url(image, :pdp_thumbnail), id:"variant_thumbnail_#{image.id}", class:"product-thumbnail #{'main-image' if image.position==1}", 'data-toggle'=>'image-popover', 'data-img'=> "#{ cdn_image_url(image, :large) }"
+  = link_to admin_product_delete_image_path(@product, image), remote: true, method:'delete', 'data-id'=> image.id, 'data-action'=>'remove', 'data-original-title'=>'Delete', class:'btn btn-danger btn-sm delete-resource icon-link with-tip action-delete', 'data-confirm'=> 'Are your sure?' do
+    %span.icon.icon-delete

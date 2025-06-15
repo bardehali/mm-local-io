@@ -1,0 +1,9 @@
+<ul id="sidebar-user" class="bg-white collapse nav nav-pills nav-stacked" data-hook="admin_user_sub_tabs">
+  <% if Spree.user_class && can?(:admin, Spree.user_class) -%>
+    <%= tab :all, url: spree.admin_users_path, label: t('spree.admin.tools.all_users'), match_path: '/users' %>
+    <%= tab :sellers, url: spree.admin_sellers_path, label: t('spree.admin.tools.sellers'), match_path: '/sellers' %>
+    <%= tab :all_sellers, url: spree.admin_all_sellers_path, label: t('spree.admin.tools.all_sellers'), match_path: '/all_sellers' if debugging? %>
+    <%= tab :buyers, url: spree.admin_buyers_path, label: t('spree.admin.tools.buyers'), match_path: '/buyers' %>
+    <%= tab :user_lists, url: spree.admin_user_lists_path, label: 'User Lists', match_path: '/user_lists' %>
+  <% end %>
+</ul>

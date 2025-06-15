@@ -1,0 +1,33 @@
+- content_for :page_title do
+  - if @recipient
+    = link_to( t('message.message_to') +' '+ @recipient.try_display_name.to_s, new_user_message_path(recipient_user_id: @recipient.id) )
+  - else
+    = link_to('Message', new_user_message_path)
+
+= form_for resource do|f|
+  = f.hidden_field(:recipient_user_id)
+  .pl-3.pr-3
+    .row
+      %label.font-weight-bold #{ t('message.noun') }
+      %br/
+      = f.text_area(:comment, class:'w-100', style:"height: 12em;")
+    .row.mt-1
+      = button_tag(type:'submit', class:'btn btn-success', data:{ disable_with: Spree.t('sending') + ' ..'} ) do
+        %span.icon.icon-ok 
+        = Spree.t('send').titleize
+      %span.m-1 &nbsp;or&nbsp;
+      = link_to spree.root_path, class:'btn btn-light border' do
+        %span.icon.icon-remove
+        = Spree.t('cancel').titleize
+
+- if @recipient && @messages_to_recipient
+  .container.user-messages-container
+    .row.mt-5
+      .col-4
+        - if spree_current_user.admin?
+          = image_tag(asset_path('logo/iOffer_logo_color_plain_h50.png'))
+      .col-4.text-center.pt-4
+        %h5.font-weight-bold #{t('message.messages_to')} #{@recipient.try_display_name}
+    .row
+      .col-11
+        = render partial:'list', locals:{ user_messages: @messages_to_recipient }

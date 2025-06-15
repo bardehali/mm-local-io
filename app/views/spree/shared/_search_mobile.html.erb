@@ -1,0 +1,101 @@
+<div class="mobile_search_placeholder">
+  <div class="box">
+      <p>Search 1M+ Products For</p>
+  </div>
+  <div class="mobile_search_slider_box">
+      <div class="mobile_search_slider">Anything</div>
+  </div>
+</div>
+
+<%= form_tag spree.m_products_path, method: :get, id: 'mobile_search_form', class: "py-md-1 d-flex align-items-center dropdown mobile-search-container" do %>
+  <%= hidden_field_tag('dropdown_selector', '#mobile_search_dropdown') %>
+  <%= search_field_tag :keywords,
+                       params[:keywords],
+                       id: 'mobile-search-box',
+                       autofocus: false, autocomplete: 'off', spellcheck: false,
+                       class: "mobile-search-box border-0"
+  %>
+  <div id="mobile_search_dropdown" class="dropdown-menu"/>
+<% end %>
+
+<script type='text/javascript'>
+  document.addEventListener("turbolinks:load", function() {
+    let input = document.querySelector("#mobile-search-box");
+    let slider_box = document.querySelector(".mobile_search_slider_box");
+    let slider = document.querySelector(".mobile_search_slider");
+    let placeholder = document.querySelector(".mobile_search_placeholder");
+
+    if (!input || !slider_box || !slider || !placeholder) return;
+
+    let intervals;
+    let list = ["Sneakers...", "Belts...", "Handbags...", "Watches...", "Anything!"];
+    let i = 0;
+
+    function text_animation() {
+      slider.innerHTML = list[i];
+      slider.style.opacity = "1";
+      slider.style.left = "0px";
+      setTimeout(() => {
+        slider.style.opacity = "0";
+        slider.style.left = "-5px";
+      }, 4000);
+      i = (i + 1) % list.length;
+    }
+
+    function set_intervals() {
+      clearInterval(intervals);
+      intervals = setInterval(() => {
+        text_animation();
+      }, 5000);
+    }
+
+    function cleanup() {
+      clearInterval(intervals);
+      if (input) {
+        input.removeEventListener("focus", handleFocus);
+        input.removeEventListener("blur", handleBlur);
+        input.removeEventListener("input", handleInput);
+      }
+    }
+
+    function handleFocus() {
+      placeholder.style.display = "none";
+      clearInterval(intervals);
+    }
+
+    function handleBlur() {
+      if (input.value.trim() === "") {
+        placeholder.style.display = "flex";
+        set_intervals();
+        text_animation();
+      }
+    }
+
+    function handleInput() {
+      if (input.value.trim() !== "") {
+        placeholder.style.display = "none";
+        clearInterval(intervals);
+      } else {
+        placeholder.style.display = "flex";
+        set_intervals();
+        text_animation();
+      }
+    }
+
+    input.addEventListener("focus", handleFocus);
+    input.addEventListener("blur", handleBlur);
+    input.addEventListener("input", handleInput);
+
+    if (input.value.trim() !== "") {
+      placeholder.style.display = "none";
+    } else {
+      placeholder.style.display = "flex";
+      set_intervals();
+      text_animation();
+    }
+
+    slider_box.style.height = slider.clientHeight + "px";
+
+    document.addEventListener("turbolinks:before-cache", cleanup, { once: true });
+  });
+</script>

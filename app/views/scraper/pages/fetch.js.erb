@@ -1,0 +1,12 @@
+$("#page_row_<%= resource.id -%>").fadeTo('slow', 0.2, function(){
+  $("#page_row_<%= resource.id -%>").replaceWith("<%= escape_javascript( render(partial: 'scraper/pages/fetch_table_row', locals:{ page: resource  }) ) -%>");
+} );
+<% if (container = params[:continue_fetching_container] ).present? %>
+if ( $("<%= container -%> a[name='fetch_detail_button']").length > 0){
+  var firstLink = $("<%= container -%> a[name='fetch_detail_button']")[0];
+  console.log("-> " + firstLink['href']);
+  firstLink.click();
+}
+<% elsif resource.page_type == 'index' && params[:return_url].present? %>
+  window.location = "<%= params[:return_url] -%>";
+<% end # continue_fetching -%>

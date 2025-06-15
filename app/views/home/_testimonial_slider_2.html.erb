@@ -1,0 +1,55 @@
+<div class="row testimonial-section-override" style="position: relative; overflow: hidden;">
+  <div class="quoteLoop-container">
+    <div class="quoteLoop">
+      <% fetch_happy_buyer_messages().each_with_index do|message_attr, index| -%>
+        <blockquote class="quote">
+          <div class="quote-container speech-bubble">
+            <div class="quote-text mb-1">
+              <span class="quote-content">
+                <%= message_attr['message']%>
+                <span class="quote-stars" style="color: #f4ae4e; white-space: nowrap; margin-left: 0px;">
+                  <% 5.times do %>
+                    <i class="glyphicon glyphicon-star"></i>
+                  <% end %>
+                </span>
+              </span>
+            </div>
+            <cite> <%= image_tag(asset_path(message_attr['avatar_url']), alt: "Avatar", class: "quote-ava")%> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <%=message_attr['user'].censored_middle%> (<%=message_attr['purchases']%> Purchases) from
+              <%= inline_svg_tag "flags/4x3/#{message_attr['country_code'].downcase}.svg", size: '2.6em*1.3em'%> </cite>
+          </div>
+        </blockquote>
+      <% end -%>
+    </div>
+  </div>
+</div>
+
+<!--<section id="testimonial">
+  <div class="quoteLoop-container">
+    <div class="quoteLoop">
+      <blockquote class="quote"> <img src="http://placehold.it/100x100" width="100" height="100" alt=""/>
+        <h5>&nbsp;<br>
+          &rdquo;Jazz it up a little bit make the picture of the cupcake look delicious make the purple more well, purple-er it looks so empty add some more hearts can you add a bit of pastel pink and baby blue?&rdquo;<br>
+          <small>Client Ipsum</small></h5>
+      </blockquote>
+      <blockquote class="quote"> <img src="http://placehold.it/100x100" width="100" height="100" alt=""/>
+        <h5>&nbsp;<br>
+          &ldquo;Just Photoshop out the dog, add a baby, and make the curtains blue. Can you make it stand out more? the hair is just too polarising can you make it look like this clipart i found. &rdquo;<br>
+          <small>Crazy Client</small></h5>
+      </blockquote>
+    </div>
+  </div>
+</section>-->
+
+
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript">
+    function fade($ele) {
+        $ele.fadeIn(1000).delay(6000).fadeOut(1000, function() {
+            var $next = $(this).next('.quote');
+            fade($next.length > 0 ? $next : $(this).parent().children().first());
+       });
+    }
+    fade($('.quoteLoop > .quote').first());
+
+  </script>

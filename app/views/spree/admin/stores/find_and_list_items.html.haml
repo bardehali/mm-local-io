@@ -1,0 +1,68 @@
+:ruby
+  show_user_info = false
+
+= stylesheet_link_tag 'selling/adoption'
+
+- if spree_current_user.try(:admin?)
+  - content_for :head do
+    :css
+      .card input { max-width: 100%; }
+
+- if params[:menu_open] && params[:option_value_ids].is_a?(Array)
+  - content_for :footer do
+    :javascript
+      if (window.addEventListener) {
+        window.addEventListener("load", function(){
+        <% params[:option_value_ids].each do|option_value_id| -%>
+          var label = $("#option_value_label_<%= option_value_id -%>");
+          label.css('border-color', 'black');
+          $("#filters_card_"+ label.attr('data-option-type-id') +" .card-body").addClass('show');
+        <% end -%>
+        }, false);
+      }
+
+%div(class="container-flex pl-5 pr-5 mb-3 d-md-flex")
+  .row.w-100
+    .col-12.col-md-2.sticky
+      .filter-title.mb-4.mb-2
+        = link_to admin_find_and_list_items_path() do
+          = t('spree.homepage.trending_wanted_items_header')
+      %ul.list-unstyled.mr-3
+        = render partial: 'spree/admin/shared/adoption_categories_menu'
+    .col-12.col-md-10.supply-background
+      .mb-4.mt-4.seller-item-banner
+        = t('seller.find_these_items')
+        .br
+        = t('seller.supply_these_items_cn')
+      - if @taxon || params[:keywords].present?
+        .seller-item-banner.mt-3.mb-3
+          - if @taxon
+            Supply More ➪ #{@taxon.breadcrumb.split('>').last.strip}
+          - elsif params[:keywords].present?
+            Supply More ➪ #{params[:keywords]}
+      .row
+        = render partial: 'spree/admin/shared/adoption_inline_category_tiles' unless params[:sid].present?
+        - @wanted_products.each do|line_item_or_product|
+          - product = line_item_or_product.is_a?(::Spree::Product) ? line_item_or_product : line_item_or_product.product
+          -# From _adoption_card
+          - taxon = product.taxons.find{|t| t.is_category? } || product.taxons.first
+          - product_url = admin_list_same_item_path(product, return_url: request.fullpath, utm_source: 'wanted', utm_medium: 'card', utm_campaign: spree_current_user&.id)
+          .col-3.col-md-3
+            .p-1.mb-2.fixed-size-card(id="product_adoption_card_#{product.id}" data-userid="#{product.user_id if spree_current_user.admin?}")
+              .ml-2
+                .row.m-1
+                  .a-image-container.product-adoption-card-image-container.zoom-hover
+                    = link_to product_url do
+                      = plp_and_carousel_image(product, class: "d-block mx-auto lazyloaded")
+                      .supply-card-overlay
+                        .a-title
+                          = product.view_count
+                          Sold
+                        .a-waiting
+                          This Week
+
+      .row.mr-2.product-pagination.mt-2
+        - if @wanted_products.respond_to?(:total_pages)
+          .col-3
+          .col-6(class="plp-pagination text-center")
+            = paginate(@wanted_products, window: 4, class:'page-link', theme: 'twitter-bootstrap-4')

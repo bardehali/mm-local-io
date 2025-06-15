@@ -1,0 +1,6 @@
+%div(class="row justify-content-center align-items-center")
+  %div(class="col-md-2 d-flex w-auto")
+    = icon(name: 'check-mark-circle', classes: 'd-block d-lg-none mx-auto product-added-modal-check-mark', width: 38, height: 38) 
+    = icon(name: 'check-mark-circle', classes: 'd-none d-lg-block mx-auto product-added-modal-check-mark', width: 68, height: 68)
+  %div(class="col-8 col-sm-6 col-lg-4 product-added-modal-message")
+    = Spree.t(:added_to_cart)

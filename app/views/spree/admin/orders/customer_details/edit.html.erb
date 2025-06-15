@@ -1,0 +1,41 @@
+<%= render 'spree/admin/shared/order_tabs', current: :customer_details %>
+  
+<% content_for :page_title do %>
+  / <%= Spree.t(:customer_details) %>
+<% end %>
+
+<% content_for :head_extra do -%>
+  <style >
+    .modal-dialog { max-width: 80%; height: 90%; }
+    .modal-dialog .modal-content { height: 100%; }
+    .modal-body iframe { width: 96%; height: 100%; }
+  </style>
+<% end -%>
+
+<% content_for :footer_extra do -%>
+  <%= render partial:'spree/admin/shared/modal', locals:{ title:'Preview Invoice',  content: '<iframe id="preview_invoice_iframe"/>' } %>
+<% end -%>
+
+<% if can? :edit, @order.user %>
+  <div id="select-customer" class="card mb-3" data-hook>
+    <div class="card-header">
+      <h1 class="card-title mb-0 h5">
+        <%= Spree.t(:customer_search) %>
+      </h1>
+    </div>
+    <div class="card-body" id="customer-search-field">
+      <%= hidden_field_tag :customer_search,  nil, class: 'error-message' %>
+      <%= render partial: "spree/admin/orders/customer_details/autocomplete", formats: :js %>
+    </div>
+  </div>
+<% end %>
+
+<%= render 'spree/admin/shared/error_messages', target: @order %>
+
+<%= form_for @order, url: spree.admin_order_customer_url(@order) do |f| %>
+  <%= render 'form', f: f %>
+<% end %>
+
+<br>
+
+<%= render 'spree/admin/shared/order_summary' %>

@@ -1,0 +1,37 @@
+:ruby
+  # Required locals
+  #   user
+  sign_in_logs = user.sign_in_request_logs
+
+%strong Last Active:
+&nbsp;
+- if user.last_active_at
+  - time_diff = user.last_active_at.relatively_days_ago
+  - if time_diff < 1
+    %label(title="#{user.last_active_at}")= pluralize(user.last_active_at.relatively_hours_ago, 'Hour')
+  - else
+    %label(title="#{user.last_active_at}")= pluralize(time_diff, 'Day')
+  &nbsp;
+%span(id="sign_in_span" style="display: inline-block;")
+  %div
+    - first_sign_in_log = sign_in_logs.first
+    - first_sign_in_ip = user.current_sign_in_ip || first_sign_in_log&.ip
+    - if first_sign_in_log
+      %label= link_to first_sign_in_ip, spree.admin_all_sellers_path("q[current_sign_in_ip_eq]"=>first_sign_in_ip), class:'text-monospace', title:'Search by this Login IP'
+    - if first_sign_in_log
+      %label.text-info.ml-1.mr-1 in #{first_sign_in_log.country}
+    - elsif (sign_in_location = find_location_by_ip(user.current_sign_in_ip))
+      %label.text-info.ml-1.mr-1 in #{sign_in_location.country.name}
+    &nbsp;
+    - if sign_in_logs.size > 1
+      %a(class="icon icon-chevron-down" data-toggle="collapse" href="#sign_in_request_logs_of_#{user.id}" role="button" aria-expanded="false" aria-controls="sign_in_request_logs_of_#{user.id}") &nbsp;
+  %div(id="sign_in_request_logs_of_#{user.id}" class="collapse overlay-list")
+    = request_logs_list(sign_in_logs, 1)
+&nbsp;
+%strong Sign Up
+- if user.ioffer_user&.ip.present?
+  %strong IP
+  &nbsp;
+  %label= user.ioffer_user.ip
+  &nbsp;
+%span(title="#{user.created_at.to_s}")= distance_of_time_in_shorts(user.created_at).titleize + ' Ago'

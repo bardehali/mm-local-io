@@ -1,0 +1,35 @@
+:ruby
+  # Require locals:
+  #   page [Scraper::Page]
+  #   or import_page_entry [Scraper::ImportPageEntry]
+  # Optional locals:
+  #   extra_link_options [Hash of parameters]
+  page = nil if not defined?(page)
+  import_page_entry = nil if not defined?(import_page_entry)
+  page = import_page_entry.page if defined?(import_page_entry) && import_page_entry && page.nil?
+  extra_link_options = {} if not defined?(extra_link_options)
+  extra_link_options ||= {}
+  extra_link_options.merge!(return_url: request.path + "?t=#{Time.now.to_i}") if page.page_type == 'index'
+%tr(id="page_row_#{page.id}" data-page-id="#{page.id}" data-page-type="#{page.page_type}" data-file-status="#{page.file_status}")
+  %td
+    %i(class="#{page_type_icon_css_class(page.page_type) }" title="Page type: #{page.page_type}")
+    &nbsp;
+    =link_to page.id, scraper_page_path(page), title:"Created#{" page entry #{import_page_entry.id}" if import_page_entry} at #{page.created_at.to_s(:db)}", 'data-toggle'=>'tooltip'
+  %td
+    - if page.retail_site
+      %strong= link_to(page.retail_site&.name, scraper_pages_path(q:{ retail_site_id_eq: page.retail_site_id }) )
+    = link_to page.relative_page_url.truncate(60), page.abs_page_url, target:'_blank', title: page.relative_page_url, 'data-toggle'=>'tooltip'
+  %td
+    %span(title="#{page.file_path}")=page.file_status
+  %td(id="page_row_status_#{page.id}" class="text-right")
+    - if page.page_type == 'detail' && page.scraper_page_imports.all.size > 0
+      - page.scraper_page_imports.each do|scraper_page_import|
+        = link_to(scraper_page_import.spree_product_id, spree.product_path(id: scraper_page_import.spree_product_id), method:'get', 'data-toggle'=>'tooltip', title:'Product from parsing', target:'_blank') 
+    - elsif !page.completed?
+      = link_to('Fetch', scraper_page_fetch_path( (extra_link_options || {}).merge(id: page.id) ), remote: true, 'data-disable-with'=>'Fetching ..', class:'btn btn-info', name:"fetch_#{page.page_type}_button" )
+    &nbsp;&nbsp;
+    = link_to(scraper_page_path(page), method:'delete', remote: true, data:{confirm:"Are you sure to delete this page?"}, title:'Delete this page') do
+      %i.btn.btn-danger.glyphicon.glyphicon-remove 
+    - if @error
+      .error-tip.dark-shadow 
+        = @error

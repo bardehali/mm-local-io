@@ -1,0 +1,40 @@
+<%
+  # General user info in table row, compared to _seller_row that's has extensive seller info.
+  # Required locals:
+  #   user [Spree::User]
+  # Optional locals:
+  #   paypal [Spree::PaymentMethod] Paypal; if nil, would fetch locally
+  paypal = Spree::PaymentMethod.paypal unless defined?(paypal) && paypal
+  paypal_account_id = user.store ? (user.store.account_parameters_of(paypal.id) || {})['account_id']  : nil
+  paypal_store_pm = user.store ? user.store.store_payment_methods.find{|spm| spm.payment_method_id == paypal.id } : nil
+  last_sign_in_log = user.request_logs.find_all{|log| log.group_name == 'sign_in' }.last
+-%>
+<tr id="<%= spree_dom_id user %>" data-hook="admin_users_index_rows">
+  <td><span title="Joined at <%= user.created_at.to_s(:db) %>"></span><%= user.id %></span></td>
+  <td>
+    <span title="<%= 'From iOffer' if user.ioffer_user -%>"><%= link_to(user.real_username, admin_user_path(user)) %></span>
+  </td>
+  <td class='user_email'><%=link_to user.email, edit_admin_user_path(user) %></td>
+  <td>
+    <% if paypal_account_id && paypal_store_pm -%>
+      <%= link_to admin_users_path(q:{ email_eq: paypal_account_id}) do -%>
+        <%= image_tag(asset_path('payment_methods/mini_avatar/paypal.svg'), class:'mini-avatar white-bg', title: paypal_account_id) %>
+      <% end if paypal_store_pm -%>
+    <% end -%>
+  </td>
+  <td class="text-right"><%= short_display_of_time(user.request_logs.last&.created_at, 'data-toggle'=>'tooltip') %></td>
+  <td class="text-right"><%= short_display_of_time(user.last_active_at, 'data-toggle'=>'tooltip') %></td>
+  <td><span data-toggle="tooltip" title="<%= last_sign_in_log&.location_combined -%>"><%= last_sign_in_log&.country -%></span></td>
+  <td class="text-right"><%= link_to user.count_of_products_created || products_count_for(user), admin_products_path(q:(params[:q] || {}).merge({ user_id_eq: user.id}) ) -%></td>
+  <td class="text-right"><%= link_to user.count_of_products_adopted || products_adopted_count_for(user), admin_products_adopted_path(variant_adoptions_user_id_eq: user.id ) -%></td>
+  <td data-hook="admin_users_index_row_actions" class="actions actions-2 text-right">
+    <% if @user_list -%>
+      <%= link_to admin_remove_user_list_user_path(id: @user_list.id, user_id: user.id, selector:"##{spree_dom_id(user)}"), method:'delete', remote: true, class:'btn btn-danger btn-sm delete-resource icon-link with-tip action-delete', title:'Remove from list' do -%>
+        <span class='icon icon-delete'></span>
+      <% end -%>
+    <% else -%>
+      <%= link_to_edit user, url: edit_admin_user_path(user), no_text: true if can?(:edit, user) %>
+      <%= link_to_delete user, url: admin_user_path(user), no_text: true if can?(:delete, user) %>
+    <% end -%>
+  </td>
+</tr>

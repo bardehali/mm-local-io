@@ -1,0 +1,66 @@
+:ruby
+  retail_site_options = Retail::Site.all.collect{|site| [site.name, site.id] }
+  # options_from_collection_for_select(Retail::Site.all, 'id', 'name')
+- content_for :head do
+  = stylesheet_link_tag 'spree/scraper'
+.container
+  .float-right
+    %button(type='button' data-toggle="modal" data-target="#page_preview_modal") Preview
+  .clearfix
+  %h4 Scraper Pages
+
+  .search-form.m-3
+    = search_form_for @search do |f|
+      .row
+        .col-4
+          = f.label(:retail_site_id_eq) { 'Site' }
+          = f.select :retail_site_id_eq, [['- All - ', nil] ] + retail_site_options
+        .col-4
+          = f.label(:file_status_eq) { 'Status'}
+          = f.select :file_status_eq, [['- Any -', nil]] + Scraper::Page::FILE_STATUSES
+        .col-4
+          = f.submit { 'Search' }
+
+  - if collection.blank?
+    %h4 No pages found.
+    - if params[:url].present?
+      %h4 Want to add this page?
+  - else
+    %table.table.table-striped
+      %thead
+        %tr
+          %th ID
+          %th Type & Path
+          %th Status
+          %th Actions
+      %tbody
+        = render partial:'scraper/pages/fetch_table_row', collection: collection, as: :page
+    - if collection.respond_to?(:total_pages)
+      %div(class="row pl-md-4 pl-sm-4")
+        .col-md-3.col-sm-2
+        .col-md-6.col-sm-8
+          %div(class="plp-pagination d-none d-lg-flex")
+            = paginate collection, window: 2, theme: 'twitter-bootstrap-4'
+          %div(class="plp-pagination d-lg-none")
+            = paginate collection, window: 1, theme: 'twitter-bootstrap-4'
+    %br/
+    %br/
+
+%div(class="modal fade" id="page_preview_modal" style="max-width:100%; margin:auto;" tabindex="-1" role="dialog" aria-labelledby="page_preview_modal_label" aria-hidden="true")
+  .modal-dialog(role="document" style="max-width:70%;")
+    = form_tag(scraper_page_preview_path) do
+      .modal-content
+        .modal-header
+          %h5(class="modal-title" id="page_preview_modal_label")
+          %button(type="button" class="close" data-dismiss="modal" aria-label="Close")
+            %span(aria-hidden="true") &times;
+        .modal-body
+          %label(for='retail_site_id') Site
+          = select_tag(:retail_site_id, options_for_select(retail_site_options) )
+          %br/
+          %label(for='source') Page Source Code
+          %br/
+          = text_area_tag(:source, @source, style:'width: 100%; height: 30rem;')
+        .modal-footer
+          %button(type="button" class="" data-dismiss="modal") Cancel
+          %button(type="submit" class="") Preview

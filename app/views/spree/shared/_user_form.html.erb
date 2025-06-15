@@ -1,0 +1,30 @@
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+<div class="form-group mb-5">
+  <%= f.email_field :email, class: 'spree-flat-input', placeholder: Spree.t(:email) %>
+</div>
+
+<div class="form-group mb-4">
+  <%= f.password_field :password, class: 'spree-flat-input', placeholder: Spree.t(:password) %>
+</div>
+
+<div class="form-group mb-5">
+  <%= f.password_field :password_confirmation, class: 'spree-flat-input', placeholder: Spree.t(:confirm_password) %>
+</div>
+
+<% #if params[:verify] == "true" %>
+<% if true %>
+  <% if Rails.env.development? || Rails.env.staging? %>
+    <div class="cf-turnstile mb-5" data-sitekey="3x00000000000000000000FF" data-callback="javascriptCallback"></div>
+  <% else %>
+    <div class="cf-turnstile mb-5" data-sitekey="0x4AAAAAAAVkUH4EudCaGDf8" data-callback="javascriptCallback"></div>
+  <% end %>
+<% end %>
+
+<div class="form-group mb-4">
+<%#= check_box_tag 'terms_agree_cb', 'yes', false -%>
+By creating your account, you agree to our <a href="/privacy_policy" rel="nofollow"><b>Privacy Policy</b></a> and <a href="/terms" rel="nofollow"><b>Terms And Conditions</b></a>.
+</div>
+
+<%= hidden_field_tag :turnstile_response, nil, id: :turnstile_response %>
+<div data-hook="signup_below_password_fields"></div>

@@ -1,0 +1,2 @@
+class SearchQueryPreset < ApplicationRecord
+end

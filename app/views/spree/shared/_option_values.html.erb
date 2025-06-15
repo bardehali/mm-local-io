@@ -1,0 +1,37 @@
+<%
+  ##
+  # Locals required
+  #   option_type [Spree::OptionType]
+  # Optional
+  #   selected_option_values [Array of Spree::OptionValue#id]
+  #   option_value_param_name [String] the parameter name to point to OptionValue#id; default is OptionType#name such as color=5
+  option_value_param_name ||= ot_downcase_name
+  selected_option_values = []
+  option_values = option_type.option_values unless defined?(option_values) && option_values
+  if option_value_param_name.present?
+    option_value_param_name.to_s.gsub!('[]', '')
+    selected_option_values = params[option_value_param_name]
+    selected_option_values = [selected_option_values] unless selected_option_values.is_a?(Enumerable)
+    selected_option_values.reject!(&:blank?)
+    selected_option_values.sort!
+  end
+-%>
+<% cache base_cache_key + ["option_type_values_#{option_type.id}", selected_option_values, filtering_params_cache_key, @taxon&.id] do %>
+  <% option_values.each do |option_value| %>
+    <% id = option_value.id -%>
+    <% name = option_value.name -%>
+    <% option_value_param = selected_option_values.include?(id) ? selected_option_values - [id] : selected_option_values + [id]
+    -%>
+    <%= link_to params.merge(option_value_param_name => option_value_param, menu_open: 1, page: 1) do %>
+      <% if ot_downcase_name =~ /\bcolor\Z/i %>
+        <span class="d-inline-block mb-1" id="option_value_label_<%= id -%>" title="<%= option_value.presentation %>" data-toggle='tooltip' data-option-type-id="<%= option_type.id -%>">
+          <%= make_color_select( option_value.extra_value_or_presentation, selected_option_values.include?(id.to_s) ) %>
+        </span>
+      <% else %>
+        <span class="d-inline-block text-uppercase py-1 px-2 m-1 plp-overlay-card-item <%= 'plp-overlay-card-item--selected' if selected_option_values.include?(id.to_s) %>" id="option_value_label_<%= option_value.id -%>" data-option-type-id="<%= option_type.id -%>">
+          <%= name %>
+        </span>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

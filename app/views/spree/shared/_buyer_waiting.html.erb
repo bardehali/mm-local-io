@@ -1,0 +1,43 @@
+<div class="review ioffer-review">
+    <div class="row">
+      <div class="review-user-side col-1">
+        <% if review.show_identifier %>
+        <% else %>
+          <span><%= Spree.t(:anonymous) %></span>
+        <% end %>
+        <% if country_flag_icon_of(review.user).present? %>
+          <%= country_flag_icon_of(review.user, { class:'buyer-wanting-flag' }) %>
+        <% else %>
+          <%
+            # Define a darker color palette with 26 colors
+            colors = [
+             '#3B5998', '#8B9DC3', '#D35400', '#27AE60', '#2980B9', '#8E44AD', '#2C3E50', '#E67E22',
+             '#16A085', '#E74C3C', '#3498DB', '#1ABC9C', '#9B59B6', '#F39C12', '#C0392B', '#34495E',
+             '#2ECC71', '#7D3C98', '#B03A2E', '#5D6D7E', '#2874A6', '#148F77', '#76448A', '#633974',
+             '#2E4053', '#6C3483'
+           ]
+
+            # Get the first initial and determine its position in the alphabet
+            first_initial = review.user.firstname[0].upcase
+            position = first_initial.ord - 'A'.ord
+
+            # Assign color based on the position in the alphabet
+            assigned_color = colors[position]
+
+            # Get the initials (First and Last Name Initials)
+            initials = "#{review.user.firstname[0].upcase}#{review.user.firstname[1].upcase}"
+          %>
+          <div style="background-color:<%= assigned_color %>; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+            <span style="color: white; font-weight: bold; font-size: 16px;"><%= initials %></span>
+          </div>
+          <% end %>
+        <span content="<%= review.fake_recent_created_at.to_date.to_s %>"></span>
+      </div>
+      <div class="reivew-comment-side col-3">
+        <div class="review-title" style="color:#933A32"><strong>Waiting <%= time_ago_in_words(review.fake_recent_created_at) %></strong></div>
+      </div>
+      <div class="reivew-comment-side col-8" >
+        Wants to Pay with PayPal
+      </div>
+      </div>
+    </div>

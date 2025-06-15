@@ -1,0 +1,89 @@
+<%
+admin_path = request.path.ends_with?('sellers') ? request.path : spree.admin_users_path
+-%>
+<% content_for :table_filter do %>
+  <div data-hook="admin_users_index_search">
+    <%= search_form_for [:admin, @search], url: admin_path do |f| %>
+      <div class="row">
+        <div class="col-12 col-md-4">
+          <div class="form-group">
+            <%= f.label :email_cont, Spree.t(:email) %>
+            <%= f.text_field :email_cont, placeholder:'Email', class: "form-control js-quick-search-target js-filterable" %>
+          </div>
+        </div>
+        <div class="col-12 col-md-4">
+          <div class="form-group">
+            <%= f.label :username_cont, Spree.t(:username) %>
+            <%= f.text_field :username_cont, placeholder:'Username', class: "form-control js-quick-search-target js-filterable" %>
+          </div>
+        </div>
+        <div class="col-12 col-md-4">
+          <div class="form-group">
+            <%= f.label :store_store_payment_methods_account_parameters_cont, 'Payment Account ID' %>
+            <%= f.text_field :store_store_payment_methods_account_parameters_cont, placeholder:'Payment Account ID', class: "form-control js-quick-search-target js-filterable" %>
+          </div>
+        </div>
+        <div class="col-12 col-md-4">
+          <div class="form-group">
+            <%= f.label :store_store_payment_methods_payment_method_id_eq, 'Payment Method' %>
+            <%= f.select :store_store_payment_methods_payment_method_id_eq, Spree::PaymentMethod.order('position asc').all.map {|pm| [pm.description, pm.id]}, { include_blank: true }, class:'form-control max-w-100' %>
+          </div>
+        </div>
+        <div class="col-12 col-md-4">
+          <div class="form-group">
+            <%= f.label :current_sign_in_ip_eq, 'Login IP' %>
+            <%= f.search_field :current_sign_in_ip_eq, placeholder:'Login IP', class: "form-control  js-filterable" %>
+          </div>
+        </div>
+        <div class="col-12 col-md-4">
+          <div class="mb-1">
+            <label>With only these roles:</label>
+          </div>
+          <% Spree::Role.non_admin_roles.each do|role| -%>
+            <label for="role_id_in_<%= role.id %>" class="mr-3">
+              <%= check_box_tag 'q[role_users_role_id_in][]', role.id, params[:q].try(:[], :role_users_role_id_in).to_a.collect(&:to_i).include?(role.id), id:"role_id_in_#{role.id}" %>
+              <span class="user-role-<%= role.short_name %>"><%= role.short_name %></span>
+            </label>
+          <% end -%>
+        </div>
+      </div>
+      <% if Spree::Config[:company] %>
+        <div class="form-group">
+          <%= f.label :bill_address_company_cont, Spree.t(:company) %>
+          <%= f.text_field :bill_address_company_cont, class: 'form-control js-filterable' %>
+        </div>
+      <% end %>
+      <div data-hook="admin_users_index_search_buttons" class="form-actions">
+        <%= submit_tag Spree.t(:search), data:{ disable_with:'Searching ...'}  %>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+
+
+<% content_for :quick_table_filter do -%>
+  <div class="filter-wrap row">
+    <div class="col-12">
+      <div class="input-group index-filter-button">
+        <span class="input-group-btn">
+          <button class="btn js-show-index-filters" type="button">
+            <span class="icon icon-chevron-right"></span>
+            <%= Spree.t(:filter) %>
+          </button>
+        </span>
+        <% quick_field_name = :email_or_store_store_payment_methods_account_parameters_or_store_store_payment_methods_instruction_cont -%>
+        <%= search_form_for [:admin, @search], url: admin_path, class: 'flex-grow-1' do|f| %>
+          <%= text_field_tag "q[#{quick_field_name}]", params[:q].try(:[], quick_field_name), class: "form-control", placeholder: Spree.t(:quick_search) %>
+          <%= f.hidden_field :store_store_payment_methods_payment_method_id_eq, value: Spree::PaymentMethod.paypal.id unless Rails.env.development? %>
+        <% end %>
+      </div>
+      <div id="table-filter" data-hook class="card bg-light filter-well">
+        <div class="card-body">
+          <%= yield :table_filter %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end -%>
+
+<div class="table-active-filters js-filters"></div>

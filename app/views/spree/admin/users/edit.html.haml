@@ -1,0 +1,83 @@
+:ruby
+  bad_user = @user.quarantined?
+
+= render partial: 'spree/admin/users/sidebar', locals: { current: :account }
+= render partial: 'spree/admin/users/user_page_actions'
+
+- content_for :page_title do
+  = @user.email
+
+:css
+  .card-body table th, .card-body table td { padding: 0.2em 0.5em; }
+  .none-text { opacity: 0.7; }
+- if bad_user
+  :css
+    .card { border: solid 3px #ffd0d0 !important; }
+    .card .card-header { background-color: #ffd0d0 !important; }
+
+:javascript
+  $(function(){
+    $('[data-toggle="tooltip"]').tooltip();
+
+  });
+
+%div(data-hook="admin_user_info" class="card mb-3")
+  .card-header
+    %h1(class="card-title mb-0 h5")
+      = Spree.t('admin.users.admin_user_info')
+      - if bad_user
+        %small.text-monospace
+          = '(' + @user.spree_roles.bad_roles.collect(&:name).join(', ') + ')'
+  .card-body
+    = render partial:'seller_admin_row', locals:{ user: @user, show_admin_actions: false }
+.row
+  - if spree_current_user.admin?
+    .col-lg-6.col-md-12.mb-3
+      = render partial: 'general_info', locals: { user: @user }
+    .col-lg-6.col-md-12.mb-3
+      = render partial: 'activity_info', locals: { user: @user }
+.row.mb-3
+  .col-12
+    = render partial: 'selection_info', locals: { user: @user }
+- if @user.ioffer_user
+  .row.mb-3
+    .col-12
+      = render partial: 'ioffer_user_info', locals: { ioffer_user: @user.ioffer_user }
+- if spree_current_user&.admin?
+  %div(data-hook="admin_user_edit_security_settings" class="row mb-3")
+    .col-12
+      .card
+        .card-header
+          %h1(class="card-title mb-0 h5")
+            = Spree.t(:security_settings)
+        .card-body
+          %div(data-hook="admin_user_edit_form_header")
+            = render partial: 'spree/admin/shared/error_messages', locals: { target: @user }
+          %div(data-hook="admin_user_edit_form")
+            = form_for [:admin, @user], as: :user, url: spree.admin_user_path(@user), method: :put do |f|
+              %div(data-hook="admin_user_form_roles" class="form-group")
+                %strong= Spree.t(:roles)
+              = f.collection_check_boxes :spree_role_ids, Spree::Role.non_admin_roles, :id, :name do |role_form|
+                .checkbox
+                  = role_form.label for: "user_spree_role_#{role_form.object.display_name}" do
+                    = role_form.check_box id: "user_spree_role_#{role_form.object.display_name}"
+                    = role_form.object.display_name
+                    &nbsp;&nbsp;
+                    %small= link_to '(view users)', admin_users_path(q:{ role_users_role_id_in: [role_form.object.id] }), class:'text-sm'
+              %div(data-hook="admin_user_edit_form_button" class="mt-3")
+                = render partial: 'spree/admin/shared/edit_resource_links', locals: { collection_url: spree.admin_users_path }
+
+- if @user.other_site_accounts.size > 0
+  %div(data-hook="admin_other_site_accounts" class="card mb-3")
+    .card-header
+      %h1(class="card-title mb-0 h5")
+        = 'Other Site Accounts'
+    .card-body
+      .row.mb-1
+        - @user.other_site_accounts.each do|other_site_account|
+          .col-6
+            %strong= other_site_account.site_name.to_s + ':'
+            = other_site_account.account_id
+
+- if false && spree_current_user.admin?
+  = render partial: 'spree/admin/users/user_api_form'

@@ -1,0 +1,11 @@
+<% # Replacement of spree_navigation_data
+    if Spree::CategoryTaxon.top_level_categories.any? %>
+    <ul class="nav pl-3 side-cat-bar">
+      <% Spree::CategoryTaxon.top_level_categories.each_with_index do |top_category, index| %>
+      <% break if index >= 6 %>
+      <li class="">
+        <%= link_to top_category.name, seo_url(top_category), class: "p-2 main-nav-bar-item main-nav-bar-category-button" %>
+      </li>
+    <% end # each top_category %>
+    </ul>
+<% end %>

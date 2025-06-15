@@ -1,0 +1,17 @@
+<% # Override and extend backend/app/views/spree/admin/shared/_destroy.js.erb
+-%>
+<% if success = flash.discard(:success) %>
+  show_flash('success', "<%= j success %>");
+<% end %>
+
+<% if error = flash.discard(:error) %>
+  show_flash('error', "<%= j error %>");
+<% end %>
+
+<%= render partial: '/spree/admin/shared/update_order_state' if @order %>
+<%= render partial: '/spree/admin/shared/update_store_credit' if @store_credit %>
+
+<%
+if @user -%>
+  $(".seller-row + *[data-user-id='<%= @user.id -%>']").fadeOut(1000);
+<% end # @user -%>

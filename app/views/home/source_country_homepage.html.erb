@@ -1,0 +1,159 @@
+<style>
+  .card { border-radius: 8%; }
+  .list-unstyled a:hover { text-decoration: none; }
+</style>
+
+<% @body_id = 'home' %>
+
+<div class="row mx-5 curated-menu">
+  <div class="col-xl-3 mt-3 categories-side-bar">
+    <div class="sticky-categories">
+      <% if !spree_current_user&.seller?   %>
+        <div class="source-country-title-header">
+          <%= Spree.t('homepage.benefits.benefits_list_header')%>
+        </div>
+        <%= render partial: 'home/source_country/benefits_list', locals: { remove_link: false } %>
+      <% end %>
+      <div class="row mt-5">
+        <div class="col-6">
+          <div class="source-country-title-header">
+            <%= Spree.t('homepage.latest_sales')%>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="">
+            <% if !spree_current_user&.seller?   %>
+              <a href="/login"><span><b>SIGN IN</b></span> <span style="color:#999999"> to see more</span></a>
+            <% end %>
+          </div>
+        </div>
+      </div>
+      <div id="recent_sales_list">
+        <%= render partial: 'spree/orders/brief_orders_list', locals:{ orders: @orders } %>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-9 col-sm-12">
+    <div class="container">
+      <% if !spree_current_user&.seller?   %>
+        <div class="source-country-title-header mt-3">
+          <%= Spree.t('homepage.happy_sellers')%>
+        </div>
+        <div class="bubble mt-4">
+          “I sell on iOffer for 3 years and I have very good success.  The international buyer traffic is very good and
+  I have made many sales”
+          <div style="font-weight: 700">
+            -zujianhui2020
+          </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-xl-8 col-lg-10">
+              <div class="about-video wow fadeInUp mt-5" data-wow-duration="1.5s" data-wow-offset="100">
+                <%= video_tag('seller-landing-video.mp4', id: 'onboarding-video', playsinline: true, autoplay: true, loop: true, muted: true, alt:'iOffer') %>
+              </div>
+              <div class="section-title text-center mt-30 pb-40">
+                  <h3 class="video-caption wow fadeInUp" data-wow-duration="1.5s" data-wow-delay="0.6s">It's as simple as Opening Your Shop, Listing Your Items and Start Selling.</h3>
+              </div> <!-- section title -->
+
+              <div class="pricing-btn rounded-buttons text-center">
+                  <a class="main-btn rounded-three mb-2 mt-4 px-5 cta-btn" style="border-radius: 8px; padding-left: 50px; padding-right: 50px;" href="/seller_signup??utm_source=seller_landing&utm_medium=cta_button&utm_campaign=seller_onboarding_fall_21_02&utm_id=091421.000002&utm_content=items_wanted">Start Selling - 开始销售</a>
+              </div>
+
+            </div>
+        </div> <!-- row -->
+      <% else %>
+        <%= render partial: 'home/curated_product_grid', locals: { extended_class: 'clear-backgound' } %>
+      <% end %>
+
+    </div> <!-- container -->
+  </div>
+</div>
+
+<div class="pricing-area mt-4">
+  <div class="container pricing-area">
+      <div class="row justify-content-center">
+          <div class="col-lg-4 col-md-7 col-sm-9">
+              <div class="pricing-style-one wow fadeIn pricing-height" data-wow-duration="1.2s" data-wow-delay="0.2s">
+                  <div class="pricing-header text-center">
+                      <h5 class="sub-title">Reach Millions</h5>
+                  </div>
+                  <div class="pricing-icon text-center pricing-icon-small">
+                      <img src="<%= asset_path('seller-panel-final-2.png') %>" alt="">
+                  </div>
+              </div> <!-- pricing style one -->
+          </div>
+
+          <div class="col-lg-4 col-md-7 col-sm-9">
+              <div class="pricing-style-one wow fadeIn pricing-height" data-wow-duration="1.2s" data-wow-delay="0.2s">
+                <div class="pricing-header text-center">
+                    <h5 class="sub-title">Sell More</h5>
+                </div>
+                <div class="pricing-icon text-center mt-5 pricing-icon-small">
+                    <img src="<%= asset_path('sell-more-van.png') %>" alt="">
+                </div>
+              </div> <!-- pricing style one -->
+          </div>
+
+          <div class="col-lg-4 col-md-7 col-sm-9">
+              <div class="pricing-style-one wow fadeIn pricing-height" data-wow-duration="1.2s" data-wow-delay="0.2s">
+                <div class="pricing-header text-center">
+                    <h5 class="sub-title">Make Money</h5>
+                </div>
+                <div class="pricing-icon text-center mt-3 pricing-icon-small">
+                    <img src="<%= asset_path('cash-make-money.png') %>" alt="">
+                </div>
+              </div> <!-- pricing style one -->
+          </div>
+      </div> <!-- row -->
+  </div> <!-- container -->
+</div>
+
+  <!--====== PRINICNG STYLE EIGHT ENDS ======-->
+
+  <!--====== ABOUT PART START ======-->
+
+  <div class="about-area">
+      <div class="container">
+          <div class="row justify-content-center">
+              <div class="col-xl-12 col-lg-12 mb-5">
+                  <div class="about-image text-center" data-wow-duration="1.5s" data-wow-offset="100">
+                      <img src="<%= asset_path('get-paid-quicker.png') %>" alt="services">
+                  </div>
+              </div>
+          </div> <!-- row -->
+      </div> <!-- container -->
+  </div>
+
+<div class="pricing-area ">
+  <div class="row mt-5">
+    <div class="col-md-3">
+      <div class="source-country-title-header ml-5">
+        <%= Spree.t('homepage.items_buyer_wants')%>
+      </div>
+      <%= render partial: 'home/source_country/visual_category_list' %>
+    </div>
+    <div class="col-md-9 col-sm-12">
+      <div class="source-country-title-header">
+        <%= Spree.t('homepage.praises')%>
+      </div>
+      <div class="review-wrapper">
+        <div class="outer" style="height:380px;">
+
+          <% fetch_happy_buyer_messages().each_with_index do|message_attr, index| -%>
+            <div class="card" style="--delay:<%= index <= 3 ? index - 1 : 2 %>;">
+              <div class="bubble">
+                <%= message_attr['message'] %>
+                <div style="font-weight: 700">
+                  <%= inline_svg_tag "flags/4x3/#{message_attr['country_code'].downcase}.svg", size: '2.6em*1.3em'%> <%=message_attr['user'].censored_middle%> (<%=message_attr['purchases']%> Purchases) from <%=message_attr['country']%>
+                </div>
+              </div>
+            </div>
+          <% end -%>
+        </div>
+    </div>
+  <% if !spree_current_user&.seller?   %>
+    <div class="pricing-btn rounded-buttons text-center mb-5">
+        <a class="main-btn rounded-three mb-2 mt-4 px-5 cta-btn" style="border-radius: 8px; padding-left: 50px; padding-right: 50px;" href="/seller_signup??utm_source=seller_landing&utm_medium=cta_button&utm_campaign=seller_onboarding_fall_21_02&utm_id=091421.000002&utm_content=items_wanted">Start Selling - 开始销售</a>
+    </div>
+  <% end %>
+</div>

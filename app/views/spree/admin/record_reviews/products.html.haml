@@ -1,0 +1,140 @@
+:ruby
+  next_to_batch_review = false
+  not_batch_mark_review = %w(all reviewed).include?(params[:filter] ) ||  params[:version].blank?
+  # preload entire yet
+  seller_stats(@products.first.user_id, @products.collect(&:user_id)) if @products.present? && params[:version] != 'old'
+
+- content_for :head do
+  = stylesheet_link_tag 'spree/record_reviews'
+  :css
+    .separator-list-item { padding: 0.5rem 0.5rem 0.5rem 1.0rem; margin-left: -0.5rem; background-color: #f6f6f6; }
+    .pagination span { font-size: 14px; line-height: 34px; margin: 0 3px; }
+    input[class=product-selection-checkbox] { display: none; }
+    input[type=checkbox]:not(:checked) + div { opacity: 0.5; }
+    input[type=checkbox]:not(:checked) + div + div { opacity: 0.5; }
+    input[type=checkbox]:not(:checked) + div + div + div { opacity: 0.5; }
+    input[type=checkbox]:checked + div { opacity: 1.0; }
+    input[type=checkbox]:checked + div + div { opacity: 1.0; }
+    input[type=checkbox]:checked + div + div + div { opacity: 1.0; }
+    .product-thumbnails input[type=radio] { display: none; }
+    .text-highlight { background-color: #FFEE99; padding: 0.2rem; margin: -0.2rem 0 0 -0.2rem; }
+
+  = javascript_include_tag 'spree/record_reviews'
+
+  :javascript
+    var productsPreviousImagesChecked = {};
+
+    function clickedProductMainImage(event) {
+      var productId = $(this).attr('data-product-id');
+      var rowCheckboxSelector = "input[name='product_selection[" + productId +"]']";
+      var inputName = $(this).prop('name');
+      var currentSelectedValue = productsPreviousImagesChecked[inputName];
+
+      //console.log( $(this).prop('name') + ", id = " + $(this).prop('id') + " val = " + $(this).val() +", vs current "+ currentSelectedValue );
+      $(this).siblings("label").removeClass('main-image');
+      if ( $(this).val() != currentSelectedValue ) { 
+        $("label[for='" + $(this).prop('id') + "']").addClass('main-image');
+        currentSelectedValue = $(this).val();
+        $('#' + $(this).prop('id'))[0].checked = true;
+      } else {
+        $("label[for='" + $(this).prop('id') + "']").removeClass('main-image');
+        currentSelectedValue = '0';
+        $("input[name='"+ inputName +"'")[0].checked = true;
+      }
+      productsPreviousImagesChecked[inputName] = currentSelectedValue;
+      $(rowCheckboxSelector).prop('checked', ( currentSelectedValue != '0') );
+    }
+
+    function collapseLimitedLines(event) {
+      $($(this).attr('data-target') ).addClass('text-collapsed');
+      $(this).hide();
+    }
+
+- content_for :footer do
+  :javascript
+    $(function(){
+      $("input.product-main-image").click(clickedProductMainImage);
+      $("button.to-collapse-limited-lines").click(collapseLimitedLines);
+    });
+
+- admin_breadcrumb do
+  = link_to(I18n.t('spree.products'), spree.admin_products_path )
+
+- if @page_title.present?
+  - admin_breadcrumb do
+    = @page_title
+
+
+.row
+  .col-6
+    %h5
+      #{t('spree.admin.tools.curation_by_image')} &gt;
+      %span(class="badge badge-info#{' badge-active-underlined' if params[:filter]=='all'}")
+        = link_to 'All', admin_niir_path(params.merge(last_product_id: nil, filter: 'all', page: 1, order:''))
+      %span(class="badge badge-success#{' badge-active-underlined' if params[:filter]=='reviewed'}")
+        = link_to admin_niir_path(params.merge(last_product_id: nil, filter: 'reviewed', page: 1, order:'')) do
+          - if @total_count_of_reviewed
+            #{@total_count_of_reviewed}
+          Reviewed
+      %span(class="badge badge-warning#{' badge-active-underlined' if params[:filter].blank? || params[:filter]=='not_reviewed'}")
+        = link_to admin_niir_path(params.merge(last_product_id: nil, filter: 'not_reviewed', page: 1, order:'')) do
+          - if @total_count_of_not_reviewed
+            #{@total_count_of_not_reviewed}
+          Not Reviewed
+  .col-4.text-right
+    - unless params[:filter] == 'all' || params[:version].blank?
+      = form_tag(admin_batch_update_products_path, method:'put', 'data-remote'=>true) do
+        = hidden_field_tag('filter', params[:filter] )
+        %span(class="text-sm text-bolder" title='Image Quality Score' data-toggle='tooltip') Base IQS
+        = text_field_tag('iqs', '', placeholder:'IQS')
+        - @products.each do|p|
+          = hidden_field_tag('product_ids[]', p.id)
+        .btn-group(role='group')
+          = submit_tag('Update', class:'btn btn-sm btn-info', title:'Only those on this page', 'data-toggle'=>'tooltip')
+          &nbsp;&nbsp;&nbsp;
+          = submit_tag('Update All', class:'btn btn-sm btn-secondary', title:'All products in this filter condition', 'data-toggle'=>'tooltip', 'data-disable-with' => 'Updating ..', onclick:"return confirm('Sure for all including following pages?')")
+  - if not not_batch_mark_review
+    .col-2.text-right
+      %a(href='#' id='check_all_bad_image' class='unchecked' data-target='#mark_reviewed_form' data-status-code="#{::Spree::RecordReview::NAME_TO_STATUS_CODE_MAPPING['Bad Main Image']}")
+        = image_tag('icon/bad-image-red-small.png')
+        Check All - Bad Main Image
+  - elsif %w(all reviewed).include?(params[:filter])
+    .col-2.text-right
+      = form_tag(admin_niir_path(version: params[:version]), method:'get', html:{ class:'form-inline'} ) do
+        = hidden_field_tag('filter', params[:filter])
+        %strong Primary Sort:
+        = select_tag('order', options_for_select([ ['IQS Desc', ''], ['Last Review Desc', 'last_review_at desc'] ], params[:order] ), onchange: 'this.form.submit()' )
+%br/
+%div
+  - if params[:view] == 'card'
+    .row(id="record_reviews" data-hook="search_results")
+      = render partial: 'product_for_review_card', collection: @products, as: 'product'
+  - else
+    %ul(id="record_reviews" class="products-list list-unstyled")
+      - if params[:version] == 'old'
+        = render partial: 'spree/admin/record_reviews/product_for_review_list_with_status_actions', collection: @products, as: :product, locals:{ is_admin: spree_current_user.try(:admin?) }
+      - else
+        = render partial: 'spree/admin/record_reviews/product_for_review_list', collection: @products, as: :product, locals:{ is_admin: spree_current_user.try(:admin?), hide_same_seller_stats: true }
+.container
+  .row.text-center
+    - if not_batch_mark_review
+      = paginate(@products)
+    - else
+      .col-3
+      .col-6.text-left
+        Jump to 
+        = paginate(@products)
+      .col-3.text-right
+        - if next_to_batch_review
+          = form_tag(admin_mark_record_reviewed_path, method:'put', id:'mark_reviewed_form') do
+            = hidden_field_tag(:record_type, 'Spree::Product')
+            = hidden_field_tag(:version, params[:version] )
+            = hidden_field_tag(:status_code, '', id:'batch_status_code')
+            - @products.each do|product|
+              = hidden_field_tag("status_code_#{product.id}", '', id: "status_code_#{product.id}")
+            %a(name='mark_next_button')
+            = submit_tag('Next', class:'btn btn-lg btn-primary', disable_with:'Next ..')
+        - else
+          = link_to('Next', { t: Time.now.to_i}, class:'btn btn-lg btn-primary', disable_with:'Next ..')
+%br/
+%br/

@@ -1,0 +1,18 @@
+<%= form_tag spree.s_products_path, method: :get, id:'bottom_search_form', class: "py-md-1 d-flex align-items-center dropdown" do %>
+  <%= hidden_field_tag('dropdown_selector', '#bottom_products_search_dropdown') %>
+  <div class="search-container align-items-center col-12">
+    <%= icon(name: 'magnifying-glass',
+              classes: 'd-none d-md-inline mb-1',
+              width: 27,
+              height: 20) %>
+    <%= search_field_tag :keywords,
+                         params[:keywords],
+                         placeholder: Spree.t(:search),
+                         id: 'inline-search-box',
+                         autofocus: false, autocomplete: 'off', spellcheck: false,
+                         class: "border-0 p-1 inline-search-box "
+    %>
+    <div id="bottom_products_search_dropdown" class="dropdown-menu">
+    </div>
+  </div>
+<% end %>

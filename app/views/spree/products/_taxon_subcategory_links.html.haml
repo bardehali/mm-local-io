@@ -1,0 +1,21 @@
+:ruby
+  # Required locals
+  #   taxons
+  taxon_ids = [params[:taxon_ids] ].compact.flatten.collect(&:to_i)
+  taxon_ids = taxons.to_a.collect(&:id) if taxon_ids.blank?
+  option_type_name = Spree.t('categories')
+  collapsed = @taxons.blank? || request.fullpath == products_path
+
+%div(class="card-header #{'collapsed' if collapsed} px-1 plp-filters-card-header" id="filters#{option_type_name}" data-toggle="collapse" data-target="#collapseFilter#{ option_type_name }" aria-expanded="false" aria-controls="collapseFilter#{ option_type_name }" role="heading" aria-level="2")
+  = option_type_name.titleize
+  = icon(name: 'plus', |
+    classes: 'mt-1 float-right arrow plp-filters-card-header-arrow--plus', |
+    width: 16, height: 16)
+  = icon(name: 'minus', |
+    classes: 'mt-1 float-right arrow plp-filters-card-header-arrow--minus', |
+    width: 16, height: 16)
+
+  %div(id="collapseFilter#{ option_type_name }" class="card-body px-0 pt-1 collapse #{ 'show' if taxons.present? || collapsed }" aria-labelledby="filters#{option_type_name }")
+    - Spree::CategoryTaxon.most_product_top_categories.where('record_count > ?', (Rails.env.production? ? 400 : 0) ).to_a.each do|taxon|
+      = link_to( taxon.permalink ? "/t/#{taxon.permalink}?utm_medium=filter" : permitted_params.merge(taxon_ids: taxon.id, menu_open: 1) ) do 
+        %span(class="d-inline-block text-uppercase py-1 px-2 m-1 plp-overlay-card-item #{ 'plp-overlay-card-item--selected' if taxon_ids.include?(taxon.id) }" id="taxon_label_#{ taxon.id }" data-taxon-id="<%= taxon.id -%>")= taxon.name

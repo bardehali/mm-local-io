@@ -1,0 +1,39 @@
+:ruby
+  # Required locals
+  #   user_messages
+
+- content_for :head do
+  :css
+    .user-messages-container { background-color: #FFFFFF; }
+
+%ul.list-unstyled.user-messages-list.p-2
+  - last_date_s = ''
+
+  - if user_messages.present?
+    - user_messages.each do|message|
+      %li.p-1
+        - cur_date_s = message.created_at.strftime('%m-%d-%Y')
+        - unless last_date_s == cur_date_s
+          - last_date_s = cur_date_s
+          %strong= cur_date_s
+          %br/
+        %p(title="#{relative_short_time(message.created_at)}")
+          - if (subject = message.subject_evaluated ).present?
+            %strong
+              = subject
+              - if message.recipient_must_respond?
+                %span(class='text-uppercase text-dark-warning')= " - #{ t('message.you_must_respond') }"
+            %br/
+          - if (instruction = message.instruction).present?
+            = instruction
+            %br/
+          - if message.comment.present?
+            %i= message.comment
+            %br/
+          - if (path = message.path).present?
+            - if message.recipient_must_respond?
+              = link_to( t('message.click_to_respond'), path, rel:'noreferrer')
+              %br/
+              = link_to( to_full_url(path), path, rel:'noreferrer' )
+            - else
+              = link_to( to_full_url(path), main_app.user_message_path(message, goto:'y'), rel:'noreferrer' )

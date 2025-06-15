@@ -1,0 +1,609 @@
+# Files in the config/locales directory are used for internationalization
+# and are automatically loaded by Rails. If you want to use locales other
+# than English, add the necessary files in this directory.
+#
+# To use the locales, use `I18n.t`:
+#
+#     I18n.t 'hello'
+#
+# In views, this is aliased to just `t`:
+#
+#     <%= t('hello') %>
+#
+# To use a different locale, set it with `I18n.locale`:
+#
+#     I18n.locale = :es
+#
+# This would use the information in config/locales/es.yml.
+#
+# The following keys must be escaped otherwise they will not be retrieved by
+# the default I18n backend:
+#
+# true, false, on, off, yes, no
+#
+# Instead, surround them with single quotes.
+#
+# en:
+#   'true': 'foo'
+#
+# To learn more, please read the Rails Internationalization guide
+# available at https://guides.rubyonrails.org/i18n.html.
+
+en:
+  site_name: iOffer
+  site_domain: www.ioffer.com
+  site_url: http://www.ioffer.com
+  more_info: More Info
+  item: Item
+  items: Items
+  all: All
+  for_all: For All
+  select_all: Select All
+  form:
+    submit: Submit
+    submitting: Submitting
+    upload_image: Upload Image
+    agree: Agree
+    you_must_agree: You Must Agree
+    sending: Sending ..
+    saving: Saving ..
+  from_site: From Site
+  or: or
+  and: and
+  to: to
+  when: When
+  which: Which
+  what: What
+  who: Who
+  worldwide: Worldwide
+  thank_you: Thank you!
+  help: Help
+  contact: contact
+  email_seller_instead: Use Email
+  retail_sites:
+    input_placeholder:
+      default: '%s ID or Email'
+      aliexpress: '%s Store ID'
+      dhgate: '%s Store ID'
+      zalando: '%s Store ID'
+      stockx: '%s Store ID'
+  spree:
+    search: Search For Anything
+    homepage:
+      sneaker_destination: The Sneaker Destination
+      men: Shop Men's
+      women: Shop Women's
+      purses: Purses
+      childrens_clothes: Shop Childrens Clothing
+      top_rated: Shop Top-Rated
+      athelsure: Athleisure
+      filler_box_title: The New iOffer
+      filler_subject: 1000's of products at the lowest prices.
+      filler_box_body: Explore and shop now.
+      filler_box_action: Explore iOffer
+      categories_header: Categories
+      trending_header: Recent Searches
+      recent_header: Recent Sales
+      recent_sales_tagline: See What's Trending Now!
+      trending_wanted_items_header: Best Selling Items
+      search_tip: Search For
+      search_tip_suggestions:
+          search_tip_1: Sneakers
+          search_tip_2: Bathing Suits
+          search_tip_3: Purses
+      top_sellers: Top Sellers
+      benefits:
+          benefits_list_header: BENEFITS OF SELLING ON iOFFER
+          first: MILLIONS of buyers everyday
+          second: Direct payments from buyers
+          third: Access international traffic data
+          fourth: Access top selling items
+          fifth: Access global buying trends
+      praises: Praise from iOffer Buyers around the worldwide
+      items_buyer_wants: ITEMS BUYERS WANT
+      happy_sellers: Happy sellers on iOffer
+      latest_sales: LATEST SALES
+    new_customer: Create An Account
+    new_customer_verify: Create An Account To Continue
+    header:
+      seller_signup: Want to sell on iOffer? Click here to apply for a free account
+      seller_logged_in_message: Post items that buyers WANT
+      user_logged_in_banner: Browse the latest and greatest at the best prices!
+      nav_bar:
+        seller_dropdown_login: Seller Registration
+        chinese_seller_dropdown_login: 中国卖家入驻
+        seller_dropdown_title: Sell on iOffer
+        seller_logged_in_dropdown_title: List Items
+        seller_dropdown_title_short: Sell
+    contact_seller: Contact Your Seller
+    admin:
+      admin: Admin
+      tools:
+        user_lists: User Lists
+        curation_by_image: New Item Review
+        imported_products_review: Imported Products Review
+        product_adoption: Top Selling Items
+        sell_more_like: Sell More Like These
+        sellers: Sellers
+        all_sellers: ALL Sellers
+        all_users: ALL Users
+        buyers: Buyers
+      products:
+        new: List Your Item
+        list_your_product: List Your Item
+        adopted: Adopted
+        choose_all_variants_supply: Choose the color, if it applies.
+        add_a_photo: Add a Photo
+        paste_photo: Paste a Photo
+        image_section_title: Images
+        image_section_subtitle: Upload your product images
+        size_variant_title: Size
+        variant_created: Item successfully created!
+      option_values:
+        count: Count of Option Values
+      user:
+        buying_items: Buying Items
+        selling_items: Selling Items
+      users:
+        admin_user_info: User Info
+        sign_in_as: Sign In As
+      sellers:
+        sale: Sale
+        sales: Sales
+        messages: Messages
+        pending_payment: Latest Sales
+        waiting_shipping: Waiting Shipping
+        completed_sales: Completed Sales
+      order_state_name:
+        messages: Messages
+        payment: Latest Sales
+        delivery: Waiting Shipping
+        need_tracking_number: Need Tracking Number
+        paid_need_tracking: Paid Need Tracking
+        complete: Completed Sales
+        complaints: Complaints
+    extra_value: Extra Value
+    master_price: Price (USD)
+    breadcrumbs: Breadcrumbs
+    taxons: Category
+    general_info: General Info
+    security_settings: Security Settings
+    activity_info: Activity Info
+    authentification_info: Authentication Info
+    back_to_store: Back to Store
+    extra_value_tip: Alternative wording; for example, color's hex #FFFFFF
+    edit_product: Edit Product
+    name: Title
+    taxon_placeholder: Choose a Category
+    variant_name: Color Name
+    colors: Colors
+    variants: Variants
+    sizes: Sizes
+    ship_to: Ship to
+    confirm_and_pay: Confirm and Pay
+    based_upon_review_count_short:
+      zero: "0"
+      one: "%{count}"
+      other: "%{count}"
+    confirmation_instructions:
+      welcome: Welcome
+      confirm: Confirm
+    rating:
+      title: Welcome {USERID}! Start Selling Immediately!
+      content: "%{user}, iOffer Rating of %{rating_percentage} on %{transaction_count} sales"
+      content_blank: We’ve found and transferred your iOffer Rating!
+      shield_label: SELLER RATING
+    review:
+      leave_a_review_and_rating_for: Please leave a review and a rating for
+      no_reviews_available: No reviews available for this product.
+      no_reviews_written: No reviews have been written for this product.
+      recent_transactions: Buyers Currently Waiting for Offers
+    errors:
+      product:
+        category_required: Please select a category
+        select_the_sizes_you_provide: Please select the sizes you provide
+        select_the_options_you_provide: Please select the options you provide
+      user:
+        account_not_available: Account not available
+    change_your_password: Reset your password
+    back_to: Back To
+    starting_from: Starting From
+    ending_at: Ending At
+    send: send
+    sending: sending
+    seller_landing_title: Welcome {USERID}, start selling on the new iOffer.
+    start_selling_now: START SELLING NOW!
+  scraper:
+    scraper: Scraper
+    pages: Pages
+    transfer_title: Transfer your ratings and items
+    transfer_subtitle: Provide your seller ID and we'll transfer your ratings and items.
+  store:
+    category_title: Categories
+    brands_title: Brands
+    submit_brands: Submit Brands
+    submit_categories: Submit Categories
+    what_brands_do_you_have: What brands do you have?
+    what_categories_do_you_supply: What categories do you supply?
+    do_you_supply: do you supply
+    select_all_that_apply: Select all that apply.
+    fill_your_shop: Fill Your Store
+    fill_your_shop_note: Get your shop started with 3 ways to list
+    fill_your_store: "Fill your store with these <b>wanted</b> items!"
+    enter_your_best_price: Enter your best price to attract more buyers
+    enter_your_lowest_price: Enter your lowest price
+    accounts_on_other_site: Accounts on other marketplaces
+    estimated_shipping_time: Estimated Shipping Time (Days)
+    update_item: Update Item
+    list_item: List Item
+    list_items: List Items
+    list_this_item: Get Contact Info
+    list_item_to_notify_buyers: "List This Item to Notify %{count} Buyers"
+    item_successfully_posted: Item %{product_id} Successfully Posted
+    item_successfully_posted_by_name: "%{name} Successfully Posted"
+    price_to_beat: "Price to Beat:"
+    your_price: "Price Including Shipping:"
+    recent_sales: Recent Sales
+    recent_sales_tagline: See What's Trending Now!
+    seller_instructions_title: "YOUR INSTRUCTIONS TO BUYER:"
+    tab:
+      select_popular_items: Select Popular Items
+      transfer_items: Transfer Items
+      upload_your_items: List Your Items
+      upload_csv: Upload Item CSV
+    sell:
+      count_of_sold: "%{count} Sold"
+      count_of_waiting_buyers: "%{count} Waiting Buyers"
+    adopt:
+      beat_this_price_and_increase_sales: Beat this price and increase sales!
+      post_and_boost: Reach a larger audience and increase your sales!
+      list_same_item: List Same Item
+      find_and_supply_the_best: Find and supply the best selling items below to make more money
+      spam_not_tolerated: You must supply the same item
+      spam_not_tolerated_chinese: 确保您能供应相同的物品
+      floor_price_warning: "Your price must include all shipping charges. Posting items with an unusually low or high price is not allowed and will result in account cancellation."
+      floor_price_warning_cn: "您的价格必须包含所有运费。发布价格异常偏低或偏高的商品将被禁止，并可能导致账户被取消。"
+  order:
+    new_price: New Price
+    original_price: Original Price
+    review_item_and_shipping: Review item and shipping
+    your_order_is_confirmed: Your order is confirmed
+    your_order_is_in: Your order is in.
+    order_complete: Order Complete
+    your_order_is_still_incompleted: Your order is still incomplete
+    please_see_payment_instructions_below: Please see payment instructions below
+    payment_instruction_sent_to_email: Payment instructions will be sent to your email
+    payment_instruction_to_email_variable: An order confirmation with payment instruction will be sent to <strong>%{email}</strong>
+    no_seller_explanation: The seller is experiencing issues.  We are trying to connect you with a new seller.
+    will_send_follow_up_email: We will send you a follow up email with payment instructions soon.
+    order_details: Order Details
+    view_order_details: View Order Details
+    thank_you_for_your_order: Thank you
+    we_will_let_you_know_seller: We will let you know the next steps once the seller has confirmed your order.  Stay tuned!
+    beware_order_not_paid: Beware <strong>your order has not yet been paid for</strong> and will not be shipped until the seller has received your payment.
+    you_can_pay_via: You can do so via the order confirmation email or immediately to the right.
+    below_are_details: Below are details of what you need to do next.
+    to_complete_transaction: To Complete Transaction
+    complete_transaction_at_service: Complete your transaction at %{service}
+    contact_seller_to_complete_transaction: Contact the Seller to complete your transaction!
+    please_send_via_to_complete: Please send %{amount} to %{account} via %{site} to complete your transaction.
+    click_here_to_payment_service: Click here to go to your %{service} account.
+    purchasing: purchasing
+    cant_pay_btn_text: Can't Pay? / Need Help
+    complete_purchase_instructions: To complete your purchase pay <strong>%{amount}</strong> to <strong>%{account}</strong> at <strong>%{site}</strong>. Or contact %{account} directly.
+    payment_instructions_header: "Seller's Instructions"
+    payment_instructions_from: "- %{account}"
+    go_to_checkout: Go to Checkout
+    you_already_purchased: You already purchased this recently.
+    add_to_cart_again: Add to Cart Again
+    order_help: Help With Order
+    need_help_with_this_order: Need Help With This Order
+    help_with_this_order: Help With This Order
+    help_with_payment: Help With Payment
+    help_we_want_to_make_sure: We want to make sure you have a positive experience.  For best result contact seller.
+    help_seller_notified: The seller has been notified.  Please be patient and allow them to respond.
+    help_we_understand_issues: We understand sometimes issues do arise.  <strong>IF</strong> you are unable to work things out with  the seller, please report seller and we will take appropriate action.
+    help_please_contact_the_seller_first: Please %{contact} the seller <strong>FIRST</strong>.
+    help_seller_changing_price: Sometimes additional shipping fees are required.  Please report sellers that are changing prices excessively.
+    tracking: Tracking
+    tracking_info: Tracking Info
+    tracking_number: Tracking Number
+    add_tracking_number: Add Tracking Number
+    enter_correct_tracking: Enter Correct Tracking
+    proof_of_payment_is_required: Proof of Payment Is Required.
+    proof_of_payment_submitted_by_buyer: Proof of Payment Submitted By Buyer
+    tracking_broken: Tracking Broken
+    other_question: Other Question
+    order_placed_successfully: Order Placed Successfully
+    account_under_review_check_back_later: Your account is under review. Please check back later.
+    if_seller_unresponsive: If the seller in unresponsive or you cannot make payment, let us know
+  payment:
+    how_will_collect_payments: How will you collect payments? Fill in at least 1.
+    instruction: Instructions
+    payment_instructions: Payment Instructions
+    how_to_pay: How to Pay
+    instruction_on_how_to_pay: Instruction on How to Pay
+    pay_with: Pay with
+    pay_for_your_order: Pay for Your Order
+    pay_seller: Pay Seller
+    show_payment_options: Show payment options
+    seller_payment_instructions_explanation: This is a sellers payment instructions for a given payment processor that the buyer has selected.
+    please_complete_payment: Please complete payment to complete your purchase order.
+    approve_payment: Approve Payment
+    other_payment_methods: Other Payment Methods
+    other_ways_to_pay: Other Ways to Pay
+    please_service_to: Please %{service} %{amount} to
+  user:
+    name: Name
+    buyer: Buyer
+    seller: Seller
+    address:
+      street: Street
+      apartment: Apartment
+      state_or_providence: State/Providence
+    username: User Name
+    access_info: Access Info
+    contact_info: Contact Info
+    contact_seller: Contact Seller
+    seller_obligations_title: iOffer Agreement
+    country: Country
+    email_confirmed: Email Confirmed
+    email_not_confirmed: Email Not Confirmed
+    provide_a_valid_username: Please provide a valid username
+    secondary_email: Secondary email
+    non_mainland_email_address: Non-mainland email address
+    example_non_mainland_emails: "Example: hotmail, outlook, yahoo, gmail"
+    contact_you_by_secondary_email: "We need a non-mainland email address incase we cannot contact you on your account email."
+    registration: Registration
+    update_your_account: Update Your Account
+    password:
+      enter_password: Enter Password
+      reenter_password: Re-enter Password
+      passwords_dont_match: The passwords do not match
+    payment_methods:
+      your_service_id: Your %{service} ID
+      for_quicker_support: For quicker support and sales notifications
+      please_add: Please add
+      to_your_service_id: to your %{service}
+      sales_notifications_quicker: "Providing us with a direct line of communication via %{service} or through a secondary email address ensures your sales can be completed successfully and on time."
+      payment_options: Payment Options
+      buyers_want_to_pay_with: Buyers want to pay with %{service}
+      please_enter_your_email: Please enter your %{service} email
+      please_enter_your_instruction: Please enter your %{service} instruction
+      your_service_email: Your %{service} email address
+      payment_instruction_note: Payment instruction/note to buyers
+      this_will_be_sent_with_order_confirmation: "This will be sent along with the order confirmation to let the buyer know what to do next"
+      recommend_setting_up_service: "Based on overwhelming feedback from our millions of buyers we strongly recommend setting up %{service} as a payment option.  This will lead to increased sales from all countries served by iOffer.  Sellers that setup %{service} will enjoy increased sales due to enhanced search placement."
+      customers_prefer_payment: "Our customers prefer paying with %{service}. You're much more likely to get sales if you accept it as a payment."
+      select_all_you_provide: Select All Payment Methods You Provide
+      these_will_be_sent_with_order_confirmation: These will be sent along with the order confirmation to let the buyer know what to do next.
+      please_select_at_least: Please select at least %{count}
+      payment_instruction_warning: Your payment email must be accurate. Failure to do so will result in suspension.
+      payment_instruction_warning_chinese: 您的付款电子邮件必须准确无误.     失败将导致停职.
+
+  product:
+    this_product_is_invalid: This product is invalid.
+    this_product_is_unavailable: This product is unavailable.
+    this_product_is_prohibited: This product is prohibited.
+    find_more_great_deals: Find More General Deals
+    my_products: My Products
+    other_listings: Other Listings
+    from: From
+    related_items: Related Items
+  activerecord:
+    attributes:
+      spree/product:
+        more_than: More than
+  errors:
+    product:
+      category_required: The category is required
+      variant_price_invalid: Your Price is invalid
+      this_item_removed: This item has been removed.
+    review:
+      not_allowed_to_review_this: You are not allowed to review this.
+      already_reviewed_this: You have already reviewed this.
+    user:
+      username_taken: This username has already been taken
+      email_taken: This email has already been taken
+      invalid_email: This is not a valid email
+    store:
+      payment_account_already_linked_to_another: This %{payment_method} account is already linked to another account.
+    order:
+      seller_out_of_stock: This item is out of stock.
+  seller:
+    list_same_item: List this item
+    list_same_item_text: at a better price and we will notify %{num_users} waiting buyers!
+    seller_banner_text: There Are Buyers That Want This Item. Can You Supply It?
+    seller_banner_subtext: Can You Supply It?
+    seller_banner_text_chinese_1: 许多买家想要这个
+    seller_banner_text_chinese_2: 你能供应吗？
+    find_these_items: Boost Your Sales By Supplying These Best Sellers 📈
+    supply_these_items: These Are The Items People Want. Supply Them Or Miss Out On Sales.
+    supply_these_items_cn: 这些是人们想要的商品。供货，否则错过销售机会
+    to_seller_you_must_agree_to: To Sell You Must Agree To
+    to_sell_you_must_agree: 'To Sell, You Must Agree to:'
+    to_sell_you_must_agree_chinese: '要销售    您必须同意'
+    your_account_has_been_flagged: Your Account Has been Flagged by Our Automated Agent
+    there_are_x_buyers: There are currently %{count_of_buyers} Buyers waiting for tracking
+    items_you_should_be_selling: Sales You've Missed
+    sell_other_items_like_this: Similar Sales You've Missed!
+    include_shipping: Price Must Include Shipping
+    include_shipping_subtitle: False/Inaccurate Prices Will Lead to Account Cancellation
+    make_sure_prices_correct_shipping: Make Sure Prices are Correct and Include Shipping
+    make_sure_prices_correct_shipping_chinese: 请确保价格正确并包括运费
+    false_prices_warning: False/Inaccurate Prices Will Lead to Account Cancellation
+    false_prices_warning_chinese: 错误或不准确的价格将导致账户被取消
+    user_stats:
+      agree_to_clear_payment_instructions:
+        icon: "icon/seller-requirements/clear_payment_instructions.png"
+        title: Clear Payment Instructions
+        chinese_title: 明确的付款指示
+      agree_to_provide_tracking_info:
+        icon: "icon/seller-requirements/tracking_truck.png"
+        title: Provide Tracking Info
+        chinese_title: 提供跟踪信息
+      agree_to_post_accurate_prices:
+        icon: "icon/seller-requirements/accurate_prices.png"
+        title: Correct and Accurate Prices
+        chinese_title: 正确准确的价格
+      agree_to_post_clear_images_descriptions:
+        icon: "icon/seller-requirements/clear_images_descriptions.png"
+        title: Clear Images and Descriptions
+        chinese_title: 清晰的图片和描述
+  listing_policy:
+    title: Item Listing Requirements
+    steps:
+      first_step:
+        title: Clear and simple images
+        body: Choose clear and simple images to visually appeal to the most customers. If your image is clean and eye catching you have a much better chance of getting the sale.
+      second_step:
+        title: Descriptive and concise titles
+        body: Titles should be relevent to your product and include only words to describe your item. Contact information is prohibitied in item titles will result in a strike against your account.
+      third_step:
+        title: Accurate prices (asking + shipping)
+        body: Give us your best price! Buyers are much more likely to complete the sale if your price is accurate and inclusive of all fees.
+      forth_step:
+        title: Item description with relevant product, payment and shipping information
+        body: Add a great item description to appeal to your potential customers. Customers want to know the materials used and relevent sizing and color information of your products.
+    violations:
+      heading: Item Listing VIOLATIONS
+      disclaimer: Violations of the policy will result in immediate removal of your item, possible administrative fees, and possible account suspension
+      do_not_include: DO NOT include
+      do_not_include_reason_one: Small, unclear pictures
+      do_not_include_reason_two: Offering more than one type of item (please create multiple listings)
+      do_not_include_reason_three: "**Contact information**"
+      do_not_include_disclaimer: (Including contact information and other methods of communication leading to off-site transactions or fee avoidance are prohibited)
+  message:
+    noun: Message
+    messages: Messages
+    message_to: Message to
+    messages_to: Messages to
+    messages_from: Messages from
+    new_message_from_ioffer: New Message from iOffer
+    name_have_new_message_from_ioffer: "%{username}, you have a new message from iOffer"
+    please_explain: Please Explain
+    click_on_the_below_link: Click on the below link
+    click_to_respond: Click to Respond
+    you_must_respond: You Must Respond
+    you_must_respond_to: Respond to %{name}
+    or_respond_to_buyer: Or Respond to Buyer
+    submit_reply: Submit Reply
+    report_sent: Report Sent
+    from_to: From %{from} to %{to}
+    note_to_seller: Note to Seller
+    the_seller_has_shipped_your_item: The Seller Has Shipped Your Item
+    the_seller_has_been_notified: The seller has been notified.
+    please_be_patient: Please be patient.
+    order_message:
+      subject: ''
+      path: "#{admin_order_path(record)}"
+    new_order:
+      subject: New Order
+      subject_with_product_details: Bought %{quantity} %{product_name} %{price} %{payment_method}
+      path: "#{admin_order_path(record)}"
+    order_payment_paid:
+      subject: Paid with %{payment_method}
+      path: "#{admin_order_path(record)}"
+    order_payment_failed:
+      subject: Failed %{payment_method} Payment
+      path: "#{admin_order_path(record)}"
+    order_payment_confirmed:
+      subject: Confirmed %{payment_method} Payment
+      path: "#{admin_order_path(record)}"
+    order_help_with_payment:
+      subject: Help with payment
+      header_instruction: "An image will help us diagnose the issue.  <br/><a href='/images/payment_problem_example.png' target='_blank' data-toggle='modal' data-target='#payment_problem_example_modal'>Example</a>"
+      form_header: Contact Seller/Payment Help
+      report_sent_header: Request for Payment Help Sent
+    order_shipped:
+      subject: Shipped %{shipping_method} %{shipment_tracking}
+      path: "#{admin_order_path(record)}"
+    order_please_select_reason:
+      subject: Please Select Reason
+    order_no_seller_response:
+      subject: No Seller Response
+      short_subject: No Seller Response
+    order_cannot_pay_seller:
+      subject: Unable to Pay Seller
+      short_subject: Unable to Pay
+      header_instruction: Please make sure your %{payment_method} account is active.  Resend payment instructions.
+      path: "#{admin_store_payment_methods_path}"
+    order_already_paid:
+      subject: Already Paid Seller
+      short_subject: Already Paid
+    order_seller_changed_price:
+      subject: Seller Changed Price
+      short_subject: Seller Changed Price
+    order_seller_does_not_accept:
+      subject: "Seller Doesn’t Accept %{payment_method}"
+    order_need_tracking_number:
+      subject: Need Tracking Number
+      path: "#{admin_order_path(record)}"
+      header_instruction: "<strong class='text-dark-warning'>**Required**</strong> Please upload proof of payment.  <br/><a href='/images/payment_proof_example.png' data-toggle='modal' data-target='#payment_proof_example_modal' target='_blank'>Example</a>"
+      form_header: Request Tracking Info
+      report_sent_header: Request for Tracking Info Sent
+    order_provided_tracking_number:
+      subject: "Tracking"
+      path: "https://www.google.com/search?q=#{comment}"
+    order_corrected_tracking_number:
+      subject: "Tracking"
+      path: "https://www.google.com/search?q=#{comment}"
+    order_broken_tracking_number:
+      subject: Broken Tracking Number
+      form_header: Broken Tracking
+      path: "#{admin_order_path(record)}"
+    order_item_not_received:
+      subject: Item Not Received
+    order_wrong_item:
+      subject: Wrong Item
+    order_long_shipping_time:
+      subject: Long Shipping Time
+    order_other_reason:
+      subject: Report Seller
+      short_subject: Other
+    order_other_question:
+      subject: ""
+    order_product_bad_photo:
+      subject_with_product_details: Your %{product_name} has some bad photo
+      path: "#{admin_product_images_path(record)}"
+  all_variants: All Colors
+  datetime:
+    distance_in_words:
+      short:
+        about_x_hours:
+          one: "%{count} hr"
+          other: "%{count} hr"
+        about_x_months:
+          one: "%{count} mo"
+          other: "%{count} mo"
+        about_x_years:
+          one: "%{count} yr"
+          other: "%{count} yr"
+        almost_x_years:
+          one: "%{count} yr"
+          other: "%{count} yr"
+        half_a_minute: 30 s
+        less_than_x_seconds:
+          one: "%{count} sec"
+          other: "%{count} sec"
+        less_than_x_minutes:
+          one: 1 min
+          other: 1 min
+        over_x_years:
+          one: "%{count} yr"
+          other: "%{count} yr"
+        x_seconds:
+          one: "%{count} sec"
+          other: "%{count} sec"
+        x_minutes:
+          one: "%{count} min"
+          other: "%{count} min"
+        x_days:
+          one: "%{count} day"
+          other: "%{count} days"
+        x_months:
+          one: "%{count} mo"
+          other: "%{count} mo"
+        x_years:
+          one: "%{count} yr"
+          other: "%{count} yr"

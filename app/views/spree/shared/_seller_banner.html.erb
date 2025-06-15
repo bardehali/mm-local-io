@@ -1,0 +1,41 @@
+<style>
+.banner{
+  background-color: black;
+  color: white;
+  padding: 0.3em;
+  text-align: center;
+  font-weight: 600;
+}
+.banner a {
+  color: white;
+}
+.banner:hover a {
+  color: white;
+  text-decoration: underline;
+}
+@media only screen and (max-width: 576px){
+  .banner {
+    font-size: 12px;
+  }
+}
+.seller {
+  background-color: #22567c;
+}
+.buyer {
+  background-color: #22567c;
+}
+</style>
+
+<% if spree_current_user&.seller?   %>
+  <div class="banner seller">
+    <a href="/admin/products"><%= Spree.t('header.seller_logged_in_message')%></a>
+  </div>
+<% elsif spree_current_user %>
+  <div class="banner buyer">
+    <a href="/admin/products"><%= Spree.t('header.user_logged_in_banner')%></a>
+  </div>
+<% else %>
+  <div class="banner">
+    <a href="/seller_onboarding"><%= Spree.t('header.seller_signup')%></a>
+  </div>
+<% end %>

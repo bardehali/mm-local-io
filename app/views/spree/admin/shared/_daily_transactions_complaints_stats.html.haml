@@ -1,0 +1,27 @@
+:ruby
+  trx_data = load_txns_per_day(::Admin::StatsHelper::PER_DAY_SHORT_LABELS)
+  daily_transactions_label = [ params[:daily_transactions_label], 'Today' ].find(&:present?)
+  complaints_data = load_complaints_per_day(::Admin::StatsHelper::PER_DAY_SHORT_LABELS)
+  daily_complaints_label = [ params[:daily_complaints_label], 'Today' ].find(&:present?)
+.row
+  .col-12.col-md-6
+    %h5
+      Transactions: 
+      - trx_data.each do|result|
+        - is_current_label = (result.label == daily_transactions_label)
+        = link_to admin_sales_in_state_path(state:'complete', daily_transactions_label: result.label, q:{ completed_at_gt: result.start_time.to_s, completed_at_lt: result.end_time.to_s }), title: result.query, style:(is_current_label ? 'color: black !important; font-weight: 500;' : '') do
+          = result.label
+          %span.pl-1
+          = result.amount
+        &nbsp;
+      %span.icon.icon-stats
+  .col-12.col-md-6
+    %h5
+      Complaints: 
+      - complaints_data.each do|result|
+        - is_current_label = (result.label == daily_complaints_label)
+        = link_to admin_sales_in_state_path(state:'messages', daily_complaints_label: result.label, q:{ completed_at_gt: result.start_time.to_s, completed_at_lt: result.end_time.to_s }), title: result.query, style:(is_current_label ? 'color: black !important; font-weight: 500;' : '') do
+          = result.label
+          %span.pl-1
+          = result.amount
+        &nbsp;

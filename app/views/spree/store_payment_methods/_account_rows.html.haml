@@ -1,0 +1,55 @@
+:css
+  .detail-title-text {
+    font-size: 12pt;
+    font-weight: 500;
+    text-align: left;
+    color: #666666;
+  }
+  .warning-box-instructions {
+    background-color: #FFF79F;
+    border-radius: 8px;
+    padding: 0.5em;
+    width: 100%;
+    margin: 1.2em 2em 0em;
+    text-align: center;
+    font-size: 12pt;
+    font-weight: 500;
+    color: #4E4E4E;
+  }
+
+:ruby
+  ##
+  # For determing whether store has account info inside Spree::StorePayment,
+  # would look inside payment_method.store_payment_method and else store_payment_methods
+  # Required locals:
+  #   payment_methods [Collection of Spree::PaymentMethod]
+  # Optional locals:
+  #   store_payment_methods [Collection of Spree::StorePaymentMethod] to fill in store's account info
+  store_payment_methods = nil unless defined?(store_payment_methods)
+  store_pm_map = store_payment_methods ? store_payment_methods.group_by(&:payment_method_id) : {}
+  show_all = params[:show_all].to_s == 'true'
+  requires_account_id = ControllerHelpers::SellerManager::REQUIRES_ACCOUNT_ID
+  requires_instruction = ControllerHelpers::SellerManager::REQUIRES_INSTRUCTION
+- payment_methods.each_with_index do|payment_method, index|
+  - store_payment_method = payment_method.store_payment_method || store_pm_map[payment_method.id]&.first
+  - next if store_payment_method.nil? && !show_all
+  - icon_path = payment_method.available_to_users ? asset_path("payment_methods/#{payment_method.name.downcase}.png") : nil
+  %div(class="row mb-3")
+    .col-2.col-xs-1
+    %div(id="payment_input_#{payment_method.id}" class="col-8 col-xs-10 card border-radius-3 p-3 payment-input")
+      .row
+        .col-4.text-center
+          = image_tag(icon_path, class:'maxw-100') if icon_path.present?
+        .col-8
+          %h5.detail-title-text.mb-1= t('user.payment_methods.please_enter_your_email', service: payment_method.description)
+          = email_field_tag("payment_method_account_ids[#{payment_method.id}]", store_payment_method&.account_id_in_parameters, class:"form-control form-control-lg form-payment#{' is-invalid' if requires_account_id && (store_payment_method&.account_id_in_parameters.blank? || store_payment_method.errors.include?(:account_parameters)) }", 'aria-describedby'=>'basic-addon', placeholder: t('user.payment_methods.your_service_email', service: payment_method.description), required: requires_account_id)
+          - if ( warning = store_payment_method.errors[:account_parameters]&.first ).present?
+            %h6.text-danger.text-dark-warning.mt-2.mb-3= warning
+          %h5.detail-title-text.mb-1.mt-4= t('user.payment_methods.payment_instruction_note')
+          = text_area_tag("store_payment_method_instruction_#{payment_method.id}", store_payment_method&.instruction, class:"form-control form-control-lg form-payment w-100#{' is-invalid' if requires_instruction && store_payment_method&.instruction.blank?}", 'aria-describedby'=>'basic-addon', required: requires_instruction)
+        - if index == 0
+          .warning-box-instructions
+            = t('user.payment_methods.payment_instruction_warning')
+            .br
+            = t('user.payment_methods.payment_instruction_warning_chinese')
+    .col-3.col-xs-1

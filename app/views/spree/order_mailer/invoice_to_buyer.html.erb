@@ -1,0 +1,83 @@
+<%
+	payment_method = @order.payments.first&.payment_method
+	pm_instruction = payment_method ? payment_method_instruction(@order, payment_method).to_s : nil
+	order_details_url = "#{host}#{spree.order_path(id: @order.number) }"
+	help_url = "#{host}#{spree.order_help_path(id: @order.number) }"
+-%>
+
+
+		<div style="background-color:white; border: solid 1px #cccccc; border-radius: 10px; padding: 2em;">
+			<div id="header" style="text-align: center;">
+				<h1 style="margin-bottom: 0; "><img src="<%= full_asset_path('icon/flashing_flag.png') -%>" alt="" style="max-height: 1.0em;"/>&nbsp;&nbsp;<%= t('thank_you') %>  <%= t('order.your_order_is_in') %></h1>
+				<h2 style="text-align: center;"><%= t('order.below_are_details') %></h2>
+			</div>
+			<div style="height: 1em;">&nbsp;</div>
+			<% if has_all_real_sellers?(@order) -%>
+				<div class="payment-instructions">
+					<h2 class="heading"><%= t('payment.payment_instructions') %></h2>
+					<%
+					if payment_method
+						store_payment_method = store_payment_method_of(@order.store, payment_method)
+					-%>
+						<% if store_payment_method&.account_id_in_parameters.present? -%>
+							<h3><%= t('order.please_send_via_to_complete', amount: @order.display_total, account: store_payment_method&.account_id_in_parameters, site: "<a href='#{full_payment_service_url(payment_method)}'>#{payment_method.domain}</a>").html_safe %>
+							</h3>
+							<br/>
+						<% end -%>
+						<div style="float: left; width: 10%; ">
+							<img src="<%= full_asset_path('icon/user_avatar.red_bg.png') %>" class='icon'/>
+						</div>
+						<div style="float: right; width: 80%; margin-left: 2%; border-radius: 15px; background-color: white; padding: 1% 2%;">
+							<h3>
+								<% if pm_instruction -%>
+									<p style='vertical-align:top;'><%= pm_instruction -%></p>
+								<% end -%>
+								<%= link_to(t('order.click_here_to_payment_service', service: payment_method.display_name ), full_payment_service_url(payment_method), style:'vertical-align:top;' ) %>
+							</h3>
+						</div>
+						<div style="clear: both;"></div>
+					<% end # payment_method -%>
+				</div>
+			<% end # payment-instructions -%>
+			<br/>
+			<h1><%= t('order.order_details') %></h1>
+			<hr/>
+			<table>
+				<tbody>
+					<% @order.line_items.each do|line_item| -%>
+					<% image_path = line_item.product.variant_images.first&.plp_url -%>
+						<tr class="product-entry">
+							<td><img src="<%= @host %><%= image_path -%>" alt=""></td>
+							<td class="text">
+								<h3><%= line_item.product.name -%></h3>
+								<% if line_item.quantity.to_i -%>
+									Qty: <%= line_item.quantity %>
+								<% end -%>
+								<% line_item.variant.option_values.sort { |ov| ov.option_type.position }.each do |ov| %>
+								<span><%= "#{ov.option_type.presentation}: #{ov.name.titleize}" %></span>
+								<% end %>
+							</td>
+							<td>
+								<h3><%= line_item.display_total %></h3>
+							</td>
+						</tr>
+					<% end -%>
+					<tr>
+						<td colspan="3"><hr/></td>
+					</tr>
+					<tr>
+						<td><h2><%= Spree.t('total') %></h2></td>
+						<td style="overflow: hidden;"><h2 style="margin: -3% 5% 0 5%; overflow: hidden;"><%= '.' * 28 %></h2></td>
+						<td><h2><%= @order.display_total %></h2></td>
+					</tr>
+				</tbody>
+			</table>
+			<br/>
+			<br/>
+			<div style="text-align: center;">
+				<a href="<%= order_details_url -%>" class="btn btn-primary"><%= t('order.view_order_details') %></a>
+			</div>
+			<div valign="middle" style="text-align: center; padding: 1.0em 2.5em 5em 2.5em;">
+				<p><a href="<%= help_url %>" class="btn btn-black-outline btn-spacing"><%= t('order.cant_pay_btn_text') %></a></p>
+			</div>
+		</div>

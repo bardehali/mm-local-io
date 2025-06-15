@@ -1,0 +1,38 @@
+<% @body_id = 'signup' %>
+<%= render partial: 'spree/shared/error_messages', locals: { target: @user } %>
+<div class="container col-lg-6 offset-lg-3">
+  <% if params[:verify] == 'true' %>
+    <h3 class="spree-header spree-mb-large spree-mt-large"><%= Spree.t(:new_customer_verify) %></h3>
+  <% else %>
+    <h3 class="spree-header spree-mb-large spree-mt-large"><%= Spree.t(:new_customer) %></h3>
+  <% end %>
+  <div id="new-customer" data-hook="login">
+    <%= form_for resource, as: :spree_user, url: spree.registration_path do |f| %>
+      <div data-hook="signup_inside_form">
+        <%= render partial: 'spree/shared/user_form', locals: { f: f, remember_me_field: true } %>
+        <div><%= f.submit Spree.t(:sign_up), class: 'btn btn-primary btn-block spree-btn mb-5', onclick: 'spinner()' %></div>
+      </div>
+    <% end %>
+
+    <h3 class="spree-header header-sm spree-mt-medium mb-3 mb-sm-4 mb-xl-4"><%= Spree.t('already_have_account') %></h3>
+    <%= link_to Spree.t(:log_in), spree.login_path(return_to: params[:return_to]), class: 'btn btn-block btn-outline-primary spree-btn spree-mb-large' %>
+    <div data-hook="login_extras"></div>
+  </div>
+
+</div>
+
+
+<script type="text/javascript">
+    function spinner() {
+      if (validateEmail(document.getElementById("spree_user_email").value)) {
+        document.getElementsByClassName("spinner_overlay")[0].style.display = "block";
+        document.getElementsByClassName("lds-default")[0].style.display = "block";
+      }
+    }
+
+    function validateEmail(email) {
+      const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return re.test(String(email).toLowerCase());
+    }
+
+</script>

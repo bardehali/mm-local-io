@@ -1,0 +1,102 @@
+<% content_for :page_title do %>
+  <%= link_to Spree.t(:taxonomies), spree.admin_taxonomies_path %> /
+  <%= link_to @taxonomy.name, spree.edit_admin_taxonomy_path(@taxonomy) %> /
+  <% @taxon.ancestors.each do|t| 
+      if t.name.match(/categories\Z/i).nil? -%>
+        <%= link_to t.name, edit_admin_taxonomy_taxon_path(@taxonomy, t.id) %> / 
+    <% end
+    end -%>
+  <%= @taxon.name %>
+<% end %>
+
+
+<% content_for :head do %>
+
+  <script>
+    $(document).ready(function () {
+      function formatOptionType (optionType) {
+        return Select2.util.escapeMarkup(optionType.presentation + ' (' + optionType.name + ')')
+      }
+
+      function setupSelect2FieldFor(elementSelector) {
+        if ($(elementSelector).length > 0) {
+          $(elementSelector).select2({
+            placeholder: Spree.translations.option_type_placeholder,
+            multiple: true,
+            initSelection: function (element, callback) {
+              var url = Spree.url(Spree.routes.option_types_api, {
+                ids: element.val(),
+                token: Spree.api_key
+              })
+              return $.getJSON(url, null, function (data) {
+                return callback(data)
+              })
+            },
+            ajax: {
+              url: Spree.routes.option_types_api,
+              quietMillis: 200,
+              datatype: 'json',
+              data: function (term) {
+                return {
+                  q: {
+                    name_cont: term
+                  },
+                  token: Spree.api_key
+                }
+              },
+              results: function (data) {
+                return {
+                  results: data
+                }
+              }
+            },
+            formatResult: formatOptionType,
+            formatSelection: formatOptionType
+          })
+        }
+      }
+
+      setupSelect2FieldFor('#taxon_related_option_type_ids');
+      setupSelect2FieldFor('#taxon_searchable_option_type_ids');
+    })
+
+  </script>
+<% end -%>
+
+<%# Because otherwise the form would attempt to use to_param of @taxon %>
+<% form_url = admin_taxonomy_taxon_path(@taxonomy.id, @taxon.id) %>
+
+<%= render partial: 'spree/admin/shared/error_messages', locals: { target: @taxon } %>
+
+<%= form_for [:admin, @taxonomy, @taxon], method: :put, url: form_url, html: { multipart: true } do |f| %>
+  <%= render 'form', f: f %>
+
+  <div class="row">
+    <div class="col-6" id="related_option_types_wrapper">
+      <div class="card">
+        <div class="card-header">Related Option Types
+          <br/><span class='text-secondary'>autoloaded upon product form's taxon selection</span>
+        </div>
+        <div class="card-body" id="related_option_types">
+          <%= f.hidden_field :related_option_type_ids, value: @taxon.option_type_ids.join(',') %>
+        </div>
+      </div>
+    </div>
+    <div class="col-6" id="searchable_record_option_types_wrapper">
+      <div class="card">
+        <div class="card-header">Searchable Option Types
+          <br/><span class='text-secondary'>category-based products search filters</span>
+        </div>
+        <div class="card-body" id="searchable_record_option_types">
+          <%= f.hidden_field :searchable_option_type_ids, value: @taxon.searchable_option_type_ids.join(',') %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="form_actions_wrapper" class="form-actions mt-1" data-hook="buttons">
+    <%= button Spree.t('actions.update'), 'save.svg' %>
+    <span class="or"><%= Spree.t(:or) %></span>
+    <%= button_link_to Spree.t('actions.cancel'), edit_admin_taxonomy_url(@taxonomy), icon: "cancel.svg" %>
+  </div>
+<% end %>

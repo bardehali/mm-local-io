@@ -1,0 +1,4 @@
+<% image_id_prefix = (@image.viewable_type.split('::').last.downcase) + '_thumbnail'
+-%>
+$("#<%= image_id_prefix -%>s_<%= @image.viewable_id -%> img").removeClass('main-image');
+$("#<%= image_id_prefix -%>_<%= @image.id -%>").addClass('main-image');

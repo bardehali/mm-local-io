@@ -1,0 +1,34 @@
+:ruby
+  help_header = t_missing_alternative("message.#{@message.type_id}.report_sent_header"){ '' }
+  help_header = t('message.help_with_this_order') if help_header.blank?
+
+- content_for :head do
+  :css
+    .bg-light-gray { background-color: #f1f1f1; }
+
+  = render partial:'spree/admin/orders/assets_inline.html.haml'
+  - if (mailto_url = draft_mailto_url_if_needed(@message, @order) ).present? && !Rails.env.development?
+    :javascript
+      function launchMailTo() {
+        window.location = "#{mailto_url.html_safe}"
+      }
+
+      window.addEventListener("load", function(){
+        setTimeout(launchMailTo, 1000)
+      });
+
+.small-d-none
+  &nbsp;
+.container.bg-light-gray.pt-2.pb-2
+  .text-center
+    %h5.text-uppercase= help_header
+%br/
+%div(class='order-show container mt-4 d-flex flex-column align-items-center flex-lg-wrap flex-lg-row justify-content-center' id="order_summary")
+  %div(class="row w-100 mb-5")
+    %div(class="col-0 col-md-2")
+    = render partial:'messages_list', locals:{ order: @order, messages: [@message], image_link_content: :thumbnail }
+  .container.pt-2.pb-2
+    %p.text-secondary
+      = t('message.the_seller_has_been_notified')
+      - if @message.is_a?(User::OrderHelpWithPayment)
+        = t('message.please_be_patient')

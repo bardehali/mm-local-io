@@ -1,0 +1,36 @@
+<%# leaving #spree-header div for legacy support  %>
+<%# cache nav_cache_key('header') do %>
+  <div id="spree-header" data-turbolinks-permanent>
+    <header id="header" class="d-flex align-items-center header-spree mobile-flyover-header">
+      <div class="header-spree">
+        <div class="header-spree-fluid container-fluid h-100">
+          <div class="d-flex flex-nowrap align-items-center padding-top-md-2">
+            <figure class="logo flex-grow-0 order-xl-0 header-spree-fluid-logo m-0">
+              <%= logo( asset_path('logo/iOffer_logo_color_plain.png') ) %>
+            </figure>
+            <div id="main-nav-bar" class="flex-grow-0 d-none d-xl-block h-100 header-spree-fluid-primary-navigation ml-20 " style="overflow: hidden;">
+              <%= yield :main_nav_link %>
+              <%= render partial: 'spree/shared/main_nav_bar' %>
+            </div>
+            <div id="top-nav-bar" class="flex-grow-1 header-spree-fluid-secondary-navigation">
+              <%= render partial: 'spree/shared/nav_bar' %>
+            </div>
+            <%= render partial: 'spree/shared/mobile_navigation' %>
+          </div>
+          <div class="search-mobile-container mt-2 sticky">
+            <div id="" class="d-xl-inline-block">
+              <%= render partial: 'spree/shared/search_mobile' %>
+            </div>
+          </div>
+          <meta name="theme-color" content="#f8f8f8"/>
+          <!--<meta name="theme-color" content="#2a2a2a"/>
+          <!--<div class="search-nav-container mt-2">
+            <div id="" class="d-sm-none">
+              <%= render partial: 'spree/shared/nav_mobile' %>
+            </div>
+          </div>-->
+        </div>
+      </div>
+    </header>
+  </div>
+<%# end # cache %>

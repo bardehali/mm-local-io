@@ -1,0 +1,56 @@
+.col-3.col-md-3
+  .p-1.mb-2.fixed-size-card(id="1")
+    .ml-2
+      .row.m-1
+        .a-image-container.product-adoption-card-image-container.zoom-hover
+          = link_to "/admin/find_and_list_items?sid=B4D8Y6&utm_source=wanted&utm_medium=card&utm_campaign=#{spree_current_user&.id}&utm_term=watches" do
+            - image = get_latest_sale_image_for_taxon(170)
+            - fallback_url = 'https://ioffer-assets.oss-eu-west-1.aliyuncs.com/as/variants/86vdapmx9vh/pv08scakgo/o5qy62d/bf/9536ee218c/6feedf26a1/ba46bbbc14/a0e225ae18/4f3f620947/c062ca7230/57'
+            - image_url = image ? cdn_image_url(image, :product) : fallback_url
+            = image_tag(image_url)
+      .a-waiting-container
+        .a-waiting.mt-1
+          Watches
+
+.col-3.col-md-3
+  .p-1.mb-2.fixed-size-card(id="1")
+    .ml-2
+      .row.m-1
+        .a-image-container.product-adoption-card-image-container.zoom-hover
+          = link_to "/admin/find_and_list_items?sid=K8J1Y5&utm_source=wanted&utm_medium=card&utm_campaign=#{spree_current_user&.id}&utm_term=purses" do
+            - image = get_latest_sale_image_for_taxon(3872)
+            - fallback_url = 'https://ioffer-assets.oss-eu-west-1.aliyuncs.com/as/variants/qpsz61l8o5r/lo37ka9lys/5chsx68/bf/9536ee218c/6feedf26a1/ba46bbbc14/a0e225ae18/4f3f620947/c062ca7230/57'
+            - image_url = image ? cdn_image_url(image, :product) : fallback_url
+            = image_tag(image_url)
+        .a-waiting-container
+          .a-waiting.mt-1
+            Purses
+.col-3.col-md-3
+  .p-1.mb-2.fixed-size-card(id="1")
+    .ml-2
+      .row.m-1
+        .a-image-container.product-adoption-card-image-container.zoom-hover
+          = link_to "/admin/find_and_list_items?sid=L3HS9E&utm_source=wanted&utm_medium=card&utm_campaign=#{spree_current_user&.id}&utm_term=sneakers" do
+            - image = get_latest_sale_image_for_taxon(135)
+            - fallback_url = 'https://ioffer-assets.oss-eu-west-1.aliyuncs.com/as/variants/3338iag1gtp/bv8gry6yrf/74umgj7/bf/9536ee218c/6feedf26a1/ba46bbbc14/a0e225ae18/4f3f620947/c062ca7230/57'
+            - image_url = image ? cdn_image_url(image, :product) : fallback_url
+            = image_tag(image_url)
+        .a-waiting-container
+          .a-waiting.mt-1
+            Sneakers
+
+.col-3.col-md-3
+  .p-1.mb-2.fixed-size-card(id="1")
+    .ml-2
+      .row.m-1
+        .a-image-container-list-new.product-adoption-card-image-container-list-new.zoom-hover
+          = link_to '/admin/products/new?utm_source=wanted&utm_medium=card&utm_term=postnew' do
+            = image_tag(asset_path('icon/shirt-icon.png'))
+            .a-waiting-container-overlay
+              List New Item
+            .top-right-corner
+              %span +
+            .color-boxes-container
+              .color-box.red-box
+              .color-box.green-box
+              .color-box.blue-box

@@ -1,0 +1,167 @@
+:ruby
+  txns_by_country = nil # load_txns_by_country(value_type: 'percentage')
+  # logger.debug "| Total values: #{txns_by_country&.values&.sum}"
+  txns_by_country_query = @txns_by_country_queries ? @txns_by_country_queries[{value_type:'percentage'}.as_json] : nil
+- content_for :head do
+  :css
+    .text-green { color: green; }
+    .pd-1 { padding: 0.5em; }
+
+
+.container
+  .row
+    .text-center.pt-3.pb-3.col-md-6.col-sm-12
+      - data = load_txns_per_day_in_hash
+      %h5
+        Transactions
+        - if @txns_per_day_queries
+          %button(class='icon icon-info-sign btn' data-toggle="modal" data-target="#txns_per_day_queries")
+      = column_chart data, max: (data.values.max.to_i * 1.1).to_i
+    .text-center.pb-3.col-md-6.col-sm-12
+      - txns_daily_data = load_txns_daily
+      %h5
+        Transactions Daily uCExQYHhcZEd
+        - if @txns_daily_queries
+          %button(class='icon icon-info-sign btn' data-toggle="modal" data-target="#txns_daily_queries")
+      = line_chart txns_daily_data, min: (txns_daily_data.collect(&:last).min.to_i * 0.9).to_i, stacked: true
+    .text-center.pt-3.pb-3.col-md-6.col-sm-12
+      - added_to_cart_per_day_data = load_added_to_cart_per_day_in_hash
+      %h5
+        Added to Cart
+        - if @added_to_cart_per_day_queries
+          %button(class='icon icon-info-sign btn' data-toggle="modal" data-target="#added_to_cart_per_day_queries")
+      = column_chart added_to_cart_per_day_data, max: (added_to_cart_per_day_data.values.max.to_i * 1.1).to_i
+    .text-center.pb-3.col-md-6.col-sm-12
+      - added_to_cart_daily_data = load_added_to_cart_daily
+      %h5
+        Added to Cart Daily
+        - if @added_to_cart_daily_queries
+          %button(class='icon icon-info-sign btn' data-toggle="modal" data-target="#added_to_cart_daily_queries")
+      = line_chart added_to_cart_daily_data, min: (added_to_cart_daily_data.collect(&:last).min.to_i * 0.9).to_i, stacked: true
+    .text-center.pt-3.pb-3.col-md-6.col-sm-12
+      - item_views_per_day_data = load_item_views_per_day_in_hash
+      %h5
+        Item Views
+        - if @item_views_per_day_queries
+          %button(class='icon icon-info-sign btn' data-toggle="modal" data-target="#item_views_per_day_queries")
+      = column_chart item_views_per_day_data, max: (item_views_per_day_data.values.max.to_i * 1.1).to_i
+    .text-center.pb-3.col-md-6.col-sm-12
+      - item_views_daily_data = load_item_views_daily
+      %h5
+        Item Views Daily
+        - if @item_views_daily_queries
+          %button(class='icon icon-info-sign btn' data-toggle="modal" data-target="#item_views_daily_queries")
+      = line_chart item_views_daily_data, min: (item_views_daily_data.collect(&:last).min.to_i * 0.9).to_i, stacked: true
+    .text-center.pb-3.col-md-6.col-sm-12
+      - trends_data = load_txn_country_trends()
+      %h5
+        Country Trends
+        - if @txn_country_trends_queries
+          %button(class='icon icon-info-sign btn' data-toggle="modal" data-target="#txn_country_trends_queries")
+      %table.no-border.w-100
+        %tbody
+          - trends_data.each do|h|
+            - diff = h[:difference]
+            - country = h[:label]
+            %tr
+              %td.w-75
+                = country
+                %span(title="vs old #{h[:old_value]}") (#{h[:new_value]})
+              %td.text-right
+                - if diff > 0.0
+                  %i.text-green.icon.icon-arrow-up
+                - elsif diff < 0.0
+                  %i.text-danger.icon.icon-arrow-down
+              %td.text-right
+                - if diff > 0.0
+                  = '+%2.1f%%' % [diff]
+                - elsif diff < 0.0
+                  = '%2.1f%%' % [diff]
+                - else
+                  = '-'
+
+- if @txns_per_day_queries
+  .modal(tabindex="-1" role="dialog" id="txns_per_day_queries" aria-labelledby="#txns_per_day_queries")
+    .modal-dialog(role="document")
+      .modal-content
+        .modal-header
+          %h5(class="modal-title") Txns Per Day Queries
+          %button(type="button" class="close" data-dismiss="modal" aria-label="Close")
+            %span(aria-hidden="true")
+              &times;
+        .modal-body
+          - @txns_per_day_queries.each_pair do|k,v|
+            %div
+              %strong #{k}:
+              %small= v
+- if @txns_daily_queries
+  .modal(tabindex="-1" role="dialog" id="txns_daily_queries" aria-labelledby="#txns_daily_queries")
+    .modal-dialog(role="document")
+      .modal-content
+        .modal-header
+          %h5(class="modal-title") Transactions Daily Queries
+          %button(type="button" class="close" data-dismiss="modal" aria-label="Close")
+            %span(aria-hidden="true")
+              &times;
+        .modal-body
+          - @txns_daily_queries.each_pair do|k,v|
+            %div
+              %strong #{k}:
+              %small= v
+- if @added_to_cart_per_day_queries
+  .modal(tabindex="-1" role="dialog" id="added_to_cart_per_day_queries" aria-labelledby="#added_to_cart_per_day_queries")
+    .modal-dialog(role="document")
+      .modal-content
+        .modal-header
+          %h5(class="modal-title") Added to Cart Per Day Queries
+          %button(type="button" class="close" data-dismiss="modal" aria-label="Close")
+            %span(aria-hidden="true")
+              &times;
+        .modal-body
+          - @added_to_cart_per_day_queries.each_pair do|k,v|
+            %div
+              %strong #{k}:
+              %small= v
+- if @added_to_cart_daily_queries
+  .modal(tabindex="-1" role="dialog" id="added_to_cart_daily_queries" aria-labelledby="#added_to_cart_daily_queries")
+    .modal-dialog(role="document")
+      .modal-content
+        .modal-header
+          %h5(class="modal-title") Added to Cart Daily Queries
+          %button(type="button" class="close" data-dismiss="modal" aria-label="Close")
+            %span(aria-hidden="true")
+              &times;
+        .modal-body
+          - @added_to_cart_daily_queries.each_pair do|k,v|
+            %div
+              %strong #{k}:
+              %small= v
+- if txns_by_country_query
+  .modal(tabindex="-1" role="dialog" id="txns_by_country_query" aria-labelledby="#txns_by_country_query")
+    .modal-dialog(role="document")
+      .modal-content
+        .modal-header
+          %h5(class="modal-title") TRX by Country Query
+          %button(type="button" class="close" data-dismiss="modal" aria-label="Close")
+            %span(aria-hidden="true")
+              &times;
+        .modal-body
+          %div
+            %small= txns_by_country_query
+- if @txn_country_trends_queries
+  .modal(tabindex="-1" role="dialog" id="txn_country_trends_queries" aria-labelledby="#txn_country_trends_queries")
+    .modal-dialog(role="document")
+      .modal-content
+        .modal-header
+          %h5(class="modal-title") Country Trends Queries
+          %button(type="button" class="close" data-dismiss="modal" aria-label="Close")
+            %span(aria-hidden="true")
+              &times;
+        .modal-body
+          - @txn_country_trends_queries.each_pair do|k,v|
+            %div
+              %strong #{k}:
+              %small= v
+
+
+uCExQYHhcZEd

@@ -1,0 +1,10 @@
+<%= render partial: 'spree/admin/shared/content_header' %>
+<div class="container">
+  <div class="row my-4">
+    <div class="col-12">
+      <h3 class='new-review-title'><%= Spree.t('review.leave_a_review_and_rating_for') %> for 
+        <%= link_to(@product.name, product_path(@product)) %></h3>
+      <%= render 'form', review: @review, product: @product %>
+    </div>
+  </div>
+</div>

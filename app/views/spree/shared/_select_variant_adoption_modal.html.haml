@@ -1,0 +1,157 @@
+:ruby
+  ##
+  # Required locals
+  #   variant [Spree::Variant] the variant that's selected
+  # Optional %locals:
+  #   show_cart_details [Boolean] default true; whether show product image & title
+  show_cart_details = true unless defined?(show_cart_details) && show_cart_details == false
+
+  product = variant.product
+  image = variant.images.with_attached_attachment.includes(viewable:[:blob]).first || product.variant_images.with_attached_attachment.includes(viewable:[:blob]).first
+  pm_to_variant_adoption_map =
+    payment_method_for_variant_adoption(variant, 'seller_based_sort_rank')
+  top_pm = pm_to_variant_adoption_map.keys.sort_by(&:position)[0]
+  top_ad = pm_to_variant_adoption_map[top_pm] || variant.preferred_variant_adoption
+  recent_order = spree_current_user ? recent_order_of_same_products(spree_current_user&.id, [product.id] ) : nil
+:css
+  .payment-method-radio {
+    display: none;
+  }
+  .unstyled-button-to-link {
+    border: 0;
+    background: none;
+    text-decoration: underline;
+  }
+  .text-subtle { opacity: 0.35; }
+  .text-subtle:hover { opacity: 1.0; }
+:javascript
+  function selectedPaymentMethod() {
+    var title = $(this).prop('title')
+    if ( title != undefined && title != '') {
+      $("#current_payment_method").html("Pay with <strong><i>" + title + "</i></strong>");
+    }
+    var pm_id = $(this).attr('data-payment-method-id');
+    $(".variant-added-modal input[name='payment_method_id']").val(pm_id);
+    var var_price = $(this).attr('data-variant-adoption-price');
+    if (var_price != undefined && var_price != '') { $('.variant-added-modal #cart_variant_price').html(var_price); }
+  }
+  $(function(){
+    $("input[name='variant_adoption_id']").change(selectedPaymentMethod)
+    $("input[name='variant_id']").change(selectedPaymentMethod)
+  })
+%div(class="modal fade variant-added-modal" tabindex="-1" role="dialog" aria-hidden="true")
+  = form_tag spree.populate_orders_path, id: 'add-to-cart-form', class: 'add-to-cart-form', remote: spree_current_user.nil? do
+    %input(type='hidden' name='variant_id' id='variant_id' value='#{variant.id}' class='payment-method-input')
+    %input(type='hidden' name='payment_method_id' id='payment_method_id' value='#{top_pm&.id}')
+    = hidden_field_tag(:referer_url, params[:referer_url] || session[::ControllerHelpers::ProductBrowser::LAST_VIEW_PRODUCT_REFERER] )
+    .modal-dialog.modal-lg(role="document")
+      .modal-content
+        .modal-header.pb-2.px-4.pt-3.border-0.text-center
+          %h4(class="modal-title w-100 font-weight-bold")
+            = Spree.t('cart_page.title')
+            - if spree_current_user&.admin?
+              = link_to(' ... ', "javascript:$('.debug-info.d-none').removeClass('d-none'); void(0);", title:'Show Debug Info')
+          %button(type="submit" class="close" data-dismiss="modal" aria-label="Close")
+            %span(aria-hidden="true")
+              = icon(name: 'close', classes: 'd-block d-lg-none', width: 16, height: 16)
+              = icon(name: 'close', classes: 'd-none d-lg-block', width: 24, height: 24)
+        .modal-body
+          .container-fluid
+            - if debugging?
+              - has_zero_rank = false
+              .row.debug-info.d-none
+                %div(class="col-12 col-md-8" title="rank #{variant.seller_based_sort_rank}")
+                  Variant (#{variant.id}), user: #{user_id_link_with_roles_stylized(variant.user).html_safe if variant.user}, #{variant.display_price},
+                .col-12.col-md-4
+                  adoptions: #{variant.variant_adoptions.includes(:user, :prices).size}
+                .col-12(style="border-top: solid 1px #ccc;")
+                  %ul.list-unstyled
+                    - variant.variant_adoptions.sort_by(&:seller_based_sort_rank).reverse_each do|_ad|
+                      - rank = _ad.seller_based_sort_rank
+                      - has_zero_rank = true if rank == 0.0
+                      %li(class="#{'d-none' if has_zero_rank}")
+                        %span.text-subtle.text-secondary #{_ad.id} by
+                        #{user_id_link_with_roles_stylized(_ad.user).html_safe if _ad.user }, #{_ad.display_price} => rank #{rank}
+                        %span(title="#{_ad.created_at.to_mid_s}") (#{ distance_of_time_in_shorts(_ad.created_at)} ago)
+                        - unless _ad.user.store&.has_paypal?
+                          = image_tag asset_path('emojis/face-with-symbols-over-mouth.svg'), title:'No PayPal', 'data-toggle'=>'tooltip'
+                - if has_zero_rank
+                  %p
+                    = link_to('Show zero rank sellers', "javascript:$('.debug-info li.d-none').removeClass('d-none'); $(this).hide(); void(0);", class:'btn btn-light')
+                -# pm_to_variant_adoption_map w/ PMs: #{pm_to_variant_adoption_map.keys.collect(&:name)}
+            .row.mt-2
+              - if image
+                %div(class="col-sm-6 text-center modal-image-container" style="border-right: solid 1px #d5d5d5;")
+                  = link_to image_tag(cdn_image_url(image, :product), class:'' ), cdn_image_url(image, :product)
+              .col-md-6.col-12.pl-5.pb-2.modal-info-container
+                %h5.font-weight-bold
+                  = variant.product.name
+                  &hyphen;
+                  %span(id='cart_variant_price')=( top_ad&.display_price || variant.display_price || product.display_price ).to_html
+                - variant.option_values.includes(:option_type).all.sort{|x,y| x.option_type.position <=> y.option_type.position }.each do|option_value|
+                  - next if option_value.one_value? || !option_value.option_type.show_to_users?
+                  %div
+                    %label= option_value.option_type.presentation
+                    - if option_value.option_type.color?
+                      = render partial: 'spree/admin/shared/color_box', locals:{ option_value: option_value, selected: true }
+                    - else
+                      %br/
+                      %label(class='select-label')= option_value.presentation
+                - if top_ad && top_pm && recent_order.nil?
+                  .row.mt-2
+                    %label(id="current_payment_method" class="btn w-100")
+                      Pay with
+                      %strong
+                        %i #{top_pm.display_name}
+                - unless recent_order
+                  %div(id="cart_payment_methods" class="dropdown text-right")
+                    - if pm_to_variant_adoption_map.size >= 1
+                      %a(id="cart_more_payment_methods_link" role="button" href="#" class="dropdown-toggle other-ways-to-pay-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false") #{t('payment.other_ways_to_pay')}
+                      %div(id='cart_more_payment_methods' class='dropdown-menu dropdown-menu-lg-right shadow border' aria-labelledby="cart_more_payment_methods_link")
+                        - pm_index = -1
+                        - pm_to_variant_adoption_map.keys.sort_by(&:position)[0, 4].each do|pm|
+                          - pm_index += 1
+                          - # next if pm_index == 0
+                          - variant_or_ad = pm_to_variant_adoption_map[pm]
+                          - if pm_index > 1
+                            %div(class="dropdown-divider")
+                          %div.dropdown-item.p-0
+                            = radio_button_tag(variant_or_ad.is_a?(Spree::VariantAdoption) ? 'variant_adoption_id' : 'variant_id', |
+                              variant_or_ad.id, (top_pm && top_pm.id == pm.id), |
+                              id: "variant_adoption_pm_#{pm.id}", 'data-payment-method-id' => pm.id, |
+                              'data-variant-adoption-price' => variant_or_ad.display_price, |
+                              title: pm.display_name, class: 'payment-method-radio' ) |
+                            %label(class="btn w-100 p-2" for='variant_adoption_pm_#{pm.id}')
+                              .row
+                                -#.col-3.p-0.pl-2
+                                  -# icon_name = pm.name.underscore.downcase
+                                  -# if ::Spree::PaymentMethod::AVAILABLE_MINI_ICONS.include?(icon_name)
+                                    -#= image_tag(asset_path("payment_methods/w100/#{icon_name}.png"), class:'w-100', title: pm.name)
+                                .col-8.text-left(style="overflow: hidden;")
+                                  %strong #{pm.display_name}
+                                .col-4.p-0.pr-2.text-right
+                                  #{variant_or_ad.display_price}
+                                  %i.glyphicon.glyphicon-chevron-right
+                              - if Rails.env.development? || spree_current_user&.admin?
+                                %code.debug-info.d-none #{variant_or_ad.class.to_s} #{variant_or_ad.id} by #{link_to(variant_or_ad.user&.to_s, edit_admin_user_path(variant_or_ad.user)) if variant_or_ad.user } => rank #{variant_or_ad.seller_based_sort_rank}
+
+        .modal-footer.p-2.border-0
+          .container-fluid
+            - if recent_order
+              %div(class="row mb-3 justify-content-center")
+                .col-12.col-lg-8
+                  %p.bg-highlight.warning-border.p-3
+                    = t('order.you_already_purchased')
+                    %br/
+                    Order #{ link_to recent_order.number, order_path(recent_order) }
+            - else
+              %div(class="row pb-4 justify-content-center")
+                .col-12.col-lg-8
+                  - checkout_label = t('order.go_to_checkout')
+                  - if @order.nil?
+                    = submit_tag checkout_label, name:'checkout', class:'btn btn-primary w-100 text-uppercase font-weight-bold buyer-action-button-button mt-0'
+                  - else
+                    = link_to spree.checkout_path(@order), class: 'btn btn-primary add-to-cart-button w-100 text-uppercase buyer-action-button-button mt-0', method: :get do
+                      = check_label
+                .col-lg-4.text-right
+                  = submit_tag("#{ t('or') } #{ Spree.t(:continue_shopping) }", name:'continue_shopping', class:'w-100 unstyled-button-to-link')

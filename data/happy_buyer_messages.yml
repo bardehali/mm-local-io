@@ -1,0 +1,247 @@
+---
+- user: go_girl
+  purchases: 6
+  message: Love the variety offered on iOffer. Fantastic shopping, so far I have never had a bad experience.
+  country: Australia
+  country_code: AU
+  avatar_url: avatars/testimonials/AV1.jpg
+- user: lillijoan
+  purchases: 6
+  message: Thanks great items as described ****** will purchase again.
+  country: Australia
+  country_code: AU
+  avatar_url: avatars/testimonials/AV2.jpg
+- user: tigerferdinands
+  purchases: 9
+  message: Service is great and big range of titles to choose from.
+  country: Australia
+  country_code: AU
+  avatar_url: avatars/testimonials/AV3.jpg
+- user: johnehayes
+  purchases: 9
+  message: Interesting items for sale at reasonable prices and helpful, friendly sellers.
+  country: Australia
+  country_code: AU
+  avatar_url: avatars/testimonials/AV4.jpg
+- user: orsaysunny
+  purchases: 20
+  message: I'm so satisfied with this handbag and seller~~also price, quality and delivery everything make me happy!
+  country: Australia
+  country_code: AU
+  avatar_url: avatars/testimonials/AV5.jpg
+- user: saginaw81
+  purchases: 6
+  message: iOffer.com lists articles you can't find anywhere else. Shopping with iOffer is fast and secure.
+  country: Australia
+  country_code: AU
+  avatar_url: avatars/testimonials/AV6.jpg
+- user: cdrosdoski
+  purchases: 7
+  message: Its super easy to find what I am interested in for a good price.
+  country: Canada
+  country_code: CA
+  avatar_url: avatars/testimonials/AV7.jpg
+- user: mommaviolet
+  purchases: 22
+  message: I enjoy finding current trends for less!
+  country: Canada
+  country_code: CA
+  avatar_url: avatars/testimonials/AV8.jpg
+- user: ckswitch
+  purchases: 34
+  message: i love shopping at iOffer as it is not expensive and I get great value for the money :)
+  country: Canada
+  country_code: CA
+  avatar_url: avatars/testimonials/AV9.jpg
+- user: ancasandor
+  purchases: 59
+  message: Very good experience! Very fast delivery and good quality! Thx
+  country: Canada
+  country_code: CA
+  avatar_url: avatars/testimonials/AV10.jpg
+- user: anon15854112
+  purchases: 6
+  message: I love make shopping on iOffer because produits proposed are good quality
+  country: France
+  country_code: FR
+  avatar_url: avatars/testimonials/AV11.jpg
+- user: fatiha57
+  purchases: 16
+  message: I love iOffer :) :) :) :) :) :) :) :) :) :)
+  country: France
+  country_code: FR
+  avatar_url: avatars/testimonials/AV12.jpg
+- user: anon9932263
+  purchases: 6
+  message: Everything is great value and brilliant service can't fault it
+  country: United Kingdom
+  country_code: GB
+  avatar_url: avatars/testimonials/AV70.jpg
+- user: anon83351853
+  purchases: 6
+  message: I like shopping with iOffer because the site is fast and easy to use and the prices are affordable too :)
+  country: United Kingdom
+  country_code: GB
+  avatar_url: avatars/testimonials/AV13.jpg
+- user: supershopper190
+  purchases: 7
+  message: I love the variety of goods at excellent prices :-)
+  country: United Kingdom
+  country_code: GB
+  avatar_url: avatars/testimonials/AV14.jpg
+- user: brooke0907
+  purchases: 7
+  message: You can get loads of things nearly half the price they are in the UK , and still get get good quality !!
+  country: United Kingdom
+  country_code: GB
+  avatar_url: avatars/testimonials/AV15.jpg
+- user: nickztar92
+  purchases: 8
+  message: Great valued items at affordable prices, done most of my Xmas shopping on here love it
+  country: United Kingdom
+  country_code: GB
+  avatar_url: avatars/testimonials/AV16.jpg
+- user: anon7455795
+  purchases: 8
+  message: Love shopping at iOffer as items are of good quality and excellent prices can't beat a good bargain 👍 Thank you iOffer
+  country: United Kingdom
+  country_code: GB
+  avatar_url: avatars/testimonials/AV17.jpg
+- user: casb
+  purchases: 8
+  message: Excellent experiences, I love shopping on iOffer!
+  country: United Kingdom
+  country_code: GB
+  avatar_url: avatars/testimonials/AV18.jpg
+- user: nenna13
+  purchases: 8
+  message: Good quality items and very fast delivery.. Thank you!!!
+  country: United Kingdom
+  country_code: GB
+  avatar_url: avatars/testimonials/AV19.jpg
+- user: anon49250427
+  purchases: 8
+  message: Absolutely love iOffer great prices, great items and always super fast delivery 👍✋👌
+  country: United Kingdom
+  country_code: GB
+  avatar_url: avatars/testimonials/AV20.jpg
+- user: skinnystiletto
+  purchases: 9
+  message: I love, love, love shopping here the good look great, good quality and great designs
+  country: United Kingdom
+  country_code: GB
+  avatar_url: avatars/testimonials/AV21.jpg
+- user: djtshc
+  purchases: 6
+  message: I can find pretty much anything I'm looking for at a reasonable price.
+  country: United States
+  country_code: US
+  avatar_url: avatars/testimonials/AV22.jpg
+- user: pokhyiathepinmaster78
+  purchases: 6
+  message: One word... Prices. The best on the net.
+  country: United States
+  country_code: US
+  avatar_url: avatars/testimonials/AV23.jpg
+- user: aprlwl86
+  purchases: 6
+  message: Good items for wonderful prices!!!!
+  country: United States
+  country_code: US
+  avatar_url: avatars/testimonials/AV24.jpg
+- user: ssmoot36
+  purchases: 6
+  message: I've had great purchases on iOffer. I would definitely recommend this website to family and friends!!
+  country: United States
+  country_code: US
+  avatar_url: avatars/testimonials/AV25.jpg
+- user: coldrockrand
+  purchases: 7
+  message: Great offerings found no where else with great service!
+  country: United States
+  country_code: US
+  avatar_url: avatars/testimonials/AV26.jpg
+- user: designerkat
+  purchases: 7
+  message: I can always find what I want at a good price!
+  country: United States
+  country_code: US
+  avatar_url: avatars/testimonials/AV27.jpg
+- user: ricstone
+  purchases: 7
+  message: I'm really appreciating shopping on iOffer.  I get to scan for the best prices, easy search options!
+  country: United States
+  country_code: US
+  avatar_url: avatars/testimonials/AV28.jpg
+- user: fjnunes01
+  purchases: 8
+  message: Good quality products,very good price,fast shipment
+  country: United States
+  country_code: US
+  avatar_url: avatars/testimonials/AV29.jpg
+- user: anon65462236
+  purchases: 8
+  message: The deals are absolutely amazing! And the delivery lead times are good!
+  country: United States
+  country_code: US
+  avatar_url: avatars/testimonials/AV30.jpg
+- user: jirwin2
+  purchases: 8
+  message: iOffer has the coolest stuff, at the best prices!!! I use it ALL the time, and have never had a bad experience!
+  country: United States
+  country_code: US
+  avatar_url: avatars/testimonials/AV31.jpg
+- user: starlene8
+  purchases: 8
+  message: I find tv series that you can't find any where else
+  country: United States
+  country_code: US
+  avatar_url: avatars/testimonials/AV32.jpg
+- user: anon49264661
+  purchases: 8
+  message: Some nice items, movie and music DVD's, you might not find on other shopping sites.
+  country: United States
+  country_code: US
+  avatar_url: avatars/testimonials/AV33.jpg
+- user: kellydotsong
+  purchases: 8
+  message: I love IOffer because I've found some rare movies that I couldn't find anywhere else. The sellers here have been great.
+  country: United States
+  country_code: US
+  avatar_url: avatars/testimonials/AV34.jpg
+- user: marion261
+  purchases: 8
+  message: There are many choices, many different things to choose from. It's great place to browse and often find what you're looking for.
+  country: United States
+  country_code: US
+  avatar_url: avatars/testimonials/AV35.jpg
+- user: anon806730
+  purchases: 9
+  message: They have the movies I have been looking for and  they deliver. Great communication between sellers and buyers.
+  country: United States
+  country_code: US
+  avatar_url: avatars/testimonials/AV36.jpg
+- user: dlcrunk
+  purchases: 9
+  message: Have loved everything.  Will order more soon.
+  country: United States
+  country_code: US
+  avatar_url: avatars/testimonials/AV50.jpg
+- user: mackparker
+  purchases: 10
+  message: iOffer has great products for great prices!
+  country: United States
+  country_code: US
+  avatar_url: avatars/testimonials/AV39.jpg
+- user: jesmeralda
+  purchases: 10
+  message: Everything on iOffer.com is so cheap in price but awesome in  Quality. Love shopping here!
+  country: United States
+  country_code: US
+  avatar_url: avatars/testimonials/AV41.jpg
+- user: annoying
+  purchases: 10
+  message: Love iOffer!  I've been able to find items that I couldn't find anywhere else.  Products have always been excellent and arrived quickly.  Very happy doing business on this site!
+  country: United States
+  country_code: US
+  avatar_url: avatars/testimonials/AV42.jpg

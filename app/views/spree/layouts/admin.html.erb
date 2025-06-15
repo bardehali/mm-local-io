@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="<%= I18n.locale %>">
+  <head data-hook="admin_inside_head">
+    <%= render partial: 'spree/admin/shared/head' %>
+    <%= yield :head_extra -%>
+  </head>
+
+  <body class="admin">
+
+    <%#-------------------------------------------------%>
+    <%# Loading progress bars                           %>
+    <%#-------------------------------------------------%>
+    <div id="progress">
+      <div class="alert alert-info alert-progress">
+        <div class="spinner"><%= Spree.t(:loading) %>...</div>
+        <div class="progress-message"><%= Spree.t(:loading) %>...</div>
+      </div>
+    </div>
+
+    <%#-------------------------------------------------%>
+    <%# Header navbar                                   %>
+    <%#-------------------------------------------------%>
+    <%= render partial: 'spree/admin/shared/header' %>
+
+    <%#-------------------------------------------------%>
+    <%# Main content                                    %>
+    <%#-------------------------------------------------%>
+    <div id="wrapper" class="container-fluid <%= wrapper_classes %>">
+      <div class="row">
+
+        <%#-------------------------------------------------%>
+        <%# Sidebar                                         %>
+        <%#-------------------------------------------------%>
+        <aside
+          class="<%= main_sidebar_classes %> sidebar position-fixed d-flex justify-content-between flex-column px-0"
+          id="main-sidebar"
+          data-hook="admin_tabs">
+          <%= render partial: 'spree/admin/shared/main_menu' %>
+
+        </aside>
+
+        <%#-------------------------------------------------%>
+        <%# Content                                         %>
+        <%#-------------------------------------------------%>
+        <main class="<%= main_part_classes%> main px-5" id="main-part" role="main">
+
+          <%#-------------------------------------------------%>
+          <%# Content header (page title/actions)             %>
+          <%#-------------------------------------------------%>
+          <%= render partial: 'spree/admin/shared/content_header' %>
+
+          <div class="row">
+            <%#-------------------------------------------------%>
+            <%# Alerts                                          %>
+            <%#-------------------------------------------------%>
+            <%# = flash_alert(flash) %>
+
+            <%#-------------------------------------------------%>
+            <%# Main content                                    %>
+            <%#-------------------------------------------------%>
+            <div class="<%= content_for?(:sidebar) ? 'with-sidebar col-8 col-md-9' : 'col-12'  %>" id="content" data-hook>
+              <% if content_for?(:table_filter) -%>
+                <% if content_for?(:quick_table_filter) -%>
+                  <%= yield :quick_table_filter %>
+                <% else -%>
+                  <%= render partial: 'spree/admin/shared/table_filter' %>
+                <% end%>
+              <% end -%>
+              <%= yield %>
+            </div>
+
+            <%#-------------------------------------------------%>
+            <%# Inner aside                                     %>
+            <%#-------------------------------------------------%>
+            <% if content_for?(:sidebar) %>
+              <div class="col-4 col-md-3">
+                <%= render partial: 'spree/admin/shared/sidebar' %>
+              </div>
+            <% end %>
+          </div>
+
+
+        </main>
+      </div>
+    </div>
+
+    <%#-------------------------------------------------%>
+    <%# Insert footer scripts here                      %>
+    <%#-------------------------------------------------%>
+    <div data-hook="admin_footer_scripts"></div>
+    <footer>
+      <%= yield :footer -%>
+    </footer>
+    <%= yield :footer_extra -%>
+    <% if @user_notifications.present? || (spree_current_user.present? && spree_current_user.store.present? && spree_current_user.store.meta_keywords.to_i > 0) -%>
+      <%= render partial: 'user/messages/notifications_from_overlay', locals:{ user_messages: @user_notifications }  %>
+      <script>
+        window.addEventListener('load', function() {
+          $('#user_notifications_modal').modal('show');
+        });
+      </script>
+    <% end -%>
+    <script>
+      function minimizeSidebar() {
+        if (window.innerWidth < 1000 && !$("#wrapper").hasClass('sidebar-minimized')){
+          $('#sidebar-toggle').click()
+        }
+      }
+      window.addEventListener('load', minimizeSidebar);
+    </script>
+  </body>
+</html>

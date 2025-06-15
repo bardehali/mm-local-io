@@ -1,0 +1,36 @@
+:ruby
+  ##
+  # Older version that includes the menu to set some status.
+  # Required locals:
+  #   product [Spree::Product]
+  # Optional locals:
+  #   is_admin [Boolean] whether to show admin options
+  #   main_image_position [Integer] the position of image list that sets as main image
+  #   extra_css_class [String]
+  is_admin = nil unless defined?(is_admin)
+  is_admin ||= spree_current_user.try(:admin?) if is_admin.nil?
+  extra_css_class = '' unless defined?(extra_css_class)
+%li(class="border-top record-review #{extra_css_class}" id="product_card_#{product.id}")
+  - dropdown_menu_id = "product_status_menu_#{product.id}"
+  .row
+    %div(class="col-md-7 col-sm-8 product-title")
+      %h4= link_to product.try(:name), edit_admin_product_path(product), 'data-content'=>"IQS: #{product.iqs}#{"<br/>site: #{product.retail_site.name}" if product.retail_site}", 'data-toggle'=>'popover', 'data-trigger'=>'hover', 'data-html':true, target:'_blank'
+    .col-md-5.col-sm-4.product-review-actions.record-review
+      - if is_admin
+        = update_record_review_link(product, 'bad-main-image', class:'small-status-action-inline', title:'Bad Main Image', 'data-toggle'=>'tooltip') do
+          = image_tag('icon/bad-image.png', alt:'Bad Main Image')
+        = update_record_review_link(product, 'ok-image', class:'small-status-action-inline', title:'OK Image', 'data-toggle'=>'tooltip') do
+          %span.text-info OK
+        = update_record_review_link(product, 'good-image', class:'small-status-action-inline', title:'Good Image', 'data-toggle'=>'tooltip') do
+          = image_tag('icon/star-gold-border.png', alt:'Good Image')
+        %a.small-status-action-inline(aria-expanded="false" aria-haspopup="true" data-target="##{dropdown_menu_id}" data-toggle="menu" href= "javascript:void(0);" id="#{dropdown_menu_id}_link" role="button" title="Remove Item Options")= image_tag('icon/x-icon.png', alt:'More Options')
+        = render(partial:'status_dropdown_menu', locals:{ product: product, dropdown_menu_id: dropdown_menu_id })
+  .product-info-labels
+    %span.product-id-label(data-toggle='tooltip' title="Created at #{product.created_at.to_s(:db)}")= product.id
+    - product.categories.each do|cat_taxon|
+      %span.category-breadcrumb-label= cat_taxon.collect(&:name).join(' > ')
+    %span.price-label= product.display_price.to_html
+  .product-thumbnails{id: "variant_thumbnails_#{product.master.id}"}
+    - product.variant_images.each do|image|
+      = link_to(admin_mark_image_as_main_path(product_id: product.id, id: image.id), remote: true, method: :put ) do
+        = image_tag(main_app.url_for(image.url(:small)), id:"variant_thumbnail_#{image.id}", class:"product-thumbnail #{'main-image' if image.position==1}",  'data-toggle'=>'popover',  'data-img'=> "#{ main_app.url_for(image.url(:large)) }" )

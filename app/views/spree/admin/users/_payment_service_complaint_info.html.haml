@@ -1,0 +1,55 @@
+:ruby
+  # CSS rules moved to app/assets/stylesheets/spree/record_reviews.css.scss for only 1 time load
+  # 
+  # Required locals:
+  #   either user [Spree::User] or variant [Spree::Variant]
+  # Optional locals:
+  #   show_admin_actions [Boolean]
+  #   show_paypal_info [Boolean] default true
+  #   show_complaint_ratio [Boolean] default true
+  #   paypal [Spree::PaymentMethod] Paypal; if nil, would fetch locally
+  #   highlight_matched_words [String]
+  show_paypal_info = true unless defined?(show_paypal_info) && show_paypal_info == false
+  show_complaint_ratio = true unless defined?(show_complaint_ratio) && show_complaint_ratio == false
+  paypal = Spree::PaymentMethod.paypal unless defined?(paypal) && paypal
+  paypal_store_pm = user.store ? user.store.paypal_store_payment_method : nil
+  paypal_account_id = paypal_store_pm&.account_id_in_parameters
+    highlight_matched_words = '' unless defined?(highlight_matched_words) && highlight_matched_words
+  count_of_recent_payment_complaints = paypal_store_pm&.recent_orders_of_same_payment_method_account&.with_complaint&.count.to_i
+  count_of_recent_orders = [paypal_store_pm&.recent_orders_of_same_payment_method_account&.count.to_i, 1].max # distinct orders paid to sellers w/ this paypal_account_id
+
+  @cached_counts_of_paid_need_tracking ||= {}
+  count_of_paid_need_tracking ||= @cached_counts_of_paid_need_tracking[user.id]
+  if count_of_paid_need_tracking.nil?
+    count_of_paid_need_tracking = paypal_store_pm&.orders_with_paid_need_tracking_of_same_payment_method_account&.count.to_i
+    @cached_counts_of_paid_need_tracking[user.id] = count_of_paid_need_tracking
+  end
+
+  complaints_url = paypal_store_pm ? spree.admin_sales_in_state_path(state: 'complaints', store_payment_method_id: paypal_store_pm.id) : '#'
+  sales_url = paypal_store_pm ? spree.admin_sales_path(store_payment_method_id: paypal_store_pm.id) : '#'
+  other_hl_args = [ highlight_matched_words, { prefix:"<span class='text-highlight'>", postfix:'</span>'} ]
+
+- if show_paypal_info
+  - if paypal_store_pm
+    = link_to store_payment_method_id: paypal_store_pm.id do
+      = image_tag(asset_path('payment_methods/mini_avatar/paypal.svg'), class:'mini-avatar white-bg', title:'Paypal')
+    &nbsp;
+  - if paypal_account_id.present?
+    - modded_paypal_account_id = highlight_keywords paypal_account_id, *other_hl_args
+    = link_to modded_paypal_account_id, spree.admin_all_sellers_path('q[store_store_payment_methods_account_parameters_cont]' => paypal_account_id, 'q[store_store_payment_methods_payment_method_id_eq]'=>paypal.id), title:'Search Paypal ID like this'
+  - if paypal_store_pm
+    %span(title="#{paypal_store_pm.created_at.to_s}")= distance_of_time_in_shorts(paypal_store_pm.created_at).titleize + ' Ago'
+  &nbsp;&nbsp;
+%span
+  = link_to count_of_recent_payment_complaints, complaints_url, title:'Recent payment complaints'
+  = "/"
+  = link_to count_of_recent_orders, sales_url, title:'Recent transactions paid to same account'
+  &nbsp;&nbsp;
+  - if show_complaint_ratio # Ratio of Complaints/Total Payments
+    -#%strong= link_to ('%.3f' % [count_of_recent_payment_complaints.to_f / count_of_recent_orders] ), complaints_url, class:'text-green'
+    %span(style="font-size: 1.4em; font-weight: 500;")
+      - if count_of_paid_need_tracking == 0
+        %span(class='text-secondary' title='Paid Neeed Tracking of Same Paypal Account')= count_of_paid_need_tracking
+      - else
+        = link_to(count_of_paid_need_tracking, paypal_store_pm ? admin_sales_in_state_path(state: 'paid_need_tracking', store_payment_method_id: paypal_store_pm.id) : '#', title:'Paid Neeed Tracking of Same Paypal Account', style:"color: #{count_of_paid_need_tracking > 5 ? 'red' : '#666666'};")
+      

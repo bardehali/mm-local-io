@@ -1,0 +1,65 @@
+<%
+  # Required locals:
+  #   order
+  #   store_payment_method
+  payment_method = store_payment_method.payment_method unless defined?(payment_method)
+  client_id = Spree::Gateway::PayPalGateway.config['client_id']
+  currency = order.payments.first&.currency || 'USD'
+-%>
+
+<br/>
+<div id="paypal-button-container"></div>
+
+<!-- Include the PayPal JavaScript SDK -->
+<script src="https://www.paypal.com/sdk/js?client-id=<%= client_id %>"></script>
+
+<% content_for :footer do -%>
+<script>
+  // Render the PayPal button into #paypal-button-container
+  paypal.Buttons({
+    env: "<%= Rails.env.production? ? 'live' : 'sandbox' %>",
+    // Set up the transaction
+    createOrder: function(data, actions) {
+      return actions.order.create({
+        intent: 'CAPTURE',
+        description: "<%= order.title %>",
+        custom_id: "<%= order.id %>",
+        reference_id: "<%= order.id %>",
+        purchase_units: [
+          {
+            amount: {
+              currency_code: "<%= currency %>",
+              value: '<%= order.total.to_s %>',
+              breakdown: {
+                item_total: { currency_code: "<%= currency %>", value: '<%= order.item_total.to_s %>' },
+                shipping: { currency_code: "<%= currency %>", value: '<%= order.ship_total.to_s %>' },
+                handling: { currency_code: "<%= currency %>", value: '0' },
+                tax_total: { currency_code: "<%= currency %>", value: '<%= order.tax_total.to_s %>' }
+              }
+            },
+            
+            items:[<%= order.line_items.includes(:product).collect{|line_item| "{ name:\"#{line_item.product.name}\", unit_amount:{ currency_code:'#{currency}', value:'#{line_item.variant.price.to_s}'}, quantity:'#{line_item.quantity}' }" }.join(', ').html_safe %>],
+
+            payee:{ email_address: "<%= store_payment_method.account_id_in_parameters&.strip %>" }
+          }
+        ]
+      });
+    },
+
+    onApprove: async (data, actions) => {
+      const response = await fetch('<%= capture_api_v1_checkout_payment_path(checkout_id: order.number, id: order.payments.first.number, token: spree_current_user.try(:spree_api_key), order_token: order.token ).html_safe %>', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ pay_pal_order_id: data.orderID })
+      });
+      const responseData = await response.json();
+      if (responseData.state === 'completed') {
+        window.location = "<%= order_path(id: order.number, t: Time.now.to_i) %>";
+      }
+    }
+    
+  }).render('#paypal-button-container');
+</script>
+<% end -%>

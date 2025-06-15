@@ -1,0 +1,31 @@
+- content_for :timeline do
+  = timeline_table do|timeline|
+    - timeline.step 1, t('user.registration'), true
+    - timeline.step 2, t('user.contact_info'), true
+    - timeline.step 3, t('user.payment_methods.payment_options'), true
+    - timeline.step 4, t('store.list_items'), false
+
+.container
+  = render partial:'home/logo_and_timeline'
+  .mt-3 &nbsp;
+  - if flash[:warning].present?
+    .row.mb-3
+      .col-2
+      .col-8.text-center.alert.alert-danger
+        %h5= flash[:warning]
+  = form_tag(admin_payment_methods_and_retail_stores_path, method:'post', id:'store_payment_methods_form') do
+    = hidden_field_tag('skip_validation', false)
+    = hidden_field_tag('require', 'all')
+    = hidden_field_tag('next_path', seller_obligations_path)
+    = render partial: 'spree/store_payment_methods/account_rows', locals:{ store_payment_methods: @store_payment_methods, payment_methods: @payment_methods }
+
+    %div(style="height: 2em;") &nbsp;
+    .row.mb-3.text-center
+      .col-3
+      .col-6.p-5
+        %h5.mb-3.text-secondary= t('user.payment_methods.these_will_be_sent_with_order_confirmation')
+        = submit_tag(t('form.submit'), class:'btn btn-primary btn-lg form-control center-in-div w-100', data:{ disable_with: t('form.submitting') } )
+        .mt-4.text-right
+          = link_to(t('payment.other_payment_methods') + ' >>', payment_methods_provided_path)
+    %div(style="height: 6em;")
+      %br/

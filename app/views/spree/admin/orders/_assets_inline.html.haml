@@ -1,0 +1,431 @@
+- content_for :head do
+  = stylesheet_link_tag 'spree/record_reviews'
+
+  :css
+    .user-info {
+      line-height: 2.0em;
+    }
+    .country-icon {
+      margin-top: -5px;
+    }
+    .user-display-name {
+      font-size: 1.2em;
+      font-weight: 500;
+    }
+    .round-label-lg {
+      background-color: black;
+      color: white;
+      border-radius: 50%;
+      border-width: 0em;
+      width: 3.0em;
+      height: 3.0em;
+      margin-top: 0.5em;
+      font-size: 1.5em;
+      text-align: center;
+      white-space: nowrap;
+    }
+    .payment-info {
+    }
+    .pending-seller-p {
+      display:inline-block;
+      color: red;
+      font-weight: 700;
+    }
+    .seller-role-outline {
+      text-shadow: 0 0 1px red,
+      -1px -1px 1px red,
+      -1px 1px 1px red,
+      1px 1px 1px red,
+      1px -1px 1px red;
+      position: relative;
+    }
+    .round-label-lg > option-type-text {
+       overflow: hidden;
+       text-overflow: ellipsis;
+       display: -webkit-box;
+       -webkit-line-clamp: 2; /* number of lines to show */
+               line-clamp: 2;
+       -webkit-box-orient: vertical;
+    }
+
+    .date-label {
+      position: relative;
+      top: -1.0em;
+      left: -0.5em;
+      padding: 0.25em 1.25em 0.25em 0.75em;
+      font-size: 1.0em;
+      font-weight: 600;
+      color: black;
+      border-top-right-radius: 6px;
+      border-bottom-right-radius: 6px;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+      background: #F6C323;
+      border: 0;
+      border-bottom: 2px solid #e2b607;
+      -webkit-box-shadow: inset 0 -2px #e2b607;
+      box-shadow: inset 0 -2px #e2b607;
+    }
+
+    .at-border {
+      margin-top: 1.0em;
+    }
+    .vertical-center {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      margin: auto;
+      height: 50vh;
+    }
+    .full-order-info-row { border-top: solid 1px #f0f0f0; }
+    .full-order-info-row > div {
+      display: inline-block;
+      padding: 15px 1.5em;
+      vertical-align: middle;
+    }
+    .no-date-label { position: relative; top: -1.0em; left: -0.5em; padding: 0.1em 1.0em 0.1em 0.5em; font-size: 0.9em; font-weight: 600; }
+    .no-border-top { border-top: none !important; }
+    .orders-table > div { border-top: solid 1px #cccccc; }
+    .orders-table .product-info { margin: 0.5em 0; }
+    .orders-table .product-title { font-weight: 500; font-size: 1.2em; line-height: 1.0em; }
+    .orders-table .color-label { padding: 0.1em 0.8em !important; width: 100%; font-size: 1.2em; border-radius: 6px; font-weight: 600; }
+    .orders-table .size-label { font-weight: 700; font-size: 1.3em; }
+    .orders-table .pay-button { padding: 0.3em 1.0em; border-radius: 1.6em;}
+    .orders-table .pay-button .icon { font-size: 1.4em; margin-top: -0.1em;}
+    .orders-table .pay-with-button { background-color: white; border: solid 2px navy; color: navy; font-weight: 600; margin-bottom: 0.8em; }
+    .orders-table .paid-with-button { background-color: navy; border: solid 2px navy; color: white; font-weight: 600; font-size: 1.1em; margin-bottom: 0.8em; }
+    .order-in-list:has(.order-messages-table:hover), .order-in-list:has(.order-info-table:hover) {
+      border: solid 1px black;
+      border-radius: 8px;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+      background-color: white;
+      transition: background-color 0.2s ease-in; /* Adjust duration as needed */
+    }
+    .orders-table .orders-info-table-image-container {
+      max-height: 100%;
+      height: 120px;
+      aspect-ratio: 1 / 1;
+      border-radius: 8px;
+      padding: 0.5em;
+      background-color: white;
+      border: solid 1px #ccc;
+      box-shadow: 0 0 5px rgba(0, 0, 0, .1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .orders-table .orders-info-table-image-container img {
+      max-width: 116px;
+      max-height: 116px;
+      padding: 4px;
+      object-fit: cover;
+      border-radius: 8px; /* Optional to match container's rounded corners */
+    }
+    .missed-order{
+      border: solid 4px #94392F !important;
+      border-radius: 8px;
+      margin-bottom: 0.5em;
+    }
+    .top-right-corner {
+      position: absolute;
+      top: 0px; /* adjust as needed for spacing */
+      right: 15px; /* adjust as needed for spacing */
+      width: 50px;
+      height: 50px;
+      background-color: #94392F;
+      border-bottom-left-radius: 15px;
+      border-top-right-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .variant-size-pill {
+      display: inline-block;
+      background-color: black; /* Black background */
+      color: white;            /* White text */
+      font-weight: bold;       /* Bold text */
+      padding: 4px 10px;       /* Adds space around the text */
+      border-radius: 20px;     /* Creates the pill shape */
+      font-size: 0.9em;        /* Optional: Adjust font size */
+    }
+    .seller-order-info {
+      margin-bottom: 1.0em;
+      font-weight: 600;
+      font-size: 1.5em;
+    }
+    .top-right-corner {
+      font-size: 32px;
+      color: white;
+      font-weight: bold;
+    }
+    .address-table td, .options-table td { border: none; padding: 0.2em 0.5em; }
+    .options-table tr > td:first-child { font-size: 0.9em; text-align: right; }
+    .message-row { background-color: #e9ecef; padding-top: 0.5em; padding-bottom: 0.5em; border-bottom: solid 1px #d9d9d9; }
+    .message-row:last-child { border: 0; }
+    .message-highlight { background-color: #FFFEA1 !important; }
+    .message-row .timestamp { font-size: 0.8em; color: #666666; }
+
+    .round-edge-button {
+      border: solid 1px lightgrey;
+      color: #666666;
+      padding: 0.5em;
+      font-size: 1.2em;
+      border-radius: 0.5em;
+    }
+    .complaint-messages a { color: maroon; }
+    .wrapped-with-warning, .withError { border: solid 2px #B0443F; border-radius: 5px; }
+    .wrapped-with-warning .row { margin: 0; }
+    .top-right-overlay { position: absolute; top: -1.5em; right: -0.8em; }
+    .round-warning-button { width: 1.9em; height: 1.9em; font-size: 1.0em; font-weight: 900; color: #B0443F; background-color: #ECD3D2; border: solid 2px #B0443F; border-radius: 50%; text-align: center; padding: 0; }
+
+    @media screen and (min-width: 576px) {
+    }
+    @media screen and (max-width: 575px) {
+
+      .orders-table .product-title { font-size: 1.1em;  }
+      .orders-table .color-label { padding: 0.1em 0.8em !important; font-size: 1.0em; border-radius: 3px; font-weight: 600; }
+      .orders-table .size-label { font-size: 1.1em; }
+      .orders-table .pay-button { padding: 0.3em 1.0em; border-radius: 1.4em;}
+      .orders-table .pay-button .icon { font-size: 1.2em; margin-top: -0.1em;}
+      .orders-table .pay-with-button { margin-bottom: 0.8em; }
+      .orders-table .paid-with-button { font-size: 0.9em; font-weight: 500; margin-bottom: 0.6em; }
+    }
+
+    .file-upload {
+      position: relative;
+    }
+    .file-upload > label {
+      background-color: lightgrey; color: #333333; font-size: 1.2em;
+      transition: background .3s;
+
+      &:hover {
+        cursor: pointer;
+        background: #000;
+      }
+    }
+    .file-upload > input {
+      position: absolute;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      font-size: 1;
+      width:0;
+      height: 100%;
+      opacity: 0;
+    }
+    *{padding:0;margin:0}.wrapper{height:100vh;display:flex;justify-content:center;align-items:center;background-color:#eee}.checkmark__circle{stroke-dasharray: 166;stroke-dashoffset: 166;stroke-width: 2;stroke-miterlimit: 10;stroke: #25d366;fill: none;animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards}.checkmark{width: 56px;height: 56px;border-radius: 50%;display: block;stroke-width: 2;stroke: #fff;stroke-miterlimit: 10;box-shadow: inset 0px 0px 0px #25d366;animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both}.checkmark__check{transform-origin: 50% 50%;stroke-dasharray: 48;stroke-dashoffset: 48;animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards}@keyframes stroke{100%{stroke-dashoffset: 0}}@keyframes scale{0%, 100%{transform: none}50%{transform: scale3d(1.1, 1.1, 1)}}@keyframes fill{100%{box-shadow: inset 0px 0px 0px 30px #25d366}}
+    .whatsapp-button {
+      width: 320px; /* Adjust the width */
+      height: auto; /* Maintain aspect ratio */
+      cursor: pointer;
+    }
+    .confirm-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      border-radius: 12px;
+      word-wrap: break-word;
+      background-color: #fff;
+      background-clip: border-box;
+      background-color: white;
+      border: solid 1px #ccc;
+      box-shadow: 0 0 5px rgba(0, 0, 0, .1);
+    }
+    .confirm-card-highlight{
+      border: solid 2.5px #3E5CFF;
+    }
+    .share-button-container {
+      position: fixed;
+      bottom: -100px;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .share-button {
+      width: 90%;
+      max-width: 500px;
+      padding: 15px;
+      background-color: #3F5CFF;
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
+      text-align: center;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: transform 0.3s ease-out;
+    }
+
+    .share-button i {
+      font-size: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .share-button-container {
+        bottom: 20px;
+        animation: bounceUp 0.6s ease-out;
+      }
+    }
+
+    @keyframes bounceUp {
+      0% { transform: translateY(100px); opacity: 0; }
+      60% { transform: translateY(-10px); opacity: 1; }
+      100% { transform: translateY(0); }
+    }
+
+  :javascript
+    function opposite(c) {
+      var result=''; var ch=''; var list1='0123456789ABCDEF'; var list2='FEDCBA9876543210';
+      for(var i=0;i<c.length;i++) { ch=c.charAt(i); for(var n=0;n<list1.length;n++){ if(ch==list1.charAt(n)) result += list2.charAt(n); } }
+      return result;
+    }
+    function collapseToggled(e) {
+      // initially whether initially has collapsed class
+      var collapsed = $(this).hasClass('collapsed');
+      if (collapsed) {
+        $(this).removeClass('icon-chevron-down').addClass('icon-chevron-up');
+      } else {
+        $(this).removeClass('icon-chevron-up').addClass('icon-chevron-down');
+      }
+    }
+    function initializeOrdersTable(){
+      $(".orders-table *[data-toggle='collapse']").addClass('collapsed');
+      $(".orders-table *[data-toggle='collapse']").click(collapseToggled);
+    }
+    // From editor
+    function initRestrictPriceOnlyInput() {
+      $("input[data-type='price-only']").on('change', validatePriceOnlyInput);
+      $("input[data-type='price-only']").on('keydown', restrictPriceOnlyInput);
+    }
+
+    var PRICE_ONLY_REGEXP = new RegExp(/^\d+\.?\d*$/);
+
+    function validatePriceOnlyInput(e) {
+      var value = $(this).val().trim();
+      $(this).parent().addClass('withError');
+      return isValidPrice(value);
+    }
+
+    function restrictPriceOnlyInput(e) {
+      if (e.shiftKey === true ) {
+        if (e.which == 9) {
+          return true;
+        }
+        return false;
+      }
+      if (e.which == 190) { return true; }
+      if (e.which > 57) { return false; }
+      if (e.which == 32) { return false; }
+      return true;
+    }
+
+    function isValidPrice(value) {
+      if (PRICE_ONLY_REGEXP.test(value) || value == '') {
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    function updateChannel(orderId, channelType) {
+      fetch(`/orders/${orderId}/update_channel`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({ channel: channelType })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Failed to update channel to ${channelType} for Order ${orderId}`);
+        }
+        console.log(`✅ Order ${orderId} channel updated to ${channelType} successfully!`);
+      })
+      .catch(error => console.error(error));
+    }
+
+
+
+    var autoFileUploadBinded = false;
+    function initAutoFileUpload() {
+      if (!autoFileUploadBinded) {
+        $("input.auto-upload-file").on('click', initAutoFileUpload);
+        $("input.auto-upload-file").on('change', uploadWithFormData);
+        autoFileUploadBinded = true;
+      }
+    }
+
+    function uploadWithFormData() {
+      var formData = new FormData();
+      formData.append('image', $(this).prop('files')[0] );
+      var formId = $(this).attr('data-form-id')
+      if (formId == undefined || formId == ''){ formId = 'create_message_form' }
+      $("#"+ formId + " input[type='hidden']").each(function(){
+        formData.append( $(this).prop('name'), $(this).prop('value') );
+      });
+      var url = $("#"+ formId).prop("action");
+      if ($(this).siblings("label").text().indexOf('Upload') >= 0){
+        $(this).siblings("label").text('Uploading ..')
+      }
+      $(this).attr('disabled', 'disabled')
+      $.ajax({ url: url, type: 'post',
+        data: formData, contentType: false, processData: false
+      });
+    }
+
+    function initializeFormValidations(){
+      $('form').submit(function(e){
+        var errorCount = 0;
+        $.each( $(this).find("input[data-type='price-only']"), function(){
+            var value = $(this).val().trim();
+            if ( isValidPrice(value) == false || ($(this).attr('required') == 'required' && value == '' ) ) {
+              $(this).addClass('wrapped-with-warning')
+              errorCount += 1;
+            }
+          });
+        $("input[type='file']").each( function(){
+            if ( $(this).prop('required') && $(this).val() == '') {
+              errorCount += 1;
+              alert("PROOF OF PAYMENT IS REQUIRED")
+            }
+          });
+        return (errorCount == 0)
+      });
+      $("input[type='file']").change(showUploadFileName)
+    }
+    document.addEventListener("DOMContentLoaded", function () {
+      const shareButton = document.getElementById("share-button");
+      const shareContainer = document.getElementById("share-button-container");
+
+      // Check if the browser supports Web Share API
+      if (navigator.share) {
+        shareButton.addEventListener("click", function () {
+          navigator.share({
+            title: "Check out what I got!",
+            text: "Look at this awesome purchase!",
+            url: window.location.href
+          })
+          .catch((error) => console.log("Error sharing:", error));
+        });
+      } else {
+        // Hide the button if sharing is not supported
+        shareContainer.style.display = "none";
+      }
+    });
+
+
+    window.addEventListener("load", initializeOrdersTable);
+    window.addEventListener("load", initializeFormValidations);
+    window.addEventListener("load", initAutoFileUpload);

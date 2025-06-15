@@ -1,0 +1,52 @@
+- content_for :head do
+  :javascript
+    function setupValidateAgreements() {
+      refreshAgreementForm()
+      $("form[id='agreement_form'] input[type='checkbox']").change(refreshAgreementForm)
+    }
+    function refreshAgreementForm() {
+      var checkedCount = 0
+      var totalCheckboxes = 0
+      $("form[id='agreement_form'] input[type='checkbox']").each(function(){
+        totalCheckboxes += 1
+        if ($(this).is(':checked')) { checkedCount += 1; }
+      })
+      var submit = $("form[id='agreement_form'] input[type='submit']")
+      if (checkedCount >= totalCheckboxes) {
+        submit.removeClass('btn-secondary').addClass('btn-light-success')
+        submit.val("#{ t('form.agree') }")
+        submit.prop('disabled', '')
+        submit.disabled = false
+      } else {
+        submit.removeClass('btn-light-success').addClass('btn-secondary')
+        submit.val("#{ t('form.you_must_agree') }")
+        submit.prop('disabled', 'disabled')
+        submit.disabled = true
+      }
+    }
+    $(setupValidateAgreements)
+    window.addEventListener("load", setupValidateAgreements)
+%br/
+%br/
+.container
+  .row
+    .col-1.col-md-2
+    .col-10.col-md-8
+      %h5.text-bold.text-danger.text-center= t('seller.your_account_has_been_flagged')
+      - if (cnt = spree_current_user.calculate_count_of_paid_need_tracking_not_responded) > 0
+        %h5.text-bold.text-danger.text-center= t('seller.there_are_x_buyers', count_of_buyers: cnt)
+      .text-center.mt-3
+        %h5.text-bold= t('seller.to_seller_you_must_agree_to') + ':'
+    .col-1.col-md-2
+  - if @options.present?
+    #options.row
+      .col-0.col-md-2
+      .col-12.col-md-8
+        = form_tag(admin_update_options_path, id:'agreement_form', method:'put') do
+          = hidden_field_tag(:critical_response, true)
+          .ioffer-requirement-box
+            %table(class="border-0 min-w-50")
+              
+          %br/
+          .text-center
+            = submit_tag(t('form.you_must_agree'), class:'w-75 btn btn-secondary', disabled: true, data:{ disable_with: t('form.saving') })
