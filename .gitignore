@@ -15,3 +15,4 @@
 /coverage/
 /mysql-data/
 /.eslintcache
+data/GeoLite/GeoLite2-City.mmdb
