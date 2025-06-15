@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # README
 
 # Legacy Spree E-Commerce Platform
@@ -25,3 +26,7 @@ Capistrano-based, with Puma + RVM
 - Create `.env` or fetch credentials
 - Add system setup instructions (MySQL, Redis, Elasticsearch, etc.)
 - Document `Capistrano` deploy flow
+=======
+# mm-local-io
+mac mini local
+>>>>>>> d1d1355008370c7fa12566c206a58aa4e085d175
