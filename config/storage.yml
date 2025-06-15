@@ -17,7 +17,7 @@ aliyun:
   access_key_id: LTAI4G68tuo9nVmZbmbG2Qcc
   access_key_secret: IeQ5X6mnd2DU5EexdlWgt5Q6u0GRyI
   bucket: "ioffer-assets"
-  path: "development/storage"
+  path: "as"
   mode: "private"
 
 vultr:
