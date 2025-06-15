@@ -1,0 +1,19 @@
+#main-part {
+  padding: $spacer ($spacer * 2) 0 ($spacer * 2);
+  margin-top: 50px;
+  background-color: $gray-100;
+  border-top-left-radius: 50px; /* Round the top-left corner */
+  margin-right: 8pt;
+  min-height: 97vh; /* Ensure the div takes up at least the full height of the viewport */
+  display: flex;
+  flex-direction: column; /* In case you have child elements and want to control their layout */
+}
+
+.sidebar-minimized #main-part {
+  padding: $spacer ($spacer * 2) 0 ($spacer * 4);
+}
+
+#logo {
+  width: auto;
+  height: 40px;
+}

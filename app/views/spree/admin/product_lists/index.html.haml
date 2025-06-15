@@ -1,0 +1,12 @@
+.row
+  .col-6 
+    %h4 Product Lists
+  .col-6.text-right
+    = form_for(Spree::ProductList.new, url: admin_product_lists_path) do|f|
+      = f.text_field :name, placeholder:"List name", 'aria-label'=>"List name"
+      = f.submit('Create List', class:"btn btn-outline-secondary")
+%ul
+  - @product_lists.each do|product_list|
+    %li
+      = link_to product_list.name, edit_admin_product_list_path(product_list) 
+      (#{product_list.product_list_products.count } products)

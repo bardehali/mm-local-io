@@ -1,0 +1,92 @@
+- content_for :head do
+  = stylesheet_link_tag 'spree/scraper'
+
+- content_for :footer do
+  :javascript
+    $(function(){ 
+      $("[data-toggle='tooltip']").tooltip();
+      $('[data-toggle="popover"]').popover();
+    });
+
+:ruby
+  admin_breadcrumb link_to('Retail Sites', retail_sites_path)
+  admin_breadcrumb link_to(resource.retail_site.domain, resource.retail_site)
+  admin_breadcrumb link_to( resource.relative_page_url.gsub(/\A(\/)/,'').truncate(40), resource.retail_site.abs_url(resource.page_url), target:'_blank' )
+
+- content_for :page_actions do
+  %button(type="button" class="button" data-toggle="modal" data-target="#new_page_modal") New Page
+  %button(type="button" class="button" data-toggle="modal" data-target="#new_import_run_modal") New Import
+
+= render_admin_breadcrumbs
+
+%i(class="#{page_type_icon_css_class(resource.page_type)}")
+%span(class="page-type-#{resource.page_type}") Page type
+%strong #{resource.page_type}
+
+.float-right
+  &nbsp;&nbsp;&nbsp;&nbsp;
+.float-right
+  - if resource.file_path.present?
+    %strong Page Source File:
+    %a(href="#{scraper_page_source_file_path(id: resource.id, source_format:'raw')}" target='_blank') Raw
+    &nbsp;|&nbsp;
+    %a(href="#{scraper_page_source_file_path(id: resource.id, source_format:'html')}" target='_blank') HTML
+    &nbsp;|&nbsp;
+    = link_to( scraper_page_path(resource, reparse: true, update_product_container:'#product_card_wrapper'), remote: true, method:'put') do
+      %i.fa.fa-sync(title='Reparse page')
+      Reparse Page
+  - else
+    = link_to(scraper_page_path(resource, reparse: true, update_product_container:'#product_card_wrapper'), remote: true, method:'put', class:'button', 'data-disable-with'=>'Fetching ..') do
+      %i.fa.fa-download
+      Fetch Page
+.clearfix
+%br/
+- if resource.file_path.present?
+  .section-gap
+  
+  - resource.product_attributes.as_json.each_pair do|k,v|
+    %div
+      %strong= k
+    %p= v
+%br/
+%h4 Imported Products
+- resource.spree_products.each do|product| 
+  %div(id="product_card_wrapper")
+    = render partial: 'spree/admin/products/card', locals: { product: product }
+%br/
+%div(id="page_links_wrapper")
+  - if resource && (mpage = resource.make_mechanize_page)
+    = render partial: 'scraper/pages/links_from_mechanize_page', locals: { scraper: resource.scraper, mechanize_page: mpage }
+- if resource.following_pages.count > 0
+  .section-gap
+  %h5 Links found (#{resource.following_pages.count})
+  %ul.list-group(id="follow_pages_list")
+    - resource.following_pages.each do|fpage|
+      %li.list-group-item
+        %i.fas.fa-angle-right
+        = link_to(fpage.relative_page_url, scraper_page_path(fpage), title: fpage.title )
+        - if fpage.following_pages.count > 0
+          %a(href="#inner_page_links_#{fpage.id}" class="btn" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="#inner_page_links_#{fpage.id}" title="See the following links found on page")
+            %i.fas.fa-angle-double-down
+          %br/
+          .collapse(id="inner_page_links_#{fpage.id}")
+            %ul
+              - fpage.following_pages.each do|inner_fpage|
+                %li
+                  %i.fas.fa-angle-double-right
+                  = link_to(inner_fpage.relative_page_url, scraper_page_path(inner_fpage) )
+                  - if inner_fpage.file_path.present?
+                    %i.fas.fa-check
+.section-gap
+  %br/
+  .float-left
+    - if previous_page = previous_page_of(resource)
+      = link_to previous_page do
+        %i.fas.fa-arrow-left &nbsp;
+        Back to Previous Page
+  .float-right
+    - if next_page = next_page_of(resource)
+      = link_to next_page do
+        %i.fas.fa-arrow-right &nbsp;
+        Go to Next Page
+.modal(tabindex="-1" role="dialog" id="shared_product_modal")

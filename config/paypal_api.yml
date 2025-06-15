@@ -1,0 +1,21 @@
+development:
+  client_id: AVnzetpF0nDlo_vfodbILL_XDythjy0JvQd5HAN8O_BuwQYUYz3ggcwx_bbz1n5BXm6uofSxwre_Sewc
+  client_secret: EO_G1VgUeeBIuNYaARu5L9Zu5gYgVf5GRRKGzmtmuRseatZfGRS-hU1fsAIcYDxc869l1WaIbEeC2dtw
+  login: sb-u4jl87126116@business.example.com
+  password: TRG4P3LYTLQJJF8Y
+  signature: ACK0LpCt36OqvfCM2B-45Xz0zObxAjg4xRZDZhhtuROIgJckMrKddZY.
+  bn_code: FLAVORsb-u4jl87126116_MP
+staging:
+  client_id: AVnzetpF0nDlo_vfodbILL_XDythjy0JvQd5HAN8O_BuwQYUYz3ggcwx_bbz1n5BXm6uofSxwre_Sewc
+  client_secret: EO_G1VgUeeBIuNYaARu5L9Zu5gYgVf5GRRKGzmtmuRseatZfGRS-hU1fsAIcYDxc869l1WaIbEeC2dtw
+  login: sb-u4jl87126116@business.example.com
+  password: TRG4P3LYTLQJJF8Y
+  signature: ACK0LpCt36OqvfCM2B-45Xz0zObxAjg4xRZDZhhtuROIgJckMrKddZY.
+  bn_code: FLAVORsb-u4jl87126116_MP
+production:
+  client_id: AVnzetpF0nDlo_vfodbILL_XDythjy0JvQd5HAN8O_BuwQYUYz3ggcwx_bbz1n5BXm6uofSxwre_Sewc
+  client_secret: EO_G1VgUeeBIuNYaARu5L9Zu5gYgVf5GRRKGzmtmuRseatZfGRS-hU1fsAIcYDxc869l1WaIbEeC2dtw
+  login: sb-u4jl87126116@business.example.com
+  password: TRG4P3LYTLQJJF8Y
+  signature: ACK0LpCt36OqvfCM2B-45Xz0zObxAjg4xRZDZhhtuROIgJckMrKddZY.
+  bn_code: FLAVORsb-u4jl87126116_MP

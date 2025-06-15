@@ -1,0 +1,26 @@
+%h3 #{@page_title || 'Product Manager > Preview Takedown' }
+
+= form_tag(admin_takedown_path, method:'post') do
+  - if @variants.blank? && @variant_adoptions.blank?
+    %h4 Could not find any products
+  - else
+    .row
+      .col-12
+        %h4 Found Products
+    - @variants.each do|variant|
+      - product = variant.product
+      .row
+        .col-1
+          = check_box_tag('variant_ids[]', variant.id, checked: true, class:'form-control')
+        .col-10
+          = link_to(product.name, spree.product_path(product), target:'_blank', title:"With /v/#{product.rep_variant_slug}")
+    - @variant_adoptions.each do|va|
+      - product = va.variant.product
+      .row
+        .col-1
+          = check_box_tag('variant_adoption_ids[]', va.id, checked: true, class:'form-control')
+        .col-10
+          = link_to(product.name, spree.product_path(product), target:'_blank', title:"With /vp/#{product.display_variant_adoption_slug}")
+    .row.mt-3
+      .col-8.text-right
+        = submit_tag('Apply', 'data-disable-with'=>'Applying ...')

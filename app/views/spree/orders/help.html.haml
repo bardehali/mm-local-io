@@ -1,0 +1,95 @@
+:ruby
+  show_seller_and_line_items = false unless defined?(show_seller_and_line_items)
+  valid_complaint_ref = User::OrderComplaint.list_of_references.include?(params[:references] )
+  extended_help_type = params[:type].to_s.ends_with?('_tracking_number') || params[:type] == 'order_help_with_payment'
+  help_header = valid_complaint_ref ? t_missing_alternative("message.#{params[:references] }.subject"){ '' }&.upcase : ''
+  if help_header.blank?
+    help_header = t_missing_alternative("message.#{params[:type] }.form_header"){ '' }&.upcase
+   t('order.request_tracking_info') 
+  end
+  help_header = t('order.help_with_this_order') if help_header.blank?
+  instruction = valid_complaint_ref ? t_missing_alternative("message.#{params[:references] }.instruction"){ '' } : ''
+  instruction = extended_help_type ? t_missing_alternative("message.#{params[:type] }.header_instruction"){ '' } : ''
+  store_pm = store_payment_method(@order, @order.payments.last&.payment_method)
+
+= render partial:'spree/admin/orders/assets_inline.html.haml'
+
+- content_for :head do
+  :css
+    .bg-light-gray { background-color: #f1f1f1; }
+  
+.small-d-none
+  &nbsp;
+.container.bg-light-gray.pt-2.pb-2
+  .text-center
+    %h5= help_header
+- if show_seller_and_line_items
+  .container.pt-3.pb-3
+    .row
+      .col-12.text-center
+        %h6
+          = t('user.seller') 
+          = ' - '
+          = @order.seller&.username || @order.seller&.email
+    .row
+      .col-12
+        %div(id="line_items" class="order-show-line-items d-flex flex-column")
+          = render partial: 'spree/shared/line_item_in_dtable_row', collection: @order.line_items, as: :line_item
+.container.p-3
+  - if valid_complaint_ref || extended_help_type
+    .row
+      .col-0.col-md-3
+      .col-12.col-md-6
+        - if params[:type] == 'order_help_with_payment'
+          - if (store_instruction = store_pm&.instruction ).present?
+            %p.text-secondary
+              %strong Seller:
+              %i #{store_instruction}
+        - elsif instruction.present?
+          %p.text-secondary.text-right= instruction.html_safe
+        - elsif params[:references] == 'order_seller_changed_price'
+          %p.text-secondary= t('order.help_seller_changing_price')
+        - elsif extended_help_type
+        - else
+          %p.text-center
+            = t('order.help_please_contact_the_seller_first', contact: '<strong>'+ link_to(t('contact'), order_help_path(@order, type:'order_help_with_payment'), class:'text-uppercase') + '</strong>' ).html_safe
+    .row
+      .col-0.col-md-3
+      .col-12.col-md-6
+        %div(id="message_form")
+          = render partial:'create_message_form', locals:{ order: @order, type: params[:type], instruction: instruction }
+      .col-0.col-md-3
+    = render partial:'spree/shared/full_modal', locals:{ target:'payment_problem_example_modal', content: image_tag( '/images/payment_problem_example.png', alt:'Payment Problem', class:'mw-100 mh-100')  }
+    = render partial:'spree/shared/full_modal', locals:{ target:'payment_proof_example_modal', content: image_tag( '/images/payment_proof_example.png', alt:'Proof of Payment', class:'mw-100 mh-100')  }
+  - else # no valid references
+    - show_contact_seller_links = false
+    - if show_contact_seller_links
+      .row
+        .col-0.col-md-3
+        .col-12.col-md-6
+          %p.text-secondary
+            = t('order.help_we_want_to_make_sure').html_safe
+      .row
+        .col.text-center.text-uppercase.mb-2
+          %a(href="#{ order_create_message_path(id: @order, type:'order_help_with_payment') }" data-method="put")= t('order.help_with_payment')
+      .row
+        .col.text-center.text-uppercase.mb-2
+          %a(href="#{order_help_path(id: @order, type:'order_need_tracking_number') }" data-method="get")= t('order.tracking_info')
+      .row
+        .col.text-center.text-uppercase.mb-2
+          %a(href="#{order_create_message_path(id: @order, type:'order_other_question') }" data-method="put")= t('user.contact_seller')
+      %br/
+      %br/
+      %br/
+    .row
+      .col-0.col-md-3
+      .col-12.col-md-6
+        %p.text-secondary
+          = t('order.help_seller_notified').html_safe
+        %p.text-secondary
+          = t('order.help_we_understand_issues').html_safe
+    %br/    
+    - %w(order_no_seller_response order_cannot_pay_seller order_seller_changed_price).each do|ref|
+      .row.text-center.text-uppercase
+        .col.mb-2.complaint-messages
+          = link_to t("message.#{ref}.short_subject"), order_help_path(@order, references: ref)

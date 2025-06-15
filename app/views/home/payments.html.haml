@@ -1,0 +1,80 @@
+:ruby
+  payment_methods_by_name = {}
+  Ioffer::PaymentMethod.all.each{|pm| payment_methods_by_name[pm.name] = pm }
+
+- content_for :footer do
+  :javascript
+    function paymentMethodChecking() {
+      var wrapper = $(this).parent();
+      if ( !wrapper.hasClass('payment-card-wrapper')) { wrapper = wrapper.parent(); }
+      if ( this.checked ) {
+        wrapper.addClass('payment-selected');
+      }
+      else {
+        wrapper.removeClass('payment-selected');
+      }
+    }
+
+    $(function() {
+      $(".payment-content input[type=checkbox]").change(paymentMethodChecking);
+    });
+
+    function scrollToTop(scrollDuration) {
+        var scrollStep = -window.scrollY / (scrollDuration / 15),
+          scrollInterval = setInterval(function(){
+          if ( window.scrollY != 0 ) {
+              window.scrollBy( 0, scrollStep );
+          }
+          else clearInterval(scrollInterval);
+          },15);
+    }
+
+    function validateBrands(minNumberOfPayments) {
+        var numPayments = $('input[name="payment_method_ids[]"]:checked').length;
+        if(numPayments < minNumberOfPayments){
+          scrollToTop(50);
+          $(".tagline").show();
+          $(".tagline").addClass('text-danger');
+          return false;
+        }
+        return true;
+    }
+
+.container
+  = render partial:'home/logo_and_timeline'
+  .mt-3 &nbsp;
+  .row
+    .col-10.my-auto.title-container
+      .center-title
+        .py-5.py-md-0
+          %h1.mb-5(title="")= t('user.payment_methods.select_all_you_provide')
+          %h5(class="tagline" style="display: none;")= t('user.payment_methods.please_select_at_least', count: 2)
+.container
+  = form_tag(ioffer_select_payment_methods_path, method: 'post', remote: true, authenticity_token: true) do
+    .row
+      = payment_card('paypal', 'col-sm payment-card-wrapper')
+      = payment_card('transferwise', 'col-sm payment-card-wrapper')
+      .col-sm.payment-card-wrapper.other
+        = text_area_tag('other_payment_method', '', class:'form-control fully-filled', 'aria-describedby'=>'basic-addon', 'aria-label'=>'Submit other...', placeholder:'Submit other...' )
+    .row
+      = payment_card('remitly', 'col-sm payment-card-wrapper')
+      = payment_card('xendpay', 'col-sm payment-card-wrapper')
+      = payment_card('worldpay', 'col-sm payment-card-wrapper')
+    .row
+      = payment_card('ipaylinks', 'col-sm payment-card-wrapper')
+      = payment_card('western_union', 'col-sm payment-card-wrapper')
+      = payment_card('bitcoin', 'col-sm payment-card-wrapper')
+    .row
+      = payment_card('paysend', 'col-sm payment-card-wrapper')
+      = payment_card('scoinpay', 'col-sm payment-card-wrapper')
+      = payment_card('ping', 'col-sm payment-card-wrapper')
+    .row
+      = payment_card('alipay', 'col-sm payment-card-wrapper')
+      = payment_card('wechat', 'col-sm payment-card-wrapper')
+      = payment_card('xoom', 'col-sm payment-card-wrapper')
+    .row
+      .col-sm-6
+      .col-sm-6
+    = submit_tag('Submit Payment Processors', class: 'btn btn-primary btn-center mb-10', onclick: "return validateBrands(2);")
+  %br/
+  %br/

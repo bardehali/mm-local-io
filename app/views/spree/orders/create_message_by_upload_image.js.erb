@@ -1,0 +1,6 @@
+<%
+if params[:container].present? -%>
+  $("<%= params[:container] -%>").html("<%= escape_javascript(render(partial:'create_message_by_upload_image_fields', locals:{ order: @order, image: @message&.image }) ) %>");
+<% 
+end
+%>

@@ -1,0 +1,23 @@
+<% if @color_option_type -%>
+  $("#variant_colors").show();
+<% end -%>
+<% if @size_option_type -%>
+  $("#variant_colors_sizes .sizes-box-head").show();
+  $("#variant_colors_sizes .sizes-box-body").html("<%= escape_javascript( render(partial:'spree/admin/products/variant_colors_by_sizes_table', locals:{ product: @product, size_option_type: @size_option_type, other_option_values: @other_option_values }) )%>");
+  <% if @other_option_values.present? -%>
+  $("#variant_colors_sizes").show();
+  <% else -%>
+  $("#variant_colors_sizes").hide();
+  <% end -%>
+
+  $("button[data-table-to-collapse]").on('click', function(){
+    $( $("button[data-table-to-collapse]").attr('data-table-to-collapse') ).find("tr.row-collapsable").removeClass('row-collapsable');
+    $(this).hide();
+  });
+  
+  var comboInputQuery = ".variant-option-box input[name='combo_option_value_ids[]']"
+  $(comboInputQuery).unbind('change')
+  $(comboInputQuery).change(changedComboOptionValueIds)
+<% else # no @size_option_type-%>
+  $("#variant_colors_sizes .sizes-box-head").hide();
+<% end # if @size_option_type -%>

@@ -1,0 +1,208 @@
+<% content_for :head do %>
+
+  <%= stylesheet_link_tag('ioffer/seller_landing') %>
+  <%= javascript_include_tag('ioffer/seller_landing') %>
+  <style>
+    .about-image {
+        height: auto;
+    }
+  </style>
+
+<% end # head -%>
+
+<!--====== PRELOADER PART START ======-->
+<div class = "primary-background">
+  <div class="preloader">
+      <div class="loader">
+          <div class="ytp-spinner">
+              <div class="ytp-spinner-container">
+                  <div class="ytp-spinner-rotator">
+                      <div class="ytp-spinner-left">
+                          <div class="ytp-spinner-circle"></div>
+                      </div>
+                      <div class="ytp-spinner-right">
+                          <div class="ytp-spinner-circle"></div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <!--====== PRELOADER PART ENDS ======-->
+
+  <!--====== NAVBAR PART START ======-->
+
+  <section class="header-area">
+      <div class="navbar-area">
+          <div class="container">
+              <div class="row">
+                  <div class="col-lg-12">
+                      <nav class="navbar navbar-expand-lg">
+                          <a class="navbar-brand" href="#">
+                              <img src="<%= asset_path('logo/iOffer_logo_color_plain.png') %>" alt="Logo">
+                          </a>
+                          <div class="collapse navbar-collapse sub-menu-bar" id="navbarEight">
+                              <ul class="navbar-nav ml-auto">
+                              </ul>
+                          </div>
+
+                          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarEight" aria-controls="navbarEight" aria-expanded="false" aria-label="Toggle navigation">
+                              <span class="toggler-icon"></span>
+                              <span class="toggler-icon"></span>
+                              <span class="toggler-icon"></span>
+                          </button>
+
+                          <div class="collapse navbar-collapse sub-menu-bar" id="navbarEight">
+                              <ul class="navbar-nav ml-auto">
+                                  <li class="nav-item">
+                                      <a class="page-scroll" href="/admin/products?utm_source=getting_started&utm_medium=dashboard_btn&utm_campaign=seller_onboarding_fall_21_02&utm_id=091421.000002&utm_content=steps">Dashboard</a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </nav> <!-- navbar -->
+                  </div>
+              </div> <!-- row -->
+          </div> <!-- container -->
+      </div> <!-- navbar area -->
+  </section>
+
+  <!--====== NAVBAR PART ENDS ======-->
+
+  <!--====== ABOUT PART START ======-->
+
+  <section id="about" class="about-area primary-background">
+      <div class="container primary-background">
+          <div class="row justify-content-center">
+              <div class="col-xl-8 col-lg-10">
+                  <div class="about-image text-center wow fadeInUp mt-90" data-wow-duration="1.5s" data-wow-offset="100">
+                    <img src="<%= asset_path('header-pic.png') %>" alt="">
+                  </div>
+              </div>
+          </div> <!-- row -->
+      </div> <!-- container -->
+  </section>
+  <!--====== ABOUT PART ENDS ======-->
+
+  <!--====== PRINICNG STYLE EIGHT START ======-->
+
+  <section id="pricing" class="pricing-area primary-background">
+
+      <div class="container">
+          <div class="row justify-content-center">
+              <div class="col-lg-4 col-md-7 col-sm-9">
+                  <div class="pricing-style-one mt-5 mb-5 wow steps-card-height fadeIn" data-wow-duration="1.5s" data-wow-delay="0.2s">
+                      <div class="pricing-icon text-center pricing-icon-small">
+                          <img src="<%= asset_path('payment-info.png') %>" alt="">
+                      </div>
+                      <div class="pricing-header text-center">
+                          <h5 class="sub-title">Step 1</h5>
+                          <p class="month">Fill out your preferred payment instructions</p>
+                      </div>
+                      <div class="pricing-list">
+                          <ul>
+                              <li><i class="lni-check-mark-circle"></i> Our customers prefer to pay with PayPal</li>
+                          </ul>
+                      </div>
+                  </div> <!-- pricing style one -->
+              </div>
+
+              <div class="col-lg-4 col-md-7 col-sm-9">
+                  <div class="pricing-style-one mt-5 mb-5 wow steps-card-height fadeIn" data-wow-duration="1.5s" data-wow-delay="0.5s">
+                      <div class="pricing-icon text-center mt-2 pricing-icon-small">
+                          <img src="<%= asset_path('laptop-items.png') %>" alt="">
+                      </div>
+                      <div class="pricing-header text-center">
+                          <h5 class="sub-title">Step 2</h5>
+                          <p class="month">List your items with great photos and competitive prices</p>
+                      </div>
+                      <div class="pricing-list">
+                          <ul>
+                              <li><i class="lni-check-mark-circle"></i> Items with the best photos are viewed the most</li>
+                              <li><i class="lni-check-mark-circle"></i> Entice your customers with your best items</li>
+                          </ul>
+                      </div>
+                  </div> <!-- pricing style one -->
+              </div>
+
+              <div class="col-lg-4 col-md-7 col-sm-9">
+                  <div class="pricing-style-one mt-5 mb-5 wow steps-card-height fadeIn" data-wow-duration="1.5s" data-wow-delay="0.8s">
+                      <div class="pricing-icon text-center pricing-icon-small">
+                          <img src="<%= asset_path('orders.png') %>" alt="">
+                      </div>
+                      <div class="pricing-header text-center">
+                          <h5 class="sub-title">Step 3</h5>
+                          <p class="month">Start getting orders!</p>
+                      </div>
+                      <div class="pricing-list">
+                          <ul>
+                              <li><i class="lni-check-mark-circle"></i> You will be notified when you have your first order!</li>
+                          </ul>
+                      </div>
+                      <!--<div class="pricing-btn-2 rounded-buttons text-center mt-3">
+                          <a class="main-btn rounded-three button" id="getting_started" href="">GET STARTED</a>
+                      </div>-->
+                  </div> <!-- pricing style one -->
+              </div>
+          </div> <!-- row -->
+      </div> <!-- container -->
+  </section>
+
+  <!--====== PRINICNG STYLE EIGHT ENDS ======-->
+
+  <!--====== ABOUT PART START ======-->
+
+  <section id="payments" class="about-area primary-background">
+      <div class="container primary-background">
+          <div class="row justify-content-center">
+              <div class="col-xl-12 col-lg-12">
+                  <div class="about-image text-center steps-card-height pricing-style-one" data-wow-duration="1.5s" data-wow-offset="100">
+                        <!--======  Payent info boxes ======-->
+                        <div class="pricing-header text-center mb-5">
+                            <h5 class="sub-title">Configure your payment methods</h5>
+                            <p class="month">Provide your account email and include your custom instructions for buyers to follow to complete transactions.</p>
+                        </div>
+                        <!--======  Payment method settings ======-->
+                        <%= form_tag(admin_payment_methods_and_retail_stores_path, method:'post') do %>
+                            <%= render partial:'spree/admin/store_payment_methods/table_of_forms', locals: { payment_methods: @payment_methods } %>
+                        <% end -%>
+                  </div>
+              </div>
+          </div> <!-- row -->
+      </div> <!-- container -->
+  </section>
+
+  <section id="about" class="about-area primary-background">
+      <div class="container">
+          <div class="row justify-content-center">
+              <div class="col-xl-12 col-lg-12">
+                  <div class="about-image text-center steps-card-height pricing-style-one" data-wow-duration="1.5s" data-wow-offset="100">
+                      <!--======  Payment info boxes ======-->
+                      <div class="pricing-header text-center mb-5">
+                          <h5 class="sub-title">Take great pictures!</h5>
+                          <p class="month">The better your pictures the more likely you are to make tons of sales.</p>
+                          <div class="great-photos">
+                            <img src="<%= asset_path('seller_landing/take_great_photos.jpg') %>" alt="Take great photos from all angles!">
+                          </div>
+                          <h5 class="sub-title">Make sure to include the item from multiple angles!</h5>
+                      </div>
+                  </div>
+              </div>
+          </div> <!-- row -->
+
+      </div> <!-- container -->
+  </section>
+  <div class="pricing-btn rounded-buttons text-center mb-5 mt-5">
+      <a class="main-btn rounded-three mb-5" href="/admin/products?utm_source=getting_started&utm_medium=get_started_button&utm_campaign=seller_onboarding_fall_21_02&utm_id=091421.000002&utm_content=steps">Start Posting Items</a>
+  </div>
+  <br/>
+  <img src="https://www.google-analytics.com/collect?v=1&tid=UA-166264208-1&cid=091421.000002&t=event&ec=getting_started&ea=visit&el=recipient_id&cs=onboarding&cm=webpage_getting_started&cn=seller_onboarding_fall_21_02">
+
+  <!--====== ABOUT PART ENDS ======-->
+
+  <!--====== BACK TOP TOP PART START ======-->
+
+  <a href="#" class="back-to-top"><i class="lni-chevron-up"></i></a>
+
+  <!--====== BACK TOP TOP PART ENDS ======-->
+</div>

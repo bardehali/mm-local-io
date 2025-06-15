@@ -1,0 +1,190 @@
+<h3 class="my-2 text-center">Purchased Items</h3>
+
+<div class="d-flex align-items-center justify-content-center mb-1">
+  <% if @item_review.avatar.present? %>
+    <img src="<%= @item_review.avatar %>" alt="Reviewer Avatar" class="rounded-circle mr-2 item-review-avatar-size" width="40" height="40">
+  <% end %>
+
+  <span class="font-weight-bold">
+    <%= @item_review.name %>
+  </span>
+
+  <span class="ml-1 item-reivew-text-muted"> In </span>
+
+  <% if @item_review.country_code.present? %>
+    <span><%= inline_svg_tag "flags/4x3/#{@item_review.country_code.downcase}.svg", class: 'item-review-flag-size'%></span>
+  <% end %>
+
+  <% if @item_review.city.present? || @item_review.state.present? || @item_review.country_code.present? %>
+    <span class="ml-1 item-reivew-text-muted">
+      <% if @item_review.city.present? %> <%= @item_review.city %>, <% end %>
+      <% if @item_review.state.present? %>
+        <%= @item_review.state %>
+      <% else %>
+        <%= @item_review.country_code %>
+      <% end %>
+    </span>
+  <% end %>
+</div>
+
+
+<div class="container pb-4">
+  <div class="row">
+    <% if @purchased_items.any? %>
+      <% @purchased_items.each_with_index do |product, index| %>
+
+      <% allowed_params = params.permit(:utm_source, :utm_term) %>
+      <% url = main_app.show_product_by_variant_adoption_path(variant_adoption_id: product.display_variant_adoption_slug, **allowed_params.to_h.symbolize_keys) %>
+      <% price = display_price(product.best_price_record) %>
+
+        <div class="col-6 col-sm-4 col-md-4 col-lg-3 col-xs-3 mt-3 mb-lg-3 mt-md-3 pr-sm-0 pr-md-0 pl-md-3 pl-sm-3 <%= index.even? ? 'pl-0 pr-1' : 'pr-0 pl-1' %>">
+          <div class="card custom-card-buyer w-100 h-100">
+            <div class="product-body custom-product-body">
+              <%= link_to url, class: 'd-block d-flex flex-column justify-content-between', 'data-turbolinks' => false do %>
+                <div class="p-image-container-buyer zoom-hover">
+                  <%= plp_and_carousel_image(product, class: "d-block mx-auto image-style lazyloaded") %>
+                  <% if price %>
+                    <div class="price-pill position-absolute">
+                      <span class="price selling-buyer" content="<%= price.nil? ? 0 : price.to_d %>">
+                        <%= price %>
+                      </span>
+                      <span content="<%= current_currency %>"></span>
+                    </div>
+                  <% end %>
+                </div>
+                <%= content_tag(:span, extra_product_name(product), class: 'info-buyer m-1 d-block', title: product.name) %>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="col-12 text-center">
+        <p class="text-muted">No purchased items found.</p>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<style media="screen">
+    .custom-card-buyer {
+      /*box-shadow: 0 0px 5px 1px rgba(0, 0, 0, 0.05)*/
+      background-color: #ffffff;
+      height: 150px;
+      overflow: hidden;
+      border-width: 0px;
+    }
+    .custom-card-buyer-footer {
+      border-width:0px;
+      background-color: #FFFFFF
+      font-size: 1.1em;
+      text-align: left;
+      padding-left: 0px;
+      padding-top: 0px;
+    }
+    .p-image-container-buyer {
+      height: 280px;
+      width: 100%;
+      position: relative;
+      text-align:center;
+      overflow: hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius: 18px;
+      background-color: #f2f2f2;
+    }
+    .p-image-container-buyer img {
+      mix-blend-mode: multiply;
+      width: 100%; /* Makes the image span the full width */
+      /* height: 100%;  Makes the image span the full height */
+      object-fit: cover;  Ensures the image covers the container without distortion
+    }
+    .price-pill {
+      bottom: 8px;
+      right: 8px;
+      background: rgba(0, 0, 0, 0.75);
+      /*background: #5D5E5F;*/
+      padding: 4px 10px;
+      border-radius: 50px;
+      text-align: center;
+      color: #FFF;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .price-pill .price {
+      font-weight: medium;
+    }
+    @media only screen and (max-width: 320px){
+      .taxon-title {
+        font-size: 24px;
+      }
+      .p-image-container-buyer {
+        height: 160px;
+      }
+      .price-pill {
+        bottom: 6px;
+        right: 6px;
+        padding: 4px 8px;
+        border-radius: 32px;
+        font-size: 10px;
+        font-weight: 400;
+      }
+    }
+    @media only screen and (min-width: 321px) and (max-width: 375px){
+      .p-image-container-buyer {
+        height: 180px;
+      }
+    }
+    @media only screen and (min-width: 376px) and (max-width: 430px){
+      .p-image-container-buyer {
+        height: 190px;
+      }
+      .taxon-title {
+        font-size: 28px;
+      }
+      .price-pill {
+        bottom: 6px;
+        right: 6px;
+        background: rgba(0, 0, 0, 0.75);
+        padding: 4px 8px;
+        border-radius: 40px;
+        font-size: 12px;
+        font-weight: 400;
+      }
+    }
+    @media only screen and (min-device-width: 431px) and (max-device-width: 575px){
+      .taxon-title {
+        font-size: 28px;
+      }
+      .p-image-container-buyer {
+        height: 220px;
+      }
+    }
+    .info-buyer {
+      line-clamp: 1;
+      max-lines: 1;
+      -webkit-line-clamp: 1;
+      font-size: 12px;
+      height: 22px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      text-decoration: none;
+      color: black;
+    }
+
+    @media only screen and (min-width: 576px){
+      .selling-buyer {
+        font-size: 14px;
+      }
+      .info-buyer {
+        font-size: 16px;
+        height: 46px;
+      }
+    }
+    .p-image-container-buyer img.square-image {
+      /* padding: 10px;  Use relative units if necessary */
+    }
+
+</style>

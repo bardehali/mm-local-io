@@ -1,0 +1,56 @@
+:ruby
+  # ioffer_user [Ioffer::User]
+%div(data-hook="admin_ioffer_user_info" class="card")
+  .card-header
+    %h1(class="card-title mb-0 h5")
+      = 'Past iOffer Account'
+      &nbsp;&nbsp;
+      %span(class='badge badge-secondary' style="font-weight: 0.8; font-size: 0.9rem;") 
+        Source: #{source_of_ioffer_user(ioffer_user)}
+  .card-body
+    %table(class="table table-borderless")
+      %tbody
+        %tr
+          %th.text-right username:
+          %td= ioffer_user.username
+          %th.text-right Email:
+          %td= ioffer_user.email
+        %tr
+          %th.text-right Location:
+          %td= ioffer_user.location
+          %th.text-right Address:
+          %td
+            %pre= ioffer_user.address.to_s.gsub(/(<br\/?>)/, '')
+        %tr
+          %th.text-right Rating:
+          %td
+            = ioffer_user.rating 
+            (
+            %span.text-success(title='Positive' data-toggle='tooltip') #{ioffer_user.positive} / 
+            %span.text-danger(title='Neagive' data-toggle='tooltip') #{ioffer_user.negative} 
+            )
+          %th.text-right GMS
+          %td= ioffer_user.gms ? number_to_currency(ioffer_user.gms) : ''
+        %tr
+          %th.text-right Items Count
+          %td= ioffer_user.items_count
+          %th.text-right Transactions Count
+          %td= ioffer_user.transactions_count
+        %tr
+          %th.text-right Sign Up Time
+          %td= short_display_of_time(ioffer_user.created_at)
+          %th.text-right Sign Up IP
+          %td
+            - if ioffer_user.ip.present?
+              = link_to ioffer_user.ip, "https://whatismyipaddress.com/ip/#{ioffer_user.ip}", target:'_blank', title:'Check IP info'
+        %tr
+          %th.text-right Sign Up cookies
+          %td(colspan='3')
+            %br
+            = text_area_tag('sign_up_cookies', ioffer_user.cookies, disabled: 'disabled', style:'width: 100%; height: 12.0em;' )
+        %tr
+          %th.text-right User Groups
+          %td
+            - ioffer_user.user_group_names.to_s.split(',').each do|group|
+              %h6
+                %span.badge.badge-secondary=group

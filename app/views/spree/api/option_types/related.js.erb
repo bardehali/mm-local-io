@@ -1,0 +1,16 @@
+<%
+  selected_option_value_ids = @product.try(:master) ? @product.master.option_value_variants.collect(&:option_value_id) : []
+  Spree::Product.logger.debug "| selected_option_value_ids: #{selected_option_value_ids}"
+  Spree::Product.logger.debug "| @option_types: #{@option_types}"
+-%>
+$("#product_option_type_ids").val("<%= @option_types.collect(&:id).collect(&:to_s).join(',') -%>");
+$("#s2id_product_option_type_ids ul > li.select2-search-choice").remove();
+var lastListItem = $("#s2id_product_option_type_ids ul > li:last")[0];
+<% @option_types.each do|option_type| -%>
+  var newOption = new Option("<%= option_type.presentation %>", <%= option_type.id %>, true, true);
+  $("#product_option_type_ids").append(newOption).trigger('change');
+<% end # @option_types.each -%>
+<% if @size_option_type -%>
+  $("#variant_colors_sizes .sizes-box-body").html("<%= escape_javascript( render(partial:'spree/admin/products/variant_colors_by_sizes_table', locals:{ product: @product, size_option_type: @size_option_type, other_option_values: @other_option_values }) )%>");
+  $("#variant_colors_sizes").show();
+<% end # if @size_option_type -%>

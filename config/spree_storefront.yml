@@ -1,0 +1,168 @@
+default:
+  navigation:
+    - title: Women's Clothing
+      subtitle: Categories
+      meta_title: Women's
+      url: /t/categories/womens-clothing?utm_medium=hb
+      items:
+        - :title: Tops
+          :url: /t/categories/womens-clothing/tops?utm_medium=hb
+        - :title: Bottoms
+          :url: /t/categories/womens-clothing/bottoms?utm_medium=hb
+        - :title: Dresses
+          :url: /t/categories/womens-clothing/tops/dresses?utm_medium=hb
+        - :title: Jackets & Coats
+          :url: /t/categories/womens-clothing/outerwear?utm_medium=hb
+        - :title: Shirts & Blouses
+          :url: /t/categories/womens-clothing/tops/blouses?utm_medium=hb
+        - :title: Sweaters
+          :url: /t/categories/womens-clothing/tops/sweatshirts?utm_medium=hb
+        - :title: Accessories
+          :url: /t/categories/womens-clothing/accessories?utm_medium=hb
+      promo_banners:
+        - subtitle: Hottest fashion of the summer
+          title: Dresses
+          url: /t/categories/womens-clothing/tops/dresses?utm_medium=dnav-banner
+          image: 'https://ioffer-assets.oss-eu-west-1.aliyuncs.com/assets/static/nav/mega-menu-womens-1.jpg'
+        - subtitle: Get the newest styles
+          title: Swimwear
+          url: /t/categories/womens-clothing/activewear/swim?utm_medium=dnav-banner
+          image: 'https://ioffer-assets.oss-eu-west-1.aliyuncs.com/assets/static/nav/mega-menu-womens-2.jpg'
+    - title: Men's Clothing
+      subtitle: Categories
+      meta_title: Men's
+      url: /t/categories/mens-clothing?utm_medium=hb
+      items:
+        - :title: Shirts & Tops
+          :url: /t/categories/mens-clothing/tops?utm_medium=hb
+        - :title: Bottoms
+          :url: /t/categories/mens-clothing/bottoms?utm_medium=hb
+        - :title: Jeans
+          :url: /t/categories/mens-clothing/bottoms/jeans?utm_medium=hb
+        - :title: Atheletic
+          :url: /t/categories/mens-clothing/athletic-apparel?utm_medium=hb
+        - :title: Accessories
+          :url: /t/categories/mens-clothing/accessories?utm_medium=hb
+        - :title: Underwear & Night
+          :url: /t/categories/mens-clothing/underwear-night?utm_medium=hb
+        - :title: Sweaters
+          :url: /t/categories/mens-clothing/tops/sweaters?utm_medium=hb
+        - :title: Jackets & Coats
+          :url: /t/categories/mens-clothing/outerwear-jackets?utm_medium=hb
+      promo_banners:
+        - subtitle: New collection
+          title: Activewear
+          url: /t/categories/mens-clothing/athletic-apparel?utm_medium=dnav-banner
+          image: 'https://ioffer-assets.oss-eu-west-1.aliyuncs.com/assets/static/nav/mega-menu-mens-1.jpg'
+        - subtitle: Update your wardrobe
+          title: Latest Jeans
+          url: /t/categories/mens-clothing/bottoms/jeans?utm_medium=dnav-banner
+          image: 'https://ioffer-assets.oss-eu-west-1.aliyuncs.com/assets/static/nav/mega-menu-mens-2.jpg'
+    - title: Sneakers
+      subtitle:
+      meta_title: Sneakers
+      url: /t/categories/sneakers?utm_medium=hb
+      items:
+        - :title: Men's Sneakers
+          :url: /t/categories/sneakers/mens-sneakers?utm_medium=hb
+        - :title: Women's Sneakers
+          :url: /t/categories/sneakers/womens-sneakers?utm_medium=hb
+      promo_banners:
+        - subtitle: Discover the latest
+          title: Men's Sneakers
+          url: /t/categories/footwear/mens-shoes/sneakers?utm_medium=dnav-banner
+          image: 'https://ioffer-assets.oss-eu-west-1.aliyuncs.com/assets/static/nav/mega-menu-shoes-1.jpg'
+        - subtitle: Treat yourself
+          title: Heels & Pumps
+          url: /t/categories/footwear/womens-shoes/heels?utm_medium=dnav-banner
+          image: 'https://ioffer-assets.oss-eu-west-1.aliyuncs.com/assets/static/nav/mega-menu-shoes-2.jpg'
+    - title: Bags & Purses
+      subtitle:
+      meta_title: Bags & Purses
+      url: /t/categories/purses?utm_medium=hb
+      items:
+        - :title: All Purses
+          :url: /t/categories/bags/womens-purses?utm_medium=hb
+        - :title: Handbags
+          :url: /t/categories/bags/womens-purses/handbags?utm_medium=hb
+        - :title: Clutches
+          :url: /t/categories/bags/womens-purses/clutches?utm_medium=hb
+        - :title: Totes
+          :url: /t/categories/bags/womens-purses/totes?utm_medium=hb
+        - :title: Wallets
+          :url: /t/categories/bags/womens-purses/wallets?utm_medium=hb
+        - :title: Unisex
+          :url: /t/categories/purses/unisex-bags?utm_medium=hb
+        - :title: Backpacks
+          :url: /t/categories/purses/unisex-bags/backpacks?utm_medium=hb
+      promo_banners:
+        - subtitle: Grab the newest
+          title: Purses
+          url: /t/categories/bags/womens-purses?utm_medium=dnav-banner
+          image: 'https://ioffer-assets.oss-eu-west-1.aliyuncs.com/assets/static/nav/mega-menu-bags-1.jpg'
+        - subtitle: Latest Fashion
+          title: Backpacks
+          url: /t/categories/purses/unisex-bags/backpacks?utm_medium=dnav-banner
+          image: 'https://ioffer-assets.oss-eu-west-1.aliyuncs.com/assets/static/nav/mega-menu-bags-2.jpg'
+    - title: Watches & Jewerly
+      url: /t/categories/jewelry-watches?utm_medium=hb
+      items:
+        - :title: Men's Watches
+          :url: /t/categories/jewelry-watches/mens-jewelry/watches?utm_medium=hb
+        - :title: Women's Jewelry
+          :url: /t/categories/jewelry-watches/womens-jewelry?utm_medium=hb
+        - :title: All Men's Jewelry
+          :url: /t/categories/jewelry-watches/mens-jewelry?utm_medium=hb
+    - title: Women's Shoes
+      url: /t/categories/footwear/womens-shoes?utm_medium=hb
+      items:
+        - :title: All Women's Shoes
+          :url: /t/categories/footwear/womens-shoes?utm_medium=hb
+        - :title: Sneakers
+          :url: /t/categories/footwear/womens-shoes/sneakers?utm_medium=hb
+        - :title: Flats
+          :url: /t/categories/footwear/womens-shoes/flats?utm_medium=hb
+        - :title: Heels
+          :url: /t/categories/footwear/womens-shoes/Heels?utm_medium=hb
+        - :title: Boots
+          :url: /t/categories/footwear/womens-shoes/boots?utm_medium=hb
+      promo_banners:
+        - subtitle: Grab the newest
+          title: Purses
+          url: /t/categories/bags/womens-purses?utm_medium=dnav-banner
+          image: 'https://ioffer-assets.oss-eu-west-1.aliyuncs.com/assets/static/nav/mega-menu-bags-1.jpg'
+        - subtitle: Latest Fashion
+          title: Backpacks
+          url: /t/categories/purses/unisex-bags/backpacks?utm_medium=dnav-banner
+          image: 'https://ioffer-assets.oss-eu-west-1.aliyuncs.com/assets/static/nav/mega-menu-bags-2.jpg'
+    - title: Men's Shoes
+      url: /t/categories/footwear/mens-shoes?utm_medium=hb
+      items:
+        - :title: All Men's Shoes
+          :url: /t/categories/footwear/mens-shoes?utm_medium=hb
+        - :title: Sneakers
+          :url: /t/categories/footwear/mens-shoes/sneakers?utm_medium=hb
+        - :title: Loafers
+          :url: /t/categories/footwear/mens-shoes/running/loafers?utm_medium=hb
+        - :title: Casual
+          :url: /t/categories/footwear/mens-shoes/casual-shoes?utm_medium=hb
+        - :title: Boots
+          :url: /t/categories/footwear/mens-shoes/boots?utm_medium=hb
+    - title: Kid's Clothing
+      subtitle: Kid's Categories
+      url: /t/categories/kids-fashion?utm_medium=hb
+      items:
+        - :title: Girl's Clothing
+          :url: /t/categories/kids-fashion/girls-clothing?utm_medium=hb
+        - :title: Boy's Clothing
+          :url: /t/categories/kids-fashion/boys-clothing?utm_medium=hb
+        - :title: Baby's Clothing
+          :url: /t/categories/kids-fashion/baby-clothing?utm_medium=hb
+        - :title: Shoes
+          :url: /t/categories/kids-fashion/shoes-bags?utm_medium=hb
+    - title: Sports & Outdoors
+      url: /t/categories/sports-outdoors?utm_medium=hb
+    - title: Cellphones & Accessories
+      url: /t/categories/cellphones-accessories?utm_medium=hb
+    - title: Home & Videos
+      url: /t/categories/home-garden-appliance?utm_medium=hb

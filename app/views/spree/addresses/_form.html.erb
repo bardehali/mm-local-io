@@ -1,0 +1,53 @@
+<% address_id = address_type.chars.first %>
+
+<!-- Render First Name -->
+<div class="form-group mb-4">
+  <%= address_field(address_form, :firstname, address_id) %>
+</div>
+
+<!-- Render Last Name -->
+<div class="form-group mb-4">
+  <%= address_field(address_form, :lastname, address_id) %>
+</div>
+
+<!-- Render Address -->
+<div class="form-group mb-4">
+  <%= address_field(address_form, :address1, address_id) %>
+</div>
+
+<!-- Render Address (Cont) -->
+<div class="form-group mb-4">
+  <%= address_field(address_form, :address2, address_id) %>
+</div>
+
+<!-- Render Country -->
+<p class="form-group checkout-content-inner-field" id="<%= "#{address_id}country" %>">
+  <span id="<%= "#{address_id}country-selection" %>" class="d-block position-relative">
+    <%= address_form.collection_select :country_id, available_countries, :id, :name,
+                                       { selected: address.country_id, prompt: Spree.t(:country).upcase },
+                                       { class: 'required form-control spree-flat-select'} %>
+    <%= image_tag 'arrow.svg', class: 'position-absolute spree-flat-select-arrow' %>
+  </span>
+</p>
+
+<!-- Render State -->
+<div class="form-group mb-4 state-field">
+  <% if Spree::Config[:address_requires_state] -%>
+    <%= address_field(address_form, :state, address_id) { address_state(address_form, address.country, address_id) } %>
+  <% end -%>
+</div>
+
+<!-- Render City -->
+<div class="form-group mb-4">
+  <%= address_field(address_form, :city, address_id) %>
+</div>
+
+<!-- Render Zip Code -->
+<div class="form-group mb-4">
+  <%= address_field(address_form, :zipcode, { class: 'form-control', required: false }) %>
+</div>
+
+<!-- Conditionally Render Phone Number -->
+<div class="form-group mb-4">
+  <%= updated_address_field(address_form, :phone, address_id) %>
+</div>

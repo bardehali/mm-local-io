@@ -1,0 +1,5 @@
+<% content_for :page_actions do %>
+  <% if spree_current_user.try(:admin?) %>
+  <%= button_link_to Spree.t('admin.users.sign_in_as'), admin_sign_in_as_path(id: @user.id), title: @user.login || @user.email, method:'put', data:{ disable_with:'Signing In ...'}, class: "btn-success", icon: 'user' %>
+  <% end # admin %>
+<% end %>

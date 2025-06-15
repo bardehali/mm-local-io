@@ -1,0 +1,26 @@
+:ruby
+  # Original but slightly extended Spree table of variants.s
+  # Required locals:
+  #   f: <FormBuilder>
+  # Optional locals:
+  #   product: <Spree::Product> if not defined would try to use @product and f.object
+  product ||= @product || f.object
+%fieldset.no-border-bottom
+  %legend(align="center") #{t('spree.variants')}
+  %table(class="table index sortable inline-editable-table" data-sortable-link="#{update_positions_admin_product_variants_path(product) }")
+    %colgroup
+      %col(style="width: 5%")
+      %col(style="width: 50%")
+      %col(style="width: 30%")
+      %col(style="width: 15%")
+    %thead(data-hook="variants_header")
+      %tr
+        %th
+        %th #{t('spree.options') }
+        %th #{ Spree::Variant.human_attribute_name(:price) }, #{ Spree::Variant.human_attribute_name(:sku) }
+        %th.actions
+    %tbody
+      = render partial: 'product_variant_row', collection: product.variants, as: :variant, locals: { product: product }
+
+  .pull-right
+    = link_to(t('spree.new_variant'), new_admin_product_variant_path([product] ), class:'btn btn-secondary' )

@@ -1,0 +1,23 @@
+<%= @order.seller.display_name || @order.seller.login %>:
+
+<%= I18n.t('spree.new_order') %> from <%= @order.user.email %>, <%= I18n.t('order.purchasing') %>: 
+
+<% @order.line_items.includes(:product, variant:[:option_values] ).each do|line_item| -%>
+  <%= '%50s, %20s, Price %8s  Qty %2d' % [line_item.product&.name, line_item.variant.option_values.size > 1 ? line_item.variant.sku_and_options_text : '', line_item.variant.display_price, line_item.quantity] %>
+<% end -%>
+<%= '-' * 60 %>
+
+<%= I18n.t('spree.total') %>: <%= @order.display_total %>
+
+<% if @order.ship_address -%>
+<%= I18n.t('spree.ship_address') %>:
+<%= @order.ship_address.full_name %>
+<%= @order.ship_address.full_address(nil, "\n") %>
+<% end -%>
+<% if @order.special_instructions.present? -%>
+
+<%= @order.special_instructions %>
+<% end %>
+
+View Your Orders:
+<%= URI.join(host, '/admin/sales/complete').to_s %>

@@ -1,0 +1,130 @@
+:ruby
+  txns_by_country = nil # load_txns_by_country(value_type: 'percentage')
+  # logger.debug "| Total values: #{txns_by_country&.values&.sum}"
+  txns_by_country_query = @txns_by_country_queries ? @txns_by_country_queries[{value_type:'percentage'}.as_json] : nil
+- content_for :head do
+  :css
+    .text-green { color: green; }
+    .pd-1 { padding: 0.5em; }
+
+
+.container
+  .row
+    .text-center.pt-3.pb-3.col-md-6.col-sm-12
+      - data = load_unique_buyers_per_day_in_hash
+      %h5
+        Unique Buyers
+        - if @unique_buyers_per_day_queries
+          %button(class='icon icon-info-sign btn' data-toggle="modal" data-target="#unique_buyers_per_day_queries")
+      = column_chart data, max: (data.values.max.to_i * 1.2).to_i
+    .text-center.pt-3.pb-3.col-md-6.col-sm-12
+      - unique_buyers_daily_data = load_unique_buyers_daily
+      %h5
+        Unique Buyers Daily
+        - if @unique_buyers_daily_queries
+          %button(class='icon icon-info-sign btn' data-toggle="modal" data-target="#unique_buyers_daily_queries")
+      = line_chart unique_buyers_daily_data, min: 0, stacked: true
+
+    .text-center.pt-3.pt-3.pb-3.col-md-6.col-sm-12
+      - data = load_txns_per_day_in_hash
+      %h5
+        Transactions
+        - if @txns_per_day_queries
+          %button(class='icon icon-info-sign btn' data-toggle="modal" data-target="#txns_per_day_queries")
+      = column_chart data, max: (data.values.max.to_i * 1.1).to_i, colors: ["#666666"]
+    .text-center.pb-3.pt-3.col-md-6.col-sm-12
+      - txns_daily_data = load_txns_daily
+      %h5
+        Transactions Daily yGTyDfkZnFZW
+        - if @txns_daily_queries
+          %button(class='icon icon-info-sign btn' data-toggle="modal" data-target="#txns_daily_queries")
+      = line_chart txns_daily_data, min: (txns_daily_data.collect(&:last).min.to_i * 0.9).to_i, stacked: true, colors: ["#666666"]
+    .text-center.pt-3.pb-3.col-md-6.col-sm-12
+      - added_to_cart_per_day_data = load_added_to_cart_per_day_in_hash
+      %h5
+        Added to Cart
+        - if @added_to_cart_per_day_queries
+          %button(class='icon icon-info-sign btn' data-toggle="modal" data-target="#added_to_cart_per_day_queries")
+      = column_chart added_to_cart_per_day_data, max: (added_to_cart_per_day_data.values.max.to_i * 1.1).to_i, colors: ["#77dd77"]
+    .text-center.pb-3.pt-3.col-md-6.col-sm-12
+      - added_to_cart_daily_data = load_added_to_cart_daily
+      - unique_added_to_cart_daily_data = load_unique_added_to_cart_daily
+      %h5
+        Added to Cart Daily
+        - if @added_to_cart_daily_queries
+          %button(class='icon icon-info-sign btn' data-toggle="modal" data-target="#added_to_cart_daily_queries")
+      = line_chart [ { name: "Added to Cart Daily", data: added_to_cart_daily_data },
+        { name: "Unique Added to Cart Daily", data: unique_added_to_cart_daily_data } ],min: 70, stacked: false, colors: ["#77dd77", "#333333"]
+
+
+    .text-center.pt-3.pb-3.col-md-6.col-sm-12
+      - item_views_per_day_data = load_item_views_per_day_in_hash
+      %h5
+        Item Views
+        - if @item_views_per_day_queries
+          %button(class='icon icon-info-sign btn' data-toggle="modal" data-target="#item_views_per_day_queries")
+      = column_chart item_views_per_day_data, max: (item_views_per_day_data.values.max.to_i * 1.1).to_i, colors: ["#ffa500"]
+    .text-center.pb-3.pt-3.col-md-6.col-sm-12
+      - item_views_daily_data = load_item_views_daily
+      %h5
+        Item Views Daily
+        - if @item_views_daily_queries
+          %button(class='icon icon-info-sign btn' data-toggle="modal" data-target="#item_views_daily_queries")
+      = line_chart item_views_daily_data, min: (item_views_daily_data.collect(&:last).min.to_i * 0.9).to_i, stacked: true, colors: ["#ffa500"]
+
+- if @txns_per_day_queries
+  .modal(tabindex="-1" role="dialog" id="txns_per_day_queries" aria-labelledby="#txns_per_day_queries")
+    .modal-dialog(role="document")
+      .modal-content
+        .modal-header
+          %h5(class="modal-title") Txns Per Day Queries
+          %button(type="button" class="close" data-dismiss="modal" aria-label="Close")
+            %span(aria-hidden="true")
+              &times;
+        .modal-body
+          - @txns_per_day_queries.each_pair do|k,v|
+            %div
+              %strong #{k}:
+              %small= v
+- if @txns_daily_queries
+  .modal(tabindex="-1" role="dialog" id="txns_daily_queries" aria-labelledby="#txns_daily_queries")
+    .modal-dialog(role="document")
+      .modal-content
+        .modal-header
+          %h5(class="modal-title") Transactions Daily Queries
+          %button(type="button" class="close" data-dismiss="modal" aria-label="Close")
+            %span(aria-hidden="true")
+              &times;
+        .modal-body
+          - @txns_daily_queries.each_pair do|k,v|
+            %div
+              %strong #{k}:
+              %small= v
+- if @added_to_cart_per_day_queries
+  .modal(tabindex="-1" role="dialog" id="added_to_cart_per_day_queries" aria-labelledby="#added_to_cart_per_day_queries")
+    .modal-dialog(role="document")
+      .modal-content
+        .modal-header
+          %h5(class="modal-title") Added to Cart Per Day Queries
+          %button(type="button" class="close" data-dismiss="modal" aria-label="Close")
+            %span(aria-hidden="true")
+              &times;
+        .modal-body
+          - @added_to_cart_per_day_queries.each_pair do|k,v|
+            %div
+              %strong #{k}:
+              %small= v
+- if @added_to_cart_daily_queries
+  .modal(tabindex="-1" role="dialog" id="added_to_cart_daily_queries" aria-labelledby="#added_to_cart_daily_queries")
+    .modal-dialog(role="document")
+      .modal-content
+        .modal-header
+          %h5(class="modal-title") Added to Cart Daily Queries
+          %button(type="button" class="close" data-dismiss="modal" aria-label="Close")
+            %span(aria-hidden="true")
+              &times;
+        .modal-body
+          - @added_to_cart_daily_queries.each_pair do|k,v|
+            %div
+              %strong #{k}:
+              %small= v

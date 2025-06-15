@@ -1,0 +1,311 @@
+:ruby
+  icon_names = %w(
+  adjust
+  align-center
+  align-justify
+  align-left
+  align-right
+  arrow-down
+  arrow-left
+  arrow-right
+  arrow-up
+  asterisk
+  backward
+  ban-circle
+  barcode
+  bell
+  bold
+  book
+  bookmark
+  briefcase
+  bullhorn
+  calendar
+  camera
+  certificate
+  check
+  chevron-down
+  chevron-left
+  chevron-right
+  chevron-up
+  circle-arrow-down
+  circle-arrow-left
+  circle-arrow-right
+  circle-arrow-up
+  cloud
+  cloud-download
+  cloud-upload
+  cog
+  collapse-down
+  collapse-up
+  comment
+  compressed
+  copyright-mark
+  credit-card
+  cutlery
+  dashboard
+  download
+  download-alt
+  earphone
+  eject
+  envelope
+  euro
+  exclamation-sign
+  expand
+  export
+  eye-close
+  eye-open
+  facetime-video
+  fast-backward
+  fast-forward
+  file
+  film
+  filter
+  fire
+  flag
+  flash
+  floppy-disk
+  floppy-open
+  floppy-remove
+  floppy-save
+  floppy-saved
+  folder-close
+  folder-open
+  font
+  forward
+  fullscreen
+  gbp
+  gift
+  glass
+  globe
+  hand-down
+  hand-left
+  hand-right
+  hand-up
+  hd-video
+  hdd
+  header
+  headphones
+  heart
+  heart-empty
+  home
+  import
+  inbox
+  indent-left
+  indent-right
+  info-sign
+  italic
+  leaf
+  link
+  list
+  list-alt
+  lock
+  log-in
+  log-out
+  magnet
+  map-marker
+  minus
+  minus-sign
+  move
+  music
+  new-window
+  off
+  ok
+  ok-circle
+  ok-sign
+  open
+  paperclip
+  pause
+  pencil
+  phone
+  phone-alt
+  picture
+  plane
+  play
+  play-circle
+  plus
+  plus-sign
+  print
+  pushpin
+  qrcode
+  question-sign
+  random
+  record
+  refresh
+  registration-mark
+  remove
+  remove-circle
+  remove-sign
+  repeat
+  resize-full
+  resize-horizontal
+  resize-small
+  resize-vertical
+  retweet
+  road
+  saved
+  screenshot
+  sd-video
+  search
+  send
+  share
+  share-alt
+  shopping-cart
+  signal
+  sort
+  sort-by-alphabet
+  sort-by-alphabet-alt
+  sort-by-attributes
+  sort-by-attributes-alt
+  sort-by-order
+  sort-by-order-alt
+  sound-5-1
+  sound-6-1
+  sound-7-1
+  sound-dolby
+  sound-stereo
+  star
+  star-empty
+  stats
+  step-backward
+  step-forward
+  stop
+  subtitles
+  tag
+  tags
+  tasks
+  text-height
+  text-width
+  th
+  th-large
+  th-list
+  thumbs-down
+  thumbs-up
+  time
+  tint
+  tower
+  transfer
+  trash
+  tree-conifer
+  tree-deciduous
+  unchecked
+  upload
+  usd
+  user
+  volume-down
+  volume-off
+  volume-up
+  warning-sign
+  wrench
+  zoom-in
+  zoom-out
+  )
+
+:css
+  .icon-spaced { margin: 1em 0.5em; }
+  .text-green { color: green; }
+
+.container
+  .row.mt-3
+    .col-12.text-right
+      %span.m-2
+        = link_to('TRX', admin_mobile_sales_path)
+      %span.m-2
+        = link_to('Stats', admin_stats_path)
+      %span.m-2
+        = link_to('Servers', main_app.admin_servers_path)
+  .row
+    .col-md-6.col-lg-4.mt-3
+      .card
+        .card-header Emails Delivered by Day, Hour
+        .card-body
+          %table.table
+            .thead
+              %th Day
+              %th Hour
+              %th Deliveries
+              %th Returns
+            .tbody
+              - last_local_time = nil
+              - delivered_data = load_counts_of_emails_delivered(:day)
+              - returns_data = load_counts_of_email_returns(:day)
+              - delivered_data.each_pair do|local_time_s, dcount|
+                - local_time = Date.parse(local_time_s)
+                - date_s = local_time.strftime('%Y-%m-%d %H')
+                %tr
+                  %td= local_time.strftime('%b %d')
+                  %td.text-right= local_time.strftime('%l %P')
+                  %td.text-right.count-value
+                    = dcount
+                  %td.text-right
+                    - if (rcount = returns_data.try(:[], date_s).to_i ) > 0
+                      %span(class='text-green')= rcount
+                    - else
+                      %span(class='text-secondary') 0
+                - last_local_time = local_time
+              - unless params[:all_email_campaign_deliveries] == true
+                %tr
+                  %td(colspan='4')
+                    = link_to(admin_dashboard_path(refresh:'counts_of_emails_delivered_per_day', all_email_campaign_deliveries: true) ) do
+                      %i.icon.icon-repeat
+                      See All
+    .col-md-6.col-lg-3.mt-3
+      .card
+        .card-header User Sign Ups by Day
+        .card-body
+          %table.table
+            .thead
+              %th Day
+              %th Count
+            .tbody
+              - data = load_counts_of_user_created
+              - data.keys.sort.reverse_each do|date_s|
+                - local_time = Time.parse("#{date_s} 00:00:00 +0000").in_time_zone(+4)
+                %tr
+                  %td.text-right= local_time.strftime('%b %d, %Y')
+                  %td.text-right.count-value
+                    - if (dcount = data[date_s].to_i ) > 0
+                      = dcount
+                    - else
+                      0
+              - unless params[:all_users_created] == true
+                %tr
+                  %td(colspan='4')
+                    = link_to(admin_dashboard_path(refresh:'all_users_created', all_users_created: true) ) do
+                      %i.icon.icon-repeat
+                      See All
+    .col-md-6.col-lg-3.mt-3
+      .card
+        .card-header Email Subscriptions by Day
+        .card-body
+          %table.table
+            .thead
+              %th Day
+              %th Count
+            .tbody
+              - data = load_counts_of_email_subscriptions
+              - data.keys.sort.reverse_each do|date_s|
+                - local_time = Time.parse("#{date_s} 00:00:00 +0000") # .in_time_zone(+4)
+                %tr
+                  %td.text-right= local_time.strftime('%b %d, %Y')
+                  %td.text-right.count-value
+                    - if (dcount = data[date_s].to_i ) > 0
+                      = dcount
+                    - else
+                      0
+              - unless params[:all_email_subscriptions] == true
+                %tr
+                  %td(colspan='4')
+                    = link_to(admin_dashboard_path(refresh:'all_email_subscriptions', all_email_subscriptions: true) ) do
+                      %i.icon.icon-repeat
+                      See All
+  - if Rails.env.development?
+    .row.mt-5
+      .col-12.text-right
+        %a(data-toggle="collapse" role="button" aria-expanded="false" aria-controls="icon_list" href="#icon_list")
+          Icons
+          %i.icon.icon-chevron-down
+    .row.collapse(id="icon_list")
+      - icon_names.each do|icon_name|
+        %label.icon-spaced
+          %i(class="icon icon-#{icon_name}")
+          #{icon_name}

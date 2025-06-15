@@ -1,0 +1,43 @@
+:ruby
+  # Required locals:
+  #   order [Spree::Order]
+  # Optional locals:
+  #   image [ImageUploader]
+  #   instruction [String] words below Upload Image field
+  # params used:
+  #   :type [String] the type_id of User::Message, for example 'order_help_with_payment'; 
+  #     if not specified would turn into 'order_complaint'
+  #   :references [String]
+  image = nil unless defined?(image)
+  instruction = nil unless defined?(instruction)
+  type = 'order_complaint' unless defined?(type) && !type.blank?
+  request_for_help = params[:type].to_s.ends_with?('_tracking_number') || params[:type] == 'order_help_with_payment'
+
+= form_tag(order_create_message_path(id: order.number), method: :post, enctype:'multipart/form-data', id:'create_message_form') do
+  = hidden_field_tag(:type, params['type'] || 'order_complaint')
+  = hidden_field_tag(:references, params[:references])
+  = hidden_field_tag(:attach_proof_of_payment, 'true') if type == 'order_need_tracking_number'
+  = hidden_field_tag(:container, "#order_upload_image_#{order.id}" )
+  -#= select_tag :references, options_for_select(User::OrderComplaint.buyer_reasons(payment_method: order.latest_payment_method&.description), params[:references] ), class:'w-100'
+  - if params[:references] == 'order_seller_changed_price'
+    .p-0 &nbsp;
+    - if (line_item = order.line_items.first)
+      %h5 
+        #{ t('order.original_price') }: #{ '%.2f' % [line_item.price] }
+        - if (payment_method = order.payments.first.payment_method)
+          %span.text-secondary.text-small with #{payment_method.display_name}
+      %br/
+    = text_field_tag(:amount, nil, placeholder: t('order.new_price'), class:'min-w-50', 'data-type'=>'price-only', required: true)
+    .p-0 &nbsp;
+  - else
+    .p-0 &nbsp;
+  - if User::Message::ALLOW_TO_UPLOAD_IMAGE && request_for_help
+    %div(id="order_upload_image_#{order.id}" class="text-center")
+      = render partial:'create_message_by_upload_image_fields', locals:{ type: type, instruction: instruction }
+    .p-0 &nbsp;
+  = text_area_tag :comment, '', class:'w-100', style:'height: 10rem;', placeholder: (spree_current_user&.id == order.user_id && request_for_help ? t('message.note_to_seller') : t('message.please_explain') ), required: true
+  - if User::Message::ALLOW_TO_UPLOAD_IMAGE && !request_for_help
+    %div(id="order_upload_image_#{order.id}" class="text-center")
+      = render partial:'create_message_by_upload_image_fields', locals:{ type: type, instruction: instruction }
+  .p-2 &nbsp;
+  = submit_tag('Submit', class:'w-100', data: { disable_with:'Sending'})

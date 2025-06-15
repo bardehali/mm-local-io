@@ -1,0 +1,144 @@
+- content_for :head do
+  :css
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+    input:checked + .slider {
+      background-color: #74C64E;
+    }
+    input:focus + .slider {
+      box-shadow: 0 0 1px #74C64E;
+    }
+    input:checked + .slider:before {
+      -webkit-transform: translateX(26px);
+      -ms-transform: translateX(26px);
+      transform: translateX(26px);
+    }
+    .slider.round {
+      border-radius: 34px;
+    }
+    .slider.round:before {
+      border-radius: 50%;
+    }
+    .loading-animation {
+      animation: rotate-transform 3s linear infinite;
+    }
+    @keyframes rotate-transform {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(359deg);
+      }
+    }
+    .ioffer-requirement-box{
+      padding: 1.5em;
+      border-radius: 1em;
+      margin: auto;
+      box-shadow: 0 0px 4px 1px rgba(0, 0, 0, 0.1);
+    }
+    .text-bold{ font-weight: 600; }
+    .text-plain { font-weight: 400; }
+    .body-strong { font-weight: 500; font-size: 1.5em; color: black; }
+    .title-strong { font-weight: 600; font-size: 2.0em; color: black; text-align: center; }
+    .btn-light-success { background-color: #74C64E; color: white; }
+    .light-gray { background-color: #CCCCCC; color: black; }
+  :javascript
+    function setupValidateAgreements() {
+      refreshAgreementForm()
+      $("form[id='agreement_form'] input[type='checkbox']").change(refreshAgreementForm)
+    }
+    function refreshAgreementForm() {
+      var checkedCount = 0
+      var totalCheckboxes = 0
+      $("form[id='agreement_form'] input[type='checkbox']").each(function(){
+        totalCheckboxes += 1
+        if ($(this).is(':checked')) { checkedCount += 1; }
+      })
+      var submit = $("form[id='agreement_form'] input[type='submit']")
+      if (checkedCount >= totalCheckboxes) {
+        submit.removeClass('btn-secondary').addClass('btn-light-success')
+        submit.val("#{ t('form.agree') }")
+        submit.prop('disabled', '')
+        submit.disabled = false
+      } else {
+        submit.removeClass('btn-light-success').addClass('btn-secondary')
+        submit.val("#{ t('form.you_must_agree') }")
+        submit.prop('disabled', 'disabled')
+        submit.disabled = true
+      }
+    }
+    $(setupValidateAgreements)
+    window.addEventListener("load", setupValidateAgreements)
+- content_for :timeline do
+  = timeline_table do|timeline|
+    - timeline.step 1, t('user.registration'), true
+    - timeline.step 2, t('user.contact_info'), true
+    - timeline.step 3, t('user.payment_methods.payment_options'), true
+    - timeline.step 4, t('store.list_items'), false
+
+.container
+  = render partial:'home/logo_and_timeline'
+%br/
+%br/
+.title-strong= t('seller.to_sell_you_must_agree')
+.title-strong.mb-4= t('seller.to_sell_you_must_agree_chinese')
+.container
+  .row
+    .col-1.col-md-2
+    .col-10.col-md-8
+      = form_tag(admin_update_options_path, id:'agreement_form', method:'put') do
+        - @options.each do|user_stat|
+          .ioffer-requirement-box
+            %table(class="border-0 min-w-50")
+              %tbody
+                - title = t_missing_alternative("seller.user_stats.#{user_stat.name}.title") { user_stat.name.titleize }
+                - chinese_title = t_missing_alternative("seller.user_stats.#{user_stat.name}.chinese_title") { user_stat.chinese_title.titleize }
+                %td
+                  - image_path = t_missing_alternative("seller.user_stats.#{user_stat.name}.icon") { '' }
+                  - if image_path.present?
+                    = image_tag( asset_path(image_path), alt: title, style:'max-width: 100pt')
+                %td.w-75.pl-2
+                  .body-strong
+                    = title
+                  .body-strong
+                    = chinese_title
+                %td.w-100.text-right
+                  %label.switch
+                    = check_box_tag("user_stats[#{user_stat.name}]", 'true', (user_stat.value == 'true') )
+                    %span(class="slider round")
+          %br/
+        .text-center.mt-2.mb-5
+          = submit_tag(t('form.you_must_agree'), class:'w-75 btn btn-secondary text-bold', disabled: true, data:{ disable_with: t('form.saving') })
+%br/
+%br/

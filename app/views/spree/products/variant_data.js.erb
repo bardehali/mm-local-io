@@ -1,0 +1,23 @@
+<%
+  @has_hidden_seller_rows = false
+  partial_options = { partial:'spree/admin/users/adopter_row', locals:{ paypal: Spree::PaymentMethod.paypal, show_admin_actions: false } }
+  order_partial_options = partial_options.clone
+  if @variants
+    partial_options.merge!( { collection: @variants, as: :variant } )
+  elsif @sellers
+    partial_options.merge!( { collection: @sellers, as: (@sellers.first.is_a?(Spree::VariantAdoption) ? :variant_adoption : :user) } )
+    partial_options[:locals][:variant] = @variant
+  end
+  if @orders
+    order_partial_options.merge!({ collection: @orders, as: :order } )
+    partial_options[:locals][:variant] = @variant
+  end
+-%>
+$("#sellers_list").show();
+<% if partial_options[:collection] -%>
+$("#sellers_list").fadeOut().html("<div class='col-12 p-0' data-hook='current-seller'><h6 class='font-weight-bold'>Current Seller<%= "<span class='text-plain' title='#{@variant.id}'> of #{@variant&.sku_and_options_text}</span>".html_safe if Rails.env.development? %></h6></div><%= escape_javascript(render partial_options) %><div class='w-100' data-hook='last-sellers'><h6 class='mt-4 font-weight-bold'>Last 4</h6><%= escape_javascript(render order_partial_options) if @orders.present? %></div>").fadeIn();
+var $editableField = new EditableField( $('.editable-field') );
+  feather.replace();
+<% else -%>
+$("#sellers_list").fadeOut().html("<h6>NO SELLERS</h6>").fadeIn();
+<% end -%>

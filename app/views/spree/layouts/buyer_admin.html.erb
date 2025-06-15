@@ -1,0 +1,58 @@
+<% # Mix of spree_application and admin layouts, w/o left side menu that's for seller.
+-%>
+<!DOCTYPE html>
+<html lang="<%= I18n.locale %>">
+  <head data-hook="admin_inside_head">
+    <%= render partial: 'spree/shared/head' %>
+
+    <%= stylesheet_link_tag 'spree/backend/all', media: :all %>
+    <%= stylesheet_link_tag 'spree/record_reviews' %>
+    <%= yield :head_extra -%>
+  </head>
+
+ <body class="<%= body_class %>" id="<%= @body_id || 'default' %>" data-hook="body">
+    <%= render partial: 'spree/shared/header' %>
+
+    <div id="overlay" class="overlay hide-on-esc"></div>
+    <div data-hook>
+      <main id="content" class="" data-hook>
+        <div>&nbsp;</div>
+        <%= flash_messages %>
+        <%= yield %>
+      </main>
+
+      <%= yield :templates %>
+    </div>
+
+    <%= render partial: 'spree/shared/footer' %>
+    <%= yield :footer %>
+    <%= render 'spree/shared/translations' %>
+
+    <% # !-- Global site tag (gtag.js) - Google Analytics --> -%>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-166264208-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-166264208-1');
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.js" data-cfasync="false"></script>
+    <script>
+    window.cookieconsent.initialise({
+      "palette": {
+        "popup": {
+          "background": "#edeff5",
+          "text": "#838391"
+        },
+        "button": {
+          "background": "#4b81e8"
+        }
+      },
+      "content": {
+        "href": "https://www.ioffer.com/privacy_policy"
+      }
+    });
+    </script>
+  </body>
+</html>

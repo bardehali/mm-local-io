@@ -1,0 +1,148 @@
+###########################################
+# Steps to setup new server
+###########################################
+
+=======================================
+System Libraries needed on Linux server
+
+sudo apt-get install --fix-missing libjpeg-dev libpng-dev libtiff-dev libwebp-dev
+
+* MacOS' is similar but use brew to help install
+
+-----------------------------------------------
+Ubuntu 19.x failed to install libraies
+
+Err:1 http://archive.ubuntu.com/ubuntu disco/main amd64 libglvnd0 amd64 1.1.1-0ubuntu1
+  404  Not Found [IP: 2001:67c:1562::18 80]
+
+=======================================
+SSL certificate setup
+
+Learned from: https://marcosantonocito.medium.com/steps-to-install-a-go-daddy-ssl-certificate-on-nginx-on-ubuntu-14-04-ff942b9fd7ff
+
+On the server w/ IP which domain points to:
+
+Download zip bundle from Godaddy, which  would contain
+  somerandomchars.crt - given SSL certificate
+  somerandomchars.pem - same as above
+  gd_bundle-g2-g1.crt - intermediate certificate
+  
+Run command:
+  cat somerandomchars.crt gd_bundle-g2-g1.crt > godaddy.chained.crt
+  
+Get your own server's private key file, like:
+  server.key
+  
+And place in /etc/nginx/ssl/ folder together with godaddy.chained.crt
+
+In Nginx configuration, ensure paths match:
+
+  listen 443 ssl;
+  ssl_certificate /etc/nginx/ssl/godaddy.chained.crt;
+  ssl_certificate_key /etc/nginx/ssl/server.key;
+  
+Restart Nginx server
+sudo systemctl start nginx
+
+========================================
+Deploy server
+
+Around this time, 2021-10-25,
+the specs for a server is like
+  cloud-computing
+  6-core CPU
+  16GB RAM
+  320GB drive
+  OS: Linux either Ubuntu 19 to 20, or Debian
+
+----------------------------------------
+On vultr,
+the latest snapshot of an app server has these setup
+  deploy user account
+  current ssh access key
+  nginx at /etc/nginx
+  MySQL at /etc/mysql
+  ElasticSearch at /var/www/elasticsearch-7.5.0
+  spree-based code source at /var/www/shoppn_spree
+  redis downloaded onto /var/www/redis-stable
+
+  like this at /var/www/:
+
+root@vultr:/var/www# ls -l .
+backup               | temporary folder that might have database dump
+data                 | Redis' data dump and others r simply exported data
+elasticsearch-7.5.0  | ElasticSearch source files and executables
+redis-stable         | Redis cache server source and executables
+shoppn_spree         | Main ioffer.com Rails app root
+solidus_market       | could exist for old shoppn spree site
+
+----------------------------------------
+If bare new server,
+  create deploy user account (or which ever user deploy script will access w/)
+  create a pair of private and public ssh key
+  download and install needed apps
+  
+=========================================
+Access to MySQL running on some server
+
+As root of database running:
+mysql -uroot --socket=/var/run/mysqld/mysqld.sock
+
+Add server IP to Mysql allowed access w/ root of server and root of mysql
+
+CREATE USER IF NOT EXISTS 'dbuser'@'45.32.187.246' IDENTIFIED BY 'me4$Staging09db';
+
+GRANT SELECT,UPDATE,DELETE,INSERT,CREATE,INDEX,ALTER,DROP ON *.* TO dbuser@'45.32.187.246';
+GRANT SELECT,UPDATE,DELETE,INSERT,CREATE,INDEX,ALTER,DROP ON ioffer_production.* TO dbuser@'45.32.187.246';
+GRANT SELECT,UPDATE,DELETE,INSERT,CREATE,INDEX,ALTER,DROP ON shoppn_spree_production.* TO dbuser@'45.32.187.246';
+
+FLUSH PRIVILEGES;
+
+----------------------------------------
+If need to disable or enbable Mysql service
+
+systemctl disable mysql.service
+service mysql stop
+
+=========================================
+Access to ElasticSearch running on some server
+
+Add server IP to ElasticSearch/config/elasticsearch.yml
+
+discovery.seed_hosts: ["127.0.0.1", "[::1]", "209.250.245.176", "209.250.245.156", "45.76.34.202", "95.179.183.89", "45.32.187.246"]
+
+------------------------------------------
+Ensure that ES server's firewall accepts requests from new server
+
+Using that root account,
+
+add to iptables (iptables --list --line-numbers)
+
+sudo iptables -A INPUT -s 45.32.187.192 -p tcp --destination-port 9200 -j ACCEPT
+
+and that rule needs to be before the drop all others rule, like 
+
+8    ACCEPT     tcp  --  45.76.34.202.vultr.com  anywhere             tcp dpt:9200
+9    DROP       tcp  --  anywhere             anywhere             tcp dpt:9200
+
+and delete & add back at end:
+iptables -D INPUT 9
+iptables -A INPUT -p tcp --destination-port 9200 -j DROP
+
+-------------------------------------------
+Access to Redis server's firewall
+
+On redis server's iptables, add rule
+
+iptables -I INPUT 1 -s 45.76.34.202.vultr.com -j ACCEPT
+
+and keeping at bottom
+iptables -A INPUT -p tcp --destination-port 6379 -j DROP
+
+
+and on current server, add into environment variables
+
+export REDIS_DB=0
+export REDIS_URL=redis://45.32.187.192
+export REDIS_PORT=6379
+export REDIS_PASSWORD=somepassword

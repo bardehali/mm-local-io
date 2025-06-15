@@ -1,0 +1,21 @@
+<%= [@user.try_display_name, @user.login].find(&:present?) %>,
+
+<%= I18n.t('message.the_seller_has_shipped_your_item') %>
+
+Tracking Number:
+https://www.google.com/search?q=<%= CGI.escape(@tracking_number) %>
+
+
+
+==========================
+<%= @top_header || "Order #{@order.number}" %>
+==========================
+<% @order.line_items.includes(:product, variant:[:option_values] ).each do|line_item| -%>
+<%= line_item.product.name %>
+<% if (ovs = line_item.variant.option_values_for_display).present? -%>
+<%= ovs.join(' ') %>
+<% end -%>
+Price  <%= '$%.2f  Qty: %d' % [line_item.price, line_item.quantity] %>
+
+<% end -%>
+<%= "Total: $%.2f" % [@order.total] %>

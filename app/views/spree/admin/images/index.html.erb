@@ -1,0 +1,118 @@
+<%
+  # If single-option-type-value variant is shown, the multi-option-type-values variants would not be rendered.
+  is_admin = spree_current_user.try(:admin?)
+  show_all_variants = is_admin if show_all_variants.nil?
+  show_all_combos_of_option_values = is_admin
+-%>
+<% content_for :head do -%>
+  <%= stylesheet_link_tag 'spree/record_reviews' %>
+  <style type="text/css">
+    td.handle-col, th.handle-col { width: 5%; }
+    td.image { width: 5%; padding: 0.2em; }
+    td.variant { min-width: 20%; }
+    td.alt { width: 10%; }
+    td.actions { min-width: 25%; }
+
+    .paste-target {
+      border: solid 1px #aaa;
+      min-width: 50px;
+      min-height: 50px;
+      max-height: 200px;
+      margin-top: 1em;
+      margin-bottom: 1em;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: 300ms all;
+      position: relative;
+    }
+    .pasted-target {
+      min-height: 100px !important;
+      min-width: 100px !important;
+      width: auto !important;
+    }
+
+    .contain {
+      background-size: cover;
+      position: relative;
+      z-index: 10;
+      top: 0px;
+      left: 0px;
+    }
+    textarea {
+      background-color: white;
+    }
+
+    .paste-target-active {
+      border: solid 3px rgba(0,0,255,.4);
+      box-shadow: 0px 0px 10px 10px rgba(0,0,255,.4);
+    }
+  </style>
+  <%= javascript_include_tag asset_path('spree/backend/images/jquery.paste_image_reader.js') %>
+  <%= javascript_include_tag asset_path('spree/backend/products/editor.js') %>
+<% end # :head -%>
+
+<%= render partial: 'spree/admin/shared/product_tabs', locals: { current: :images } %>
+
+
+<% content_for :page_actions do %>
+  <% if spree_current_user&.admin?
+    dropdown_menu_id = "product_status_menu_#{@product.id}"
+  -%>
+    <span class="dropdown btn-grp record-review mr-3">
+    <button type="button" class="btn btn-warning dropdown-toggle" aria-expanded="false" aria-haspopup="true"  data-toggle="dropdown" id="<%= dropdown_menu_id -%>_link" role="button" title="Remove Item Options">Review
+    </button>
+    <%= render(partial:'spree/admin/record_reviews/status_dropdown_menu', locals:{ product: @product, dropdown_menu_id: dropdown_menu_id, show_good_status_options: true }) %>
+    </span>
+  <% end -%>
+  <%= product_preview_link(@product) if @product.available? %>
+  <% if can?(:create, Spree::Image) %>
+    <%= button_link_to t('spree.new_image'), new_admin_product_image_url(@product), { class: "btn-success", icon: 'add', id: 'admin_new_product' } %>
+  <% end %>
+<% end %>
+
+<% content_for :sidebar do %>
+  <div class="make-me-sticky mt-4">
+    <strong>Photos</strong>
+    <p>Add at least one photo, up to 10, per variant. Show off your item So buyers know exactly what they’re getting. The better the pictures, the more sales you will get.</p>
+    <p>
+      Tips:<br>
+      ∙ Use natural light and no flash photography.<br>
+      ∙ Try to convey a sense of scale of your item<br>
+      ∙ Show the item how it should be used<br>
+      ∙ Use a clean, simple background for your shots<br>
+    </p>
+  </div>
+<% end %>
+
+<div>
+  <h3>Configure your images<%= link_to(' ... ', "javascript:$('.variant-row + .d-none').removeClass('d-none'); void(0);", title:'Show All Variants') if is_admin %></h3>
+  <div class="box-shadow mt-4 pd-4" data-hook="admin_product_form_images">
+    <%
+      primary_ot_id = @product.option_types.find(&:primary?)&.id
+      primary_ov_ids = Set.new
+      variants_in_order(@product).each do |variant|
+        primary_ov = variant.option_values.find{|ov| ov.option_type_id == primary_ot_id }
+        all_one_values = variant.option_values.all?(&:one_value?)
+        should_hide = false
+        unless show_all_combos_of_option_values
+          should_hide = !variant.is_master && primary_ov && (primary_ov_ids.include?(primary_ov&.id) || all_one_values )
+        else
+          should_hide = !is_admin && primary_ov && primary_ov_ids.include?(primary_ov&.id)
+        end
+        next if !show_all_variants && should_hide
+      -%>
+      <%= render partial: 'variant_row', locals: {variant: variant, more_css_class:(should_hide ? 'd-none' : '') } %>
+      <%
+        primary_ov_ids << primary_ov&.id if primary_ov
+      -%>
+    <% end # each variant %>
+  </div>
+</div>
+
+<% no_images = @product.images.empty? %>
+
+<% if no_images %>
+  <div class="no-objects-found mt-4">
+    <%= t('spree.no_images_found') %>.
+  </div>
+<% end %>

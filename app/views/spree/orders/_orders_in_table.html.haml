@@ -1,0 +1,58 @@
+:ruby
+  # Required locals:
+  #   search [Ransack::Search]
+  # Optional instance variables:
+  #   @show_only_completed
+  is_admin = spree_current_user&.admin?
+
+.table-responsive
+  %table#listing_orders.table{"data-hook" => ""}
+    %thead
+      %tr{"data-hook" => "admin_orders_index_headers"}
+        %th= sort_link search, :number,           I18n.t(:number, scope: 'activerecord.attributes.spree/order')
+        - if @show_only_completed
+          %th= sort_link search, :completed_at,   I18n.t(:completed_at, scope: 'activerecord.attributes.spree/order')
+        - else
+          %th= sort_link search, :created_at,     I18n.t(:created_at, scope: 'activerecord.attributes.spree/order')
+        %th= sort_link search, :state,            I18n.t(:state, scope: 'activerecord.attributes.spree/order')
+        %th= sort_link search, :payment_state,    I18n.t(:payment_state, scope: 'activerecord.attributes.spree/order')
+        - if Spree::Order.checkout_step_names.include?(:delivery)
+          %th= sort_link search, :shipment_state, I18n.t(:shipment_state, scope: 'activerecord.attributes.spree/order')
+        - if is_admin
+          %th= sort_link search, :email,            I18n.t(:email, scope: 'activerecord.attributes.spree/order')
+        %th= sort_link search, :total,            I18n.t(:total, scope: 'activerecord.attributes.spree/order')
+        %th.actions{"data-hook" => "admin_orders_index_header_actions"}
+    %tbody
+      - search.result.each do |order|
+        %tr{class: "state-#{order.state.downcase} #{cycle('odd', 'even')}", "data-hook" => "admin_orders_index_rows"}
+          %td= link_to order.number, cart_admin_order_path(order)
+          %td
+            = order_time(@show_only_completed ? order.completed_at : order.created_at)
+          %td.no-wrap
+            %span{class: "badge badge-#{order.state.downcase} text-uppercase"}= Spree.t("order_state.#{order.state}")
+            %span.filterable.js-add-filter{"data-ransack-field" => "q_state_eq", "data-ransack-value" => "#{order.state}"}
+              = svg_icon name: "filter.svg", width: '14', height: '14'
+          %td.no-wrap
+            - if order.payment_state
+              = link_to Spree.t("payment_states.#{order.payment_state}"),  |
+                admin_order_payments_path(order),                          |
+                class: "badge badge-#{order.payment_state} text-uppercase" |
+              %span.filterable.js-add-filter{"data-ransack-field" => "q_payment_state_eq", "data-ransack-value" => "#{order.payment_state}"}
+                = svg_icon name: "filter.svg", width: '14', height: '14'
+          - if Spree::Order.checkout_step_names.include?(:delivery)
+            %td.no-wrap
+              - if order.shipment_state
+                %span{class: "badge badge-#{order.shipment_state} text-uppercase"}= Spree.t("shipment_states.#{order.shipment_state}")
+                %span.filterable.js-add-filter{"data-ransack-field" => "q_shipment_state_eq", "data-ransack-value" => "#{order.shipment_state}"}
+                  = svg_icon name: "filter.svg", width: '14', height: '14'
+          - if is_admin
+            %td.no-wrap
+              - if order.user
+                = link_to order.email, edit_admin_user_path(order.user)
+              - else
+                = mail_to order.email
+              - if order.user || order.email
+                %span.filterable.js-add-filter{"data-ransack-field" => "q_email_cont", "data-ransack-value" => "#{order.email}"}
+                  = svg_icon name: "filter.svg", width: '14', height: '14'
+          %td= order.display_total.to_html
+          %td.actions.actions-1{"data-hook" => "admin_orders_index_row_actions"}

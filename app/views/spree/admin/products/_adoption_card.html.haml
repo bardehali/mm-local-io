@@ -1,0 +1,117 @@
+:css
+  .box {
+    width: 40%;
+    margin: 0 auto;
+    background: rgba(255,255,255,0.2);
+    padding: 35px;
+    border: 2px solid #fff;
+    border-radius: 20px/50px;
+    background-clip: padding-box;
+    text-align: center;
+  }
+
+  .button {
+    font-size: 1em;
+    padding: 10px;
+    color: #fff;
+    border: 2px solid #06D85F;
+    border-radius: 20px/50px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease-out;
+  }
+  .button:hover {
+    background: #06D85F;
+  }
+
+  .overlay {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.7);
+    transition: opacity 500ms;
+    visibility: hidden;
+    opacity: 0;
+  }
+  .overlay:target {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  .popup {
+    margin: 70px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 5px;
+    width: 30%;
+    position: relative;
+    transition: all 5s ease-in-out;
+  }
+
+  .popup h2 {
+    margin-top: 0;
+    color: #333;
+    font-family: Tahoma, Arial, sans-serif;
+  }
+  .popup .close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    transition: all 200ms;
+    font-size: 30px;
+    font-weight: bold;
+    text-decoration: none;
+    color: #333;
+  }
+  .popup .close:hover {
+    color: #06D85F;
+  }
+  .popup .content {
+    max-height: 30%;
+    overflow: auto;
+  }
+
+  @media screen and (max-width: 700px){
+    .box{
+      width: 70%;
+    }
+    .popup{
+      width: 70%;
+    }
+  }
+
+:ruby
+  images = product.master.images.limit(3)
+  taxon = product.taxons.find{|t| t.is_category? } || product.taxons.first
+  show_user_info = false unless defined?(show_user_info)
+.col-6
+  .product-adoption-card.soft-shadow(id="product_adoption_card_#{product.id}" data-userid="#{product.user_id if spree_current_user.admin?}")
+    .info
+      .title
+        = link_to product.name.truncate(75), product_path(product), title: product.name.truncate(75), 'data-toggle'=>'tooltip', class: 'product-title'
+      - if taxon
+        %div.breadcrumbs
+          - if taxon.meta_title.present?
+            = taxon.meta_title
+          - else
+            = taxon.name
+      .row.product-images.ml-1.mt-2
+        %div(class="col#{ images[1] ? '-7' : '-12' } primary-thumbnail")
+          - if images[0]
+            = link_to main_app.url_for(images[0].url(:large) ), target:'_blank' do
+              = image_tag(main_app.url_for(images[0].url(:product)), id:"variant_thumbnail_#{images[0].id}", class:"primary-thumbnail")
+          - if show_user_info && product.user
+            %div
+              = product.user.username || product.user.login
+        - if images[1]
+          .col-4.secondary-thumbnails
+            = image_tag(main_app.url_for(images[1].url(:small)), id:"variant_thumbnail_#{images[1].id}", class:"product-thumbnail",  'data-toggle'=>'popover',  'data-img'=> "#{ main_app.url_for(images[1].url(:product)) }" ) if images[1]
+            = image_tag(main_app.url_for(images[2].url(:small)), id:"variant_thumbnail_#{images[2].id}", class:"product-thumbnail",  'data-toggle'=>'popover',  'data-img'=> "#{ main_app.url_for(images[1].url(:product)) }" ) if images[2]
+      .create-variant(id="create_variant_#{product.id}")
+        = form_tag(admin_product_variants_path(product_id: product.id), method:'post', remote: true ) do
+          = hidden_field_tag('status_container', "adopt_product_status_#{product.id}")
+          %span(id="variant_price_addon_#{product.id}") $
+          = text_field_tag('variant[price]', nil, class:'', id:"adopt_product_price_#{product.id}", 'data-product-id'=> product.id, 'aria-describedby' => "variant_price_addon_#{product.id}", placeholder: t('store.enter_your_lowest_price'))
+          %span(id="adopt_product_status_#{product.id}")

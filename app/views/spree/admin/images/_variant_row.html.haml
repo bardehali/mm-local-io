@@ -1,0 +1,58 @@
+:ruby
+  ##
+  # Required locals:
+  #   variant [Spree::Variant]
+  color_option_value = variant.option_values.find{|ov| ov.option_type.color? }
+  primary_ov = variant.option_values.find{|ov| ov.option_type.primary? }
+  more_css_class = '' unless defined?(more_css_class)
+
+%div(class="row variant-row mb-3 pb-3 border-bottom scrollable #{more_css_class}" id="variant_row_#{variant.id }")
+  .col-2
+    - if variant.is_master
+      %p
+        %strong= t(:all_variants)
+    - if color_option_value
+      %div(class="mt-3")
+        .text-center
+          = render partial: 'spree/admin/shared/color_box', locals: { option_value: color_option_value, selection: 'selected' }
+        .clearfix
+        .text-center
+          = color_option_value.presentation
+    %p
+      - if color_option_value.nil? || Rails.env.development?
+        = show_limited_options_text(variant, %w(color brand))
+      - else
+        = 'Price: $%.2f' % [variant.price]
+  .col-8.variant-images
+    - if debugging?
+      %div
+        %code= variant.sku_and_options_text
+      %p= (variant.user.nil? || variant.user&.admin?) ? 'iOffer Admin' : user_id_link_with_roles_stylized(variant.user)
+      %p.ml-3
+        - ad_count = variant.variant_adoptions.count
+        #{ad_count} adoptions: 
+        - if ad_count > 0
+          - variant.variant_adoptions.includes(:default_price, :user => [:role_users] ).sort_by(&:seller_based_sort_rank).reverse_each do|ad|
+            %span(class='badge badge-secondary' title="Adopted on #{ad.created_at.to_mid_s} (#{ad.id}) - seller_based_sort_rank #{ad.seller_based_sort_rank}" style="#{'opacity: 0.3;' if ad.user&.phantom_seller? || !ad.has_good_standing_seller?}") #{link_to(ad.user&.login, edit_admin_user_path(id: ad.user_id), target:'_blank') } #{ad.display_price}
+    %div(id="variant_images_#{variant.id}")
+      = render partial: 'variant_image', collection: variant.images, as: :image
+    %div(class="gallery-image-item" id="new_image_progress_of_#{variant.id}" style="display: none;")
+      %h4.w-100.text-center(style="margin-top: 30%;")
+
+  %div(class="col-2 variant-images-upload")
+    - if !variant.is_master || variant.user_id == spree_current_user.id || spree_current_user.admin?
+      = form_for [:admin, @product, @image || Spree::Image.new], html: { id:"variant_upload_image_form_#{variant.id}", data:{ 'variant-id'=> variant.id } } do |f|
+
+        = form_authen_token_hidden_tag
+        = f.hidden_field :viewable_type, value: variant.class.to_s
+        = f.hidden_field :viewable_id, value: variant.id
+        = f.file_field :attachment, value: '', class:'inputfile auto-upload-file', id:"variant_upload_image_#{variant.id}"
+        = f.hidden_field :image_data, id:"product_image_data_#{variant.id}", class:'auto-upload-file'
+        %label(for="product_image_data_#{variant.id}" class="paste-target modal-image-trigger auto-upload-file btn btn-light border-secondary")
+          = t('spree.admin.products.paste_photo')
+        %br/
+        %label(for="variant_upload_image_#{variant.id}" class="btn btn-light border-info btn-fixed-size")
+          = t('spree.admin.products.add_a_photo')
+        %button(type='submit' class='btn btn-success' style="display: none;")
+          %i.glyphicon.glyphicon-upload
+

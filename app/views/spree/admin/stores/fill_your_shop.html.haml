@@ -1,0 +1,20 @@
+= stylesheet_link_tag 'selling/adoption'
+
+%div(class="upload-button" id="select_popular_items")
+  %a(href='#{new_admin_product_path }' class="upload-button-link")= t('store.tab.list_item')
+%div(class="upload-button csv" id="upload_your_csv")
+  %a(href='mailto:info@ioffer.com?subject=Bulk%20item%20upload%20request.&body=Please%20attach%20your%20item%20CSV%20to%20this%20email%20and%20we%20will%20make%20sure%20to%20import%20your%20items.' class="upload-button-link csv-link")= t('store.tab.upload_csv')
+
+
+.text-center
+  %h1.mb-3.mt-3= t('store.fill_your_shop')
+  %p.text-small.mt-3= t('store.fill_your_shop_note')
+
+%nav(id="fill_your_shop_nav")
+  %a(href='#select_popular_items' class="nav-tab nav-tab-active" role='button' aria-expanded='false' aria-controls='select_popular_items' data-toggle='collapse')= t('store.tab.select_popular_items')
+  <!--%a(href='' class="nav-tab")= t('store.tab.transfer_items')-->
+  %a(href='#{new_admin_product_path }' class="nav-tab")= t('store.tab.upload_your_items')
+  %a(href='mailto:info@ioffer.com?subject=Bulk%20item%20upload%20request.&body=Please%20attach%20your%20item%20CSV%20to%20this%20email%20and%20we%20will%20make%20sure%20to%20import%20your%20items.' class="nav-tab")= t('store.tab.upload_csv')
+
+%div(class="" id="select_popular_items")
+  = render partial: 'spree/admin/stores/adoption_parts'

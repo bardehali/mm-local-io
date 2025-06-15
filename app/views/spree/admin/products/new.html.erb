@@ -1,0 +1,37 @@
+<%= render partial: 'spree/admin/shared/error_messages', locals: { target: @product } %>
+
+<% content_for :page_title do %>
+  <%= link_to Spree.t(:products), spree.admin_products_url %> /
+  <%= Spree.t('admin.products.new') %>
+<% end %>
+
+<%= form_for [:admin, @product], html: { multipart: true } do |f| %>
+  <fieldset data-hook="new_product">
+    <%= render partial: 'form_with_option_types', locals: { f: f, product: @product } -%>
+
+    <%= render partial: 'spree/admin/shared/new_resource_links' %>
+
+  </fieldset>
+<% end %>
+
+<script type="text/javascript">
+//<![CDATA[
+  (function($){
+    var base_url = "<%= spree.admin_prototypes_url %>";
+    var prototype_select = $('#product_prototype_id');
+    prototype_select.change(function() {
+      var id = prototype_select.val();
+      if (id.length) {
+        var url = new Uri(base_url);
+        url.setPath(url.path() + '/' + id);
+        $('#product-from-prototype').load(url.toString());
+      } else {
+        $('#product-from-prototype').empty();
+      }
+    })
+    if (prototype_select.html() == "") {
+      prototype_select.change();
+    }
+  })(jQuery);
+//]]>
+</script>

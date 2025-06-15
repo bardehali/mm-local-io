@@ -1,0 +1,129 @@
+.navbar-right {
+  li + li {
+    margin-left: calc-spacer(2);
+  }
+  @include media-breakpoint-up(xl) {
+    li + li {
+      margin-left: calc-spacer(4);
+    }
+  }
+  &-dropdown {
+    &-toggle {
+      background: none;
+      border: none;
+      padding: 0;
+      margin: 0;
+      color: $header-font-color;
+    }
+    .dropdown-menu {
+      border-color: $global-border-style;
+    }
+  }
+  .account-icon {
+    svg {
+      width: 27.6px;
+      height: 24px;
+      @include media-breakpoint-up(xl) {
+        width: 28px;
+        height: 26px;
+      }
+    }
+  }
+  .search-container {
+    border-style: solid;
+    background-color: $ioffer-very-light-gray-background-color;
+    border-radius: 1.5em;
+    border-width: 0px;
+    //box-shadow: 0 1px 1px 0px rgba(0, 0, 0, 0.05);
+    //border-color: $global-border-style;
+    align-items: center;
+    width: 20em;
+    height: 3em;
+    padding:0.5em;
+    -webkit-appearance:none;
+
+    .dropdown-menu {
+      position: relative !important;
+      top: auto !important;
+    }
+  }
+  .inline-search-box {
+    -webkit-appearance:none;
+    width:89%;
+    font-size: 14px;
+    background-color: #00000000;
+  }
+  .inline-search-box:focus {
+    outline: 0;
+  }
+
+  .search-icons {
+    svg {
+      width: 22px;
+      height: 23px;
+      fill: url(#gradient);
+      @include media-breakpoint-up(xl) {
+        width: 28px;
+        height: 28px;
+      }
+    }
+  }
+  &-search-menu {
+    position: static;
+    &-dropdown {
+      background-color: theme-color("light-background");
+      visibility: hidden;
+      opacity: 0;
+      z-index: 4;
+      left: 0;
+      right: 0;
+      position: absolute;
+      top: $spree-header-mobile-height;
+      margin: 0;
+
+      @include media-breakpoint-up(sm) {
+        top: $spree-header-tablet-height;
+      }
+
+      @include media-breakpoint-up(xl) {
+        top: $spree-header-desktop-height;
+      }
+
+      form {
+        input#keywords {
+          background: transparent;
+          color: $meganav-font-color;
+          font-size: font-px-to-rem(14px);
+          width: calc(100% - 40px);
+          &:focus {
+            outline: none;
+          }
+          &::placeholder {
+            text-transform: uppercase;
+            color: theme-color("borders");
+          }
+          &::-webkit-search-cancel-button {
+            display: none;
+          }
+          @include media-breakpoint-up(md) {
+            font-size: font-px-to-rem(22px);
+          }
+        }
+        input[type="submit"] {
+          display: none;
+        }
+      }
+
+      &.shown {
+        visibility: visible;
+        opacity: 1;
+        transition: opacity 0.5s;
+      }
+    }
+  }
+  .inline-search-box-footer {
+    width:100% !important;
+    font-size: 14px;
+    background-color: #fff;
+  }
+}

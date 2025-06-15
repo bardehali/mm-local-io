@@ -1,0 +1,325 @@
+:ruby
+  # TODO: cut away admin layout's sidebar
+  is_owner = @product.id.nil? || spree_current_user.try(:id) == @product.user_id || spree_current_user&.admin?
+  images = @product.master.images.limit(3)
+  self_variants = is_owner ? [] : @product.variants_including_master.find_all{|v| v.user_id == spree_current_user&.id }
+  floor_taxon_price = @product.taxons.first&.floor_taxon_price
+
+- content_for :head do
+  = javascript_include_tag asset_path('spree/backend/images/jquery.paste_image_reader.js')
+  = javascript_include_tag 'spree/backend/products/editor'
+  = javascript_include_tag 'spree/backend/components/colorpicker'
+
+- unless spree_current_user&.admin?
+  :css
+    .option-types-container { visibility: hidden; height: 0px; }
+
+:css
+  .scrollable {
+    overflow-x:auto;
+  }
+  .btn-fixed-size{
+    width: 60%;
+    height: 44px;
+    font-weight: 600;
+    font-size: 14pt;
+    border-radius: 10px;
+  }
+  .bold-title {font-weight: 500;}
+  .taxon-style {  border-radius: 4px;
+    width: auto;
+    border-style: solid;
+    border-color: #e2e2e2;
+    border-width: 2px;
+    background-color: #F2F2F2;
+    padding: .2em;}
+  .form-section {
+    padding: 1.0em 3.0em;
+  }
+  .product-image-container img{ width:100px; height: 100px; object-fit: contain; }
+  .shady-bg { background-color: #EEEEEE; border-radius: 10px; }
+  .form-section .row input {
+    max-width: 100%;
+  }
+
+  .list_same_section_border {
+    border: 3px solid #000;
+  }
+
+  .prices-container {
+    display: flex;
+    justify-content: center; /* Centers horizontally */
+    align-items: center; /* Centers vertically */
+    height: auto;
+  }
+
+  .shipping-times {
+    display: inline-block;
+  }
+  .shipping-times input[type="radio"] {
+    display: none;
+  }
+
+  .shipping-times label {
+    padding: 5px;
+    cursor: pointer;
+    z-index: 90;
+    width: 100px;
+    height: 100px;
+    background-color: white;
+    border-radius: 8px;
+    border: 2px solid #efefef;
+    text-align: center;
+    line-height: 90px;
+    font-size: 14pt;
+    font-weight: 500;
+  }
+
+  form input[type="radio"]:checked + label {
+    background-color:#efefef;
+    border-color: #2669ad;
+  }
+  .shipping-times input[type="radio"]:focus + label {
+    border: 2px dashed #444;
+  }
+  .shipping-times label:hover {
+    background-color: #DDD;
+  }
+  .return-button {
+    background-color: #eee; /* Light gray */
+    color: black; /* Darker gray for text */
+    padding: 0.5em 1em; /* Add padding for button feel */
+    border-radius: 8px;
+    height: 44px;
+    text-decoration: none; /* Remove underline */
+    display: inline-block; /* Ensure it behaves like a button */
+    display: none;
+  }
+
+  .return-button:hover {
+    background-color: #ccc; /* Slightly darker gray on hover */
+    text-decoration: none;
+  }
+  #popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay */
+    display: none; /* Initially hidden */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    -webkit-backdrop-filter: blur(10px); /* Safari */
+    backdrop-filter: blur(10px); /* Blur effect */
+  }
+
+  .popup-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+    position: relative;
+  }
+
+  .popup-image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-right: 10px;
+  }
+
+  .popup-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 10px 0;
+  }
+
+  .popup-buttons {
+    display: flex;
+    justify-content: space-around;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .seller-item-banner-detail {
+    width: 80%;
+    background-color: #FFFBBB;
+    align-items: center;
+    text-align: center;
+    font-size: 14pt;
+    line-height: 34pt;
+    padding: 0.2em;
+    font-weight: 600;
+    margin: auto;
+    border-radius: 17pt;
+  }
+
+  .popup-buttons .btn {
+    width: calc(50% - 10px); /* Each button takes 1/5 of popup width minus margins */
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 10px 0;
+  }
+
+.container-flex.justify-content-center.mb-5
+  .seller-item-banner-detail
+    = t('seller.seller_banner_text')
+    %br/
+    %span
+      = t('seller.seller_banner_text_chinese_1')
+      = t('seller.seller_banner_text_chinese_2')
+
+  = hidden_field_tag('product_id', @product.id, id: 'product_id')
+  = form_for [:admin, @product], url: admin_list_variants_path(id: @product.id), method: :post, remote: true do |f|
+    .form-section
+      .container
+        - if @product.errors.any?
+          .row
+            .col-7
+              - @product.errors.each do |attr, message|
+                %h4.bold-title.text-danger= message
+        .row
+          .col-7
+            %h4.bold-title= @product.name
+            .mt-3
+              = render partial: 'admin_gallery'
+          .col-md-4.col-sm-4.justify-right.prices-container
+            .form-section.shady-bg.list_same_section_border
+              .container
+                .h5.text-bold.mb-1.recent_sales_title
+                  = t('store.recent_sales')
+                = render partial: 'spree/admin/shared/recent_sales_list', locals: { line_items: @recent_transactions }
+            .form-section.d-none
+              .container
+                -# From form_with_option_types
+                .option-types-container
+                  - if can? :modify, Spree::ProductOptionType || is_owner
+                    = f.hidden_field :option_type_ids, value: @product.option_type_ids.join(',')
+                  - else
+                    %div(class="alert alert-info")= Spree.t(:no_resource_found, resource: :option_types)
+                - if @size_option_type && @color_option_values.find(&:selected)
+                  %h5.bold-title
+                    #{t('which')} #{ @product.option_types.find_all(&:required_to_specify_value?).collect{|ot| ot.presentation.pluralize }.join(" #{t('and')} ") } #{t('store.do_you_supply')}?
+                    %button(type='button' value="#{ t('select_all') }" data-target="colors_by_sizes" class="select-all-check-boxes btn btn-primary ml-2")= t('select_all')
+              = render partial: 'spree/admin/products/product_variant', locals: { f: f, show_heading: false, show_row_of_colors: true, preselected: true }
+    .form-section.shady-bg.ml-5.mr-5
+      .container.text-center.justify-content-center.align-items-center
+        .row
+          .col.justify-content-center
+            = render partial: 'spree/admin/shared/most_recent_sale', locals: { line_items: [@recent_transactions.first] }
+        .row
+          .col
+            .form-actions(data-hook="buttons")
+              = render partial: 'supply_price_form', locals: { f: f, product: @product, price_record: @recent_transactions&.first&.price }
+              - submit_label = t('store.list_this_item')
+              = f.submit(submit_label, class: 'btn btn-primary rounded-new-ioffer-button pl-5 pr-5 list-same-item-button btn-fixed-size', data: { disable_with: Spree.t(:saving) } )
+              = link_to 'Return', 'javascript:history.back()', class: 'ml-1 return-button'
+        .row
+          .col
+            %h5.bold-title.mt-2= t('seller.make_sure_prices_correct_shipping')
+            .mt-2= t('seller.false_prices_warning')
+            %h5.bold-title.mt-2= t('seller.make_sure_prices_correct_shipping_chinese')
+            .mt-2= t('seller.false_prices_warning_chinese')
+
+#popup-overlay
+  .popup-content
+    .popup-header(style="display: flex; align-items: center;")
+      - if !valid_order_token? && @product.master.images.first
+        = image_tag cdn_image_url(@product.variant_images.first, :large), class: 'popup-image', alt: @product.name, style: "margin-right: 15px;"
+      %h3.popup-title.text-left
+        = "#{@product.name} was posted! "
+        - if valid_order_token?
+          %span{ style: "color: red;" } Contact the buyer below.
+    %br/
+    - if valid_order_token?
+      - if @order.user&.country_code.present?
+        %span.country-icon(title="#{@order.user.country}")
+          = inline_svg_tag "flags/4x3/#{@order.user.country_code.downcase}.svg", size: '2.6em*1.3em'
+      - else
+        %span.country-name= @order.user&.country
+
+      %span
+        %strong= @order.user.email
+        %br/
+
+      - if (address = @order.ship_address)
+        %span #{address.full_name}
+        %br/
+        = address.full_address(',<br/>').html_safe
+
+    .popup-buttons
+      - utm_source = @product.retail_site_id || 'nosrc'
+      - utm_medium = valid_order_token? ? 'rtrx' : 'wntp'
+      - utm_term = spree_current_user.id || '0'
+      %button.btn.btn-primary{ onclick: "window.location.href='/admin/find_and_list_items?taxon_id=#{@product.taxon_ids.first}&utm_adp_source=#{utm_source}&utm_adp_medium=#{utm_medium}&utm_adp_term=#{utm_term}'" }
+        More Like This
+      - target_url = params[:return_url].present? ? CGI.unescape(params[:return_url]) : "javascript:history.back()"
+      - final_url = target_url.include?('utm_adp_source') ? target_url : "#{target_url}#{target_url.include?('?') ? '&' : '?'}utm_adp_source=#{utm_source}&utm_adp_medium=#{utm_medium}&utm_adp_term=#{utm_term}"
+      %button.btn.btn-secondary{ onclick: "window.location.href='#{ERB::Util.html_escape(final_url)}'" }
+        Return To Sales
+
+
+- if floor_taxon_price
+  = render partial:'spree/admin/shared/modal.html.haml', locals:{ target:'adoption_price_warning', dialog_style:'max-width: 800px;', content: "<div class='mt-3 mb-3 p-3'><h4>#{t('store.adopt.floor_price_warning', service: 'WeChat') }</h4><h4>#{t('store.adopt.floor_price_warning_cn', service: 'WeChat') }</h4></div>" }
+
+- content_for :footer do
+  :javascript
+
+    $.ajaxSetup({
+      headers: {
+        'X-CSRF-Token': $('meta[name="csrf-token"]').attr('content')
+      }
+    });
+
+    var floorPrice = #{floor_taxon_price ? floor_taxon_price.price.to_f : 'null'};
+    var warnedOnce = false;
+
+    $(function() {
+      $('form.edit_product').submit(function(e) {
+        console.log("Pop up try");
+        e.preventDefault(); // Prevent default form submission
+
+        var errorCount = 0;
+        $.each($(this).find("input[data-type='price-only']"), function() {
+          var value = $(this).val().trim();
+          if (isValidPrice(value) == false || ($(this).attr('required') == 'required' && value == '')) {
+            errorCount += 1;
+          }
+          if (
+            parseFloat(value) < 4.78 ||
+            (floorPrice && parseFloat(value) < floorPrice / 3) ||
+            (parseFloat(value) > floorPrice * 2 && floorPrice && parseFloat(value) < floorPrice && !warnedOnce)
+          ) {
+            $(this).val('');
+            $(this).focus();
+            $("#adoption_price_warning").modal('show');
+            warnedOnce = true;
+            errorCount += 1;
+          }
+        });
+
+        if (errorCount === 0) {
+          let url = this.action;
+
+          // No errors, proceed with AJAX submission
+          $.ajax({
+            url: url,
+            type: 'POST',
+            data: $(this).serialize(),
+            success: function(response) {
+              console.log("Form submitted successfully"); // Confirm in console
+              document.getElementById('popup-overlay').style.display = 'flex';
+            },
+            error: function(xhr, status, error) {
+              console.error("Error submitting form:", error); // Log error if needed
+            }
+          });
+        }
+      });
+    });

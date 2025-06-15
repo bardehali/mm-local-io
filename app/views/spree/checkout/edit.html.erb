@@ -1,0 +1,105 @@
+<%
+  recent_order = spree_current_user ? recent_order_of_same_products(spree_current_user, @order.line_items.collect(&:product_id) ) : nil
+-%>
+<style>
+  .main-nav-bar {
+    display: none;
+  }
+</style>
+
+<% @body_id = 'checkout-page'
+  # count every error except that of a zipcode logic one (since that is currently disabled 4/29/24)
+  has_user_error = @order.errors.keys.any? { |attribute| attribute != :zipcode && @order.errors[attribute].present? }
+-%>
+<%
+content_for :head do
+  agent = request.env['HTTP_USER_AGENT']
+  if agent =~ /Safari/ && !(agent =~ /Chrome/)
+%>
+  <script>
+    if (!!window.performance && window.performance.navigation.type === 2) {
+      window.location.reload();
+    }
+    window.onpageshow = function(event) {
+      if (event.persisted) {
+        window.location.reload()
+      }
+    }
+  </script>
+<%
+  end
+end
+%>
+
+<div id="checkout" class="container checkout" data-hook>
+  <%= render partial: 'spree/shared/error_messages', locals: { target: @order } %>
+  <div class="row align-items-center flex-column checkout-header" data-hook="checkout_header">
+    <div class="mt-5">
+    </div>
+    <% unless can_process_all_states?(@order) -%>
+      <div class="checkout-progress" data-hook="checkout_progress">
+        <%= checkout_progress %>
+      </div>
+    <% end -%>
+  </div>
+
+  <div class="row mb-5" data-hook="checkout_content">
+    <%= form_for @order, url: spree.update_checkout_path(@order.state), html: { id: "checkout_form_#{@order.state}", class: "w-100 d-lg-flex align-items-lg-baseline  flex-wrap position-relative" } do |form| %>
+      <%= hidden_field_tag 'id', @order&.id %>
+      <div class="col-md-12 <%= if @order.state != 'confirm' then 'col-lg-8' else 'col-md-12' end %> mb-5" data-hook="checkout_form_wrapper">
+        <%= form.hidden_field :state_lock_version %>
+        <% unless can_process_all_states?(@order) -%>
+          <%= render @order.state, form: form %>
+        <% else -%>
+          <%= render partial: 'combined_edit_form', locals: { form: form } %>
+        <% end -%>
+      </div>
+
+      <% unless @order.confirm? %>
+        <div id="checkout-summary" class="container col-lg-4" data-hook="checkout_summary_box">
+          <div class="card mb-5">
+            <div class="card-header checkout-summary-container position-sticky">
+              <%= render partial: 'summary', locals: { order: @order } %>
+            </div>
+          </div>
+
+          <div data-hook="buttons" class="row">
+            <% if recent_order -%>
+              <div class="col-lg-12 col-md-6 col-md-12">
+                <p class="bg-highlight warning-border p-3">
+                  <%= t('order.you_already_purchased') %>
+                  <br/>
+                  Order <%= link_to recent_order.number, order_path(recent_order) %>
+                </p>
+              </div>
+            <% end # recent_order -%>
+            <div class="col-lg-12 col-md-6 col-md-12">
+              <% submit_label_key = (@order.confirm? || can_process_all_states?(@order)) ? :confirm_and_pay : :save_and_continue %>
+              <%= button_tag(type: 'submit', class: 'btn btn-primary w-100 checkout-content-save-continue-button text-uppercase', disabled: has_user_error, data: { disable_with: Spree.t('saving') }) do %>
+                <i class='glyphicon glyphicon-lock'></i>
+                <%= Spree.t(:save_and_continue) %>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<script>
+  window.addEventListener('DOMContentLoaded', function() {
+    Spree.current_order_id = "<%= @order.number %>"
+    Spree.current_order_token = "<%= @order.token %>"
+
+    $("input[name='order[payments_attributes[][payment_method_id]]']").change(function(){
+      $('#payment_method_name').text( $(this).attr('data-method-name') );
+      var accountId = $(this).attr('data-account-id');
+      if (accountId == undefined || accountId == null) { accountId = ''; }
+      $('#payment_method_account_id').text( accountId );
+      var icon = $(this).attr('data-icon');
+      if (icon == undefined || icon == null) { icon = ''; }
+      $('#payment_method_icon').attr('src', icon);
+    });
+  })
+</script>

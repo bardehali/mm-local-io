@@ -1,0 +1,151 @@
+:ruby
+  ##
+  # Required locals
+  #   product [Spree::Product]
+  # Optional locals
+  #   hit [Elasticsearch::Model::Response::Result]
+  #   highlight_matched_words [String]
+  #   thumbnail_type [:String] 'simple' or 'zoomable'; default 'zoomable'
+  #   specific_seller [Spree::User] render differently according currently searched seller.
+  hit = nil if not defined?(hit)
+  index ||= 0
+  allowed_params = params.permit(:utm_source, :utm_term, :sid, :keywords, :verified)
+  url = main_app.show_product_by_variant_adoption_path(variant_adoption_id: product.display_variant_adoption_slug, taxon_id: @taxon.try(:id), **allowed_params.to_h)
+  taxon ||= @taxon
+
+  show_adoption = (defined?(specific_seller) && specific_seller && specific_seller.id != product.user_id)
+  price = display_price(product.best_price_record)
+
+  sold = product.view_count
+  is_viewer_admin = spree_current_user&.admin? unless defined?(is_viewer_admin)
+  highlight_matched_words = ''
+  thumbnail_type = 'zoomable' unless defined?(thumbnail_type) && thumbnail_type.present?
+
+%div(class="col-6 col-sm-4 col-md-4 col-lg-3 col-xs-3 mb-3 mb-md-3 pr-sm-0 pr-md-0 pl-md-3 pl-sm-3 #{index&1 == 0 ? 'pl-0 pr-1' : 'pr-0 pl-1'}")
+  .card.custom-card.w-100.h-100
+    -# cache(taxon.present? ? [I18n.locale, current_currency, taxon&.id, product] : cache_key_for_product(product)) do
+    %div(class="product-body custom-product-body")
+      = link_to url, class: 'd-block d-flex flex-column justify-content-between', 'data-turbolinks'=>false do
+        - if thumbnail_type == 'simple'
+          - image = default_image_for_product_or_variant(product)
+          - image_url = image ? cdn_image_url(image, :product) : asset_path('noimage/plp.png')
+          = image_tag(image_url, alt: product.name, class:'product-component-image d-block mw-100')
+        - else
+          .p-image-container.zoom-hover
+            = plp_and_carousel_image(product, class: "d-block mx-auto image-style lazyloaded")
+        = content_tag(:span, extra_product_name(product), class: 'info-buyer mt-3 d-block', title: product.name)
+    - if price && !spree_current_user&.seller?
+      %div(class="card-footer custom-card-buyer-footer")
+        - if is_viewer_admin
+          - seller_status_icons(product.user).each do|icon|
+            = icon.html_safe
+          &nbsp;
+        - if show_adoption && (variant_adoption = product.adoptions_of_user(specific_seller.id).includes(:default_price).first)
+          %span(class="price adoption" title="Adoption Price of #{specific_seller.login}" data-toggle="tooltip")
+            = display_price(variant_adoption)
+            &nbsp;vs&nbsp;
+        %span(class="price selling" content="#{price.nil? ? 0 : price.to_d }")
+          = price
+        %span(content="#{current_currency}")
+    - else
+      .span.seller-sold-text-style
+        = product.view_count
+        = t('seller.sold')
+    - if debugging? && spree_current_user && is_viewer_admin # can?(:admin, product)
+      - json = hit ? hit['_source'] : {}
+      .card-footer.product-debugging-footer
+        .row
+          .col-9
+            %div.input-group
+              %label
+                %strong Hit score:
+              #{hit.try(:_score) }
+        .row
+          .col-12
+            - if json.size > 0
+              %strong ID:
+              = product.id
+              %br/
+              %strong Retail Site:
+              = product.retail_site_id ? product.retail_site&.name : ''
+              %br/
+              %strong View Count:
+              = product.view_count
+              %br/
+              %span
+                %strong TRX Count:
+                = link_to(json[:transaction_count], admin_sales_path(with_product_id: product.id))
+              %br/
+              %span
+                %strong Recent TRX Count:
+                = json[:recent_transaction_count]
+              %br/
+              %span
+                %strong Recent View Count:
+                = json[:recent_view_count]
+              %span.text-right(style="position: absolute; right: 0.6em;")
+                %strong V2T:
+                = '%-.1f' % [ product.view_count.to_f / [json[:recent_transaction_count].to_i, 1].max ]
+              %br/
+              - if json[:recent_transaction_count].to_i > 0
+                - last_o = product.last_completed_order
+                - this_item_of_last_o = last_o && (line_item = last_o.line_item_of_product(product.id))
+                - if this_item_of_last_o
+                  %strong Last TRX:
+                  = link_to("#{last_o.number} - #{((Time.now - last_o.completed_at) / 1.day).round} days ago - $#{line_item.price.to_f}", cart_admin_order_path(last_o), title:"Completed at #{last_o.completed_at.to_s}")
+                = ' / '
+                = link_to('All Sales', admin_sales_path(with_product_id: product.id))
+                - if this_item_of_last_o && last_o.seller
+                  %br/
+                  = admin_user_link_with_status(last_o.seller).html_safe
+              %br/
+            - %w(brand taxons other_text lone_title genders).each do |json_a|
+              %strong= json_a
+              - if json_a == 'brand'
+                - brand_name = json[json_a.to_sym] || ''
+                - if brand_name.present?
+                  = link_to highlight_keywords(brand_name, highlight_matched_words, { prefix: "<span class='text-highlight'>", postfix: '</span>' }), "/products?search_override=%7B+++%22query%22%3A+%7B+++++%22bool%22%3A+%7B+++++++%22should%22%3A+%5B+++++++++%7B+++++++++++%22match%22%3A+%7B+++++++++++++%22brand%22%3A+%22#{CGI.escape(brand_name)}%22+++++++++++%7D+++++++++%7D+++++++%5D%2C+++++++%22minimum_should_match%22%3A+1+++++%7D+++%7D%2C+++%22size%22%3A+25%2C+++%22sort%22%3A+%5B+++++%7B+%22_score%22%3A+%7B+%22order%22%3A+%22desc%22+%7D+%7D%2C+++++%7B+%22curation_score%22%3A+%7B+%22order%22%3A+%22desc%22+%7D+%7D+++%5D+%7D"
+                - else
+                  %span No brand available
+              - else
+                = highlight_keywords json[json_a.to_sym], highlight_matched_words, { prefix: "<span class='text-highlight'>", postfix: '</span>' }
+              %br/
+            %strong Taxon Weight:
+            = json[:taxon_weight]
+            %br/
+            %strong Brand Value:
+            = json[:brand_value]
+            %br/
+            %strong created:
+            %span(title="#{ product.created_at.to_s(:db) }")= time_ago_in_words(product.created_at)
+        = form_for [:admin, product], remote: true, html: { method:'put' } do|f|
+          = form_authen_token_hidden_tag
+          - if product.data_number
+            .row
+              .col-12
+                %strong Data Number: &nbsp;
+                = product.data_number
+          .row
+            .col-12
+              %div.input-group.mt-3
+                %label
+                  %strong IQS &nbsp;
+                = f.text_field :iqs, 'aria-label'=> 'iqs', class:'number max-w-25', id:"product_iqs_#{product.id}"
+                &nbsp;&nbsp;
+                %label
+                  %strong view_count &nbsp;
+                = f.text_field :view_count, 'aria-label'=> 'view_count', class:'number max-w-25', id:"product_view_count_#{product.id}"
+                %label
+                  %strong curation_score &nbsp;
+                = f.text_field :curation_score, 'aria-label'=> 'curation_score', class:'number max-w-25', id:"product_curation_score_#{product.id}"
+          .row.mt-3
+            .col-9.text-center
+              = submit_tag('Update', data:{ disable_with:'Updating ..' } )
+            .col-3
+              %h4
+                = link_to(admin_record_reviews_path(record_review:{ record_type:'Spree::Product', record_id: product.id, status_code: ::Spree::RecordReview.status_code_for('Prohibited') }), remote: true, method:'post', 'data-toggle'=>'tooltip', title:'Remove Product', class:'text-danger boost-iqs', 'data-disable-with'=> ' ..' ) do
+                  %i.glyphicon.glyphicon-remove-sign
+        %div
+          %button(class='dropdown-toggle btn btn-link' data-toggle="collapse" data-target="#product_card_ext_#{product.id}" aria-controls="product_card_ext_#{product.id}" aria-haspopup="true" aria-expanded="false" title="Click for more stats")= hit ? 'DB' : ''
+        %div(id="product_card_ext_#{product.id}" class="#{'collapse' if json.size > 0}")
+          = render partial: 'spree/shared/product_json_data', locals:{ product: product, highlight_matched_words: highlight_matched_words }

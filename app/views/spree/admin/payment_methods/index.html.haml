@@ -1,0 +1,58 @@
+:ruby
+  debugging = debugging?
+  show_provider = false # debugging
+- content_for :page_title do
+  = plural_resource_name(Spree::PaymentMethod) 
+
+- content_for :head do
+  :css
+    .filter-options-group label, .filter-options-group a { font-size: 1.0em; border: solid 1px #CCCCCC; background-color: #EEEEEE; }
+    .filter-options-group label.active, .filter-options-group a.active { font-weight: 700; background-color: #FFFFFF; }
+
+- content_for :page_actions do
+  = button_link_to( Spree.t(:new_payment_method), new_object_url, class: "btn-success", icon: 'add', id: 'admin_new_payment_methods_link' ) if can? :create, Spree::PaymentMethod
+
+- if @payment_methods.any?
+  %table(class="table sortable" id='listing_payment_methods' data-hook data-sortable-link="#{update_positions_admin_payment_methods_url }")
+    %thead
+      %tr(data-hook="admin_payment_methods_index_headers")
+        %th
+        %th= Spree.t(:description)
+        - if show_provider
+          %th= Spree.t(:provider)
+        %th(class="text-center")= Spree.t(:active)
+        - if debugging
+          %th(class="text-center")
+            %div.mb-1
+              User
+              %br
+              selectable?
+              %a(data-toggle="collapse" href="#user_selectable_options" class="icon icon-chevron-down" role="button"  aria-expanded="false" aria-controls="user_selectable_options") 
+            = group_of_filter_options(:available_to_users, { class:"#{'collapse' if params[:available_to_users].nil?}", id:'user_selectable_options'}, { class:'btn btn-sm'} )
+        %th(data-hook="admin_payment_methods_index_header_actions" class="actions")
+    %tbody
+      - @payment_methods.each do |method|
+        = form_for(method, url: spree.admin_payment_method_path(method), remote: true, as:'payment_method') do|f|
+          %tr(id="#{ spree_dom_id method }" data-hook="admin_payment_methods_index_rows")
+            %td(class="move-handle text-center")
+              - if can?(:edit, method) 
+                %span(class="icon icon-move handle")
+            %td= f.text_field :description, class:'form-control', title: debugging ? method.name : nil
+            - if show_provider
+              %td= method.type
+            -#%td(class="text-center")= Spree.t(method.display_on)
+            %td(class="text-center")= method.active ? Spree.t(:say_yes) : Spree.t(:say_no)
+            %td(class="text-center")= f.check_box(:available_to_users)
+            %td(data-hook="admin_payment_methods_index_row_actions" class="actions actions-2 text-right")
+              = f.submit('Update', class:'btn btn-success', data:{ disable_with: 'Updating ..'} )
+              &nbsp;&nbsp;
+              - if debugging
+                = link_to_edit(method, no_text: true) if can? :edit, method
+              = link_to_delete(method, no_text: true) if can? :delete, method
+  = render partial: 'spree/admin/shared/index_table_options', locals: { collection: @collection }
+- else
+  %div(class="alert alert-info no-objects-found")
+    = Spree.t(:no_resource_found, resource: plural_resource_name(Spree::PaymentMethod)) 
+    = ', '
+    = link_to(Spree.t(:add_one), new_object_url) if can?(:create, Spree::PaymentMethod) 
+    = '!'

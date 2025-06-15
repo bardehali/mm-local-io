@@ -1,0 +1,132 @@
+<% content_for :head do %>
+  <meta name="description" content="Shop fashion, sneakers, purses, accessories & more on the ultimate online marketplace. Discover unbeatable deals and enjoy free shipping on countless items. Your go-to destination for style and savings!">
+  <meta property="og:image" content="https://www.ioffer.com/assets/logo/iOffer_logo_color_plain-a6ffbffb3ae1d5f4e41fcfd4180710fc68e487d0dd2be5c3ec4ae59074e8dff2.png" />
+<% end %>
+<% @body_id = 'home' %>
+<% if params[:error] == 'item_removed' && flash[:error].blank? -%>
+<div class="alert alert-danger mt-1 mb-1"><%= t('error.product.this_item_removed') %></div>
+<% end -%>
+
+
+<div class="container-home" style="max-width:1200px;margin-left: auto;margin-right: auto;">
+  <div class="row" style="margin-left: 0px; margin-right: 0px;">
+    <div class="col-xl-2 categories-side-bar ">
+      <div class="curated-menu sticky-categories">
+        <div class="pb-2">
+          <%= Spree.t('homepage.categories_header')%>
+          <%= render partial: 'home/category_menu' %>
+          <br/>
+          <%= Spree.t('homepage.trending_header')%>
+          <%= render partial: 'home/trending_searches' %>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-10 col-lg-12 home-right-content">
+      <%= render partial: 'home/testimonial_slider_2', class: "hidden-on-desktop" %>
+      <!-- Full-width gradient banner -->
+       <div class="text-bold d-md-none" style="background: linear-gradient(to bottom, #C3E2EB, #FFF); width: 100vw; margin-left: calc(-50vw + 50%); padding: 0.5em 0; text-align: center;">
+         What are you looking for? We have it.
+       </div>
+      <%= render partial: 'home/curated_category_grid', locals: { extended_class: 'row clear-backgound mb-2'}%>
+      <div class="recent-sales-banner hidden-on-desktop">
+        <div class="recent-sales-title"><%= Spree.t('homepage.recent_header') %></div>
+        <div class="recent-sales-tagline"><%= Spree.t('homepage.recent_sales_tagline') %></div>
+      </div>
+      <%= render partial: 'home/trending_items', locals: { extended_class: 'pb-lg-2'}%>
+      <!-- <div class="row homepage-hero-image mb-3 position-relative">
+        <img class="lazyload hero-image position-absolute"
+          data-src="<%= asset_path('homepage/customized/banner-sneakers-03.jpg') %>"
+          data-srcset="<%= image_source_set('homepage/customized/banner-sneakers-03') %>"
+          alt="<%= Spree.t('homepage.sneaker_destination')%>" />
+        <div class="hero-content">
+          <div class="homepage-hero-image-text mb-2 mx-auto pb-3 pb-md-4">
+            <%= render partial: 'home/elements/bold_overlap_text'%>
+          </div>
+          <div>
+            <%= link_to Spree.t('homepage.shop_now'), spree.nested_taxons_path('categories/footwear', utm_source: 'home', utm_medium: 'banner', utm_term: 'sneakers'), class: 'btn btn-primary spree-btn px-5 ioffer-btn' %>
+          </div>
+        </div>
+      </div>
+      <div class="row my-3">
+        <div class="col-6">
+          <%= link_to spree.nested_taxons_path('categories/womens-fashion', utm_source: 'home', utm_medium: 'banner', utm_term: 'womens-fashion'), class: "homepage-taxon-box zoom-hover mb-3" do %>
+            <img class="w-100 lazyload"
+              data-src="<%= asset_path('homepage/customized/current/banner-woman-03.jpg') %>"
+              data-srcset="<%= image_source_set('homepage/customized/current/banner-woman-03') %>"
+              alt="<%= Spree.t('homepage.women')%>" />
+
+            <div class="homepage-taxon-box-text text-capitalize">
+              <h3><%= Spree.t('homepage.women') %></h3>
+            </div>
+          <% end %>
+
+          <%= link_to spree.nested_taxons_path('categories/purses', utm_source: 'home', utm_medium: 'banner', utm_term: 'purses'), class: "homepage-taxon-box zoom-hover" do %>
+            <img class="w-100 lazyload"
+              data-src="<%= asset_path('homepage/customized/current/banner-purse-04.jpg') %>"
+              data-srcset="<%= image_source_set('homepage/customized/current/banner-purse-04') %>"
+              alt="<%= Spree.t('homepage.purses')%>" />
+
+            <div class="homepage-taxon-box-text text-capitalize" role="img" aria-label="<%= Spree.t('homepage.sportswear') %>">
+              <h3><%= Spree.t('homepage.purses') %></h3>
+            </div>
+          <% end %>
+
+        </div>
+
+        <div class="col-6 d-flex flex-column">
+
+          <%= link_to spree.nested_taxons_path('categories/mens-fashion', utm_source: 'home', utm_medium: 'banner', utm_term: 'mens-fashion'), class: "homepage-taxon-box zoom-hover flex-grow-1" do %>
+            <img class="w-100 lazyload"
+              data-src="<%= asset_path('homepage/customized/current/banner-men-tall-02.jpg') %>"
+              data-srcset="<%= image_source_set('homepage/customized/current/banner-men-tall-02') %>"
+              alt="<%= Spree.t('homepage.men')%>" />
+
+              <div class="homepage-taxon-box-text text-capitalize">
+                <h3><%= Spree.t('homepage.men') %></h3>
+              </div>
+          <% end %>
+        </div>
+      </div> -->
+      <!--  <div class="row">
+          <div class="col-12 col-lg-6">
+            <%= link_to spree.nested_taxons_path('categories/kids-fashion') do %>
+              <div class="homepage-bottom-box zoom-hover text-center mb-3">
+                <img class="w-100 lazyload"
+                  data-src="<%= asset_path('homepage/customized/promo_banner_left.jpg') %>"
+                  data-srcset="<%= image_source_set('homepage/customized/promo_banner_left') %>"
+                  alt="<%= Spree.t('homepage.childrens_clothes')%>" />
+
+                <div class="homepage-bottom-box-inner" role="img" aria-label="<%= Spree.t('homepage.childrens_clothes') %>">
+                  <div class="homepage-bottom-box-inner-small-text">
+                  </div>
+                  <div class="homepage-bottom-box-inner-big-text">
+                    <%= Spree.t('homepage.childrens_clothes') %>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+
+          <div class="col-12 col-lg-6">
+            <%= link_to spree.nested_taxons_path('categories/womens-clothing/activewear') do %>
+              <div class="homepage-bottom-box zoom-hover text-center mb-3">
+                <img class="w-100 lazyload"
+                  data-src="<%= asset_path('homepage/customized/promo_banner_right.jpg') %>"
+                  data-srcset="<%= image_source_set('homepage/customized/promo_banner_right') %>"
+                  alt="<%= Spree.t('homepage.top_rated')%>" />
+
+                <div class="homepage-bottom-box-inner">
+                  <div class="homepage-bottom-box-inner-small-text">
+                    <%= Spree.t('homepage.top_rated') %>
+                  </div>
+                  <div class="homepage-bottom-box-inner-big-text">
+                    <%= Spree.t('homepage.athelsure') %>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+      </div>-->
+    </div>
+  </div>
+</div>

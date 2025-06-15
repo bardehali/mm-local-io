@@ -1,0 +1,85 @@
+:ruby
+  order = @order # local to stay consistent
+  critical_response = @critical_response || request.path.starts_with?('/admin/critical_response')
+  order_in_list_locals = critical_response ?
+    { order: order, image_link_content: :product, show_actions_in_order_info: false } :
+    { order: order, show_full_info: true, image_link_content: :thumbnail }
+.seller-order-info
+  = Spree.t('admin.sellers.sale') + " - #{truncate(@order.line_items.first.product.name, length: 60)} - #{@order.number}"
+
+= render partial:'spree/admin/orders/assets_inline'
+- content_for :head do
+  :css
+    .orders-table > div:first-child { border-top: 0; }
+    .payment-instructions {
+      background-color: #B2D765; /* Light green background */
+      padding: 1em;             /* Padding inside the box */
+      margin-bottom: 1em;       /* Margin below the box */
+      border-radius: 8px;       /* Rounded corners */
+      width: 100%;              /* Full width */
+      box-sizing: border-box;   /* Include padding in the width calculation */
+    }
+- if critical_response
+  %br/
+  %br/
+  %br/
+
+.orders-table
+  = render partial:'spree/admin/orders/order_in_list_simplified', locals: order_in_list_locals
+
+.payment-instructions.mt-5
+  .text-bold
+    = t('store.seller_instructions_title')
+  = payment_method_instruction(order, order.payments.first&.payment_method).to_s
+  %a.edit-link{ href: "/admin/store_payment_methods" } Edit
+
+- if (last_message = order.messages.last) && order.messages.count > 1
+  - content_for :response_form do
+    = form_tag(order_create_message_path(id: order.number, order_id: order.number), method: :post) do
+      = hidden_field_tag(:type, 'order_message')
+      = hidden_field_tag(:parent_message_id, last_message.id)
+      = hidden_field_tag(:critical_response, true) if critical_response
+      - placeholder = (spree_current_user.id == order.seller_user_id) ? t('message.you_must_respond_to', { name: t('user.buyer').downcase } ) : t('message.please_explain')
+      = text_area_tag :comment, '', class:'w-100', style:'height: 10rem;', placeholder: placeholder, required: true
+      .text-center
+        %br/
+        = submit_tag(t('form.submit'), class:'btn btn-success min-w-75', style:'min-width: 75%;', data:{ disable_with:'Sending' } )
+  .container.mt-5
+    - if spree_current_user&.admin?
+    - elsif order.claimed_broken_tracking?
+      .row
+        .col-1.col-md-2
+        .col-8.col-md-5.text-right
+          %button(class='btn btn-alert text-uppercase mb-2' data-toggle='modal' data-target="#order_add_tracking_#{order.id}")= t('order.enter_correct_tracking')
+          %br/
+          %a(href="" data-toggle='modal' data-target="#order_response_modal_#{order.id}")
+            %strong= t('message.or_respond_to_buyer')
+      = render partial:'spree/admin/shared/modal', locals:{ target:"order_add_tracking_#{order.id}", show_footer: false, partial:'spree/admin/orders/add_tracking_number', partial_locals:{ order: order, add_or_correct:'correct' } }
+    - elsif order.requested_tracking?
+      .row
+        .col-1.col-md-2
+        .col-8.col-md-5.text-right
+          %button(class='btn bg-dark-warning' data-toggle='modal' data-target="#order_bottom_add_tracking_#{order.id}")= t('order.add_tracking_number')
+          %br/
+          %a(href="" data-toggle='modal' data-target="#order_response_modal_#{order.id}")
+            %strong= t('message.or_respond_to_buyer')
+        = render partial:'spree/admin/shared/modal', locals:{ target:"order_bottom_add_tracking_#{order.id}", show_footer: false, partial:'spree/admin/orders/add_tracking_number', partial_locals:{ order: order, add_or_correct:'add' } }
+    - else
+      .row
+        .col-3.col-md-2
+        .col-9.col-md-7
+          = yield :response_form
+  = render partial:'spree/admin/shared/modal', locals:{ target:"order_response_modal_#{order.id}", show_footer: false, content:(yield :response_form), header_title: t('order.respond_to_buyer') }
+
+  %br/
+  %br/
+
+%h4.text-bold{style: "margin-top: 5em;"}= t('seller.sell_other_items_like_this')
+- @similar_missed_sales.first(3).each do |line_item|
+  = render partial: 'missed_sale_order_in_list', locals: { order: line_item.order, show_full_info: false, inline: true, has_warning: false, image_link_content: :product, specific_user_id: @user&.id }
+
+
+- if critical_response
+  %br/
+  %br/
+  %br/

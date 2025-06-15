@@ -1,0 +1,89 @@
+<nav class="mt-5">
+  <% if Spree.user_class && can?(:admin, Spree.user_class) %>
+    <ul class="nav nav-sidebar text-bold" id="sidebarUser">
+      <%= main_menu_tree Spree.t(:users), icon: "user", sub_menu: "user", url: "#sidebar-user" %>
+    </ul>
+  <% end %>
+
+  <% if can?(:index, Spree::Order)
+    cur_order_stats = order_stats
+    all_count_s = cur_order_stats['sales'].to_i > 0 ? " (#{cur_order_stats['sales']})" : ''
+  -%>
+    <ul class="nav nav-sidebar text-bold" id="sidebarOrder">
+      <%= main_menu_tree t('spree.admin.sellers.sales') + all_count_s, icon: 'shopping-cart', sub_menu: 'sales', url:'#sidebar-order' %>
+    </ul>
+  <% end %>
+
+  <% if can? :admin, Spree::Product %>
+    <ul class="nav nav-sidebar text-bold" id="sidebarProduct">
+      <%= main_menu_tree Spree.t(:products), icon: "th-large", sub_menu: "product", url: "#sidebar-product" %>
+    </ul>
+  <% end %>
+
+  <% if can? :adopt, Spree::Product %>
+    <ul class="nav nav-sidebar text-bold" id="sidebarAdoptProduct">
+      <%= tab *Spree::BackendConfiguration::ADOPTION_TABS, label: t('spree.admin.tools.product_adoption'), match_path: '/wanted_products', icon: 'file'  %>
+    </ul>
+  <% end %>
+
+  <% if Spree.user_class && can?(:admin, Retail::SiteCategory) %>
+    <ul class="nav nav-sidebar text-bold" id="sidebarSiteCategory">
+      <%= tab *Spree::BackendConfiguration::RETAIL_TABS, url: Rails.application.routes.url_helpers.retail_site_categories_path, icon: 'th-list' %>
+    </ul>
+  <% end %>
+
+  <% if Spree.user_class && can?(:admin, Scraper::Page) %>
+    <ul class="nav nav-sidebar text-bold" id="sidebarScraper">
+      <%= main_menu_tree t('scraper.scraper'), icon: "import", sub_menu: "scraper", url: "#sidebar-scraper" %>
+    </ul>
+  <% end %>
+
+  <% if can?(:admin, Spree::ReturnAuthorization) || can?(:admin, Spree::CustomerReturn) %>
+    <ul class="nav nav-sidebar text-bold" id="sidebarReturn">
+      <%= main_menu_tree Spree.t(:returns), icon: "transfer", sub_menu: "returns", url: "#sidebar-returns" %>
+    </ul>
+  <% end %>
+
+  <% if can? :admin, Spree::Admin::ReportsController %>
+    <ul class="nav nav-sidebar text-bold" id="sidebarReport">
+      <%= tab *Spree::BackendConfiguration::REPORT_TABS, icon: 'file'  %>
+    </ul>
+  <% end %>
+
+  <% if can? :admin, Spree::Promotion %>
+    <ul class="nav nav-sidebar text-bold" id="sidebarPromotion">
+      <%= main_menu_tree Spree.t(:promotions), icon: "gift", sub_menu: "promotion", url: "#sidebar-promotions" %>
+    </ul>
+  <% end %>
+
+  <%
+  begin
+    # controller outside of Spree::Admin::BaseController can fail to get routes from outside gem like spree_reviews
+    if can? :admin, current_store -%>
+    <ul class="nav nav-sidebar text-bold" id="sidebarConfiguration">
+      <%= main_menu_tree Spree.t(:configurations), icon: "wrench", sub_menu: "configuration", url: "#sidebar-configuration" %>
+    </ul>
+  <% elsif spree_current_user&.seller? -%>
+    <ul class="nav nav-sidebar text-bold" id="sidebarSellerSettings">
+      <%= tab [:payments], url: spree.admin_store_payment_methods_path, label: t('spree.payment_methods'), icon: 'credit-card' %>
+    </ul>
+  <% end
+  rescue Exception => config_menu_e -%>
+    <ul class='nav nav-siebar text-bold'>
+      <li class='sidebar-menu-item d-block w-100 position-relative'>
+        <a class='w-100 p-3 d-flex align-items-center icon-link with-tip action-file'>
+          <span class='icon icon-warning-sign mr-2'></span>
+          <span class='text'>Configuration</span>
+        </a>
+      </li>
+    </ul>
+  <% end
+  -%>
+  <% if (can? :adopt, Spree::Product) && !spree_current_user&.admin? %>
+    <ul class="nav nav-sidebar mt-3 pl-3 pr-3 mt-5 text-bold visual-categories-container" id="sidebarAdoptProductCategories" style="overflow: hidden;">
+      <%=t('spree.admin.tools.sell_more_like')%>
+      <%= render partial: 'spree/admin/shared/adoption_categories_menu' %>
+    </ul>
+  <% end %>
+</nav>
+<div class='mb-5'>&nbsp;</div>

@@ -1,0 +1,45 @@
+<div style="text-align: center; width: 100%; background-color: #f1f1f1;">
+  <div style="display: none; font-size: 1px;max-height: 0; max-width: 0; opacity: 0; overflow: hidden; mso-hide: all; font-family: sans-serif;">
+    &zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;
+  </div>
+  <div style="max-width: 600px; margin: 0 auto;" class="email-container">
+    <!-- BEGIN BODY -->
+    <table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: auto;">
+      <tr>
+        <td valign="top" class="bg_white" style="padding: .5em 2.5em 1em 2.5em;">
+          <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+            <tr>
+              <td class="logoimage">
+                <a href="<%= @url.to_s.html_safe -%>"><img src="<%= URI.join(@host, asset_path('logo/iOffer_logo_color.png') ) -%>" alt="" style="width: 100%; max-width: 600px; height: auto; display: block;"></a>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr><!-- end tr -->
+      <tr>
+        <td valign="top" class="bg_white" style="padding: 0;">
+          <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+            <tr>
+            </tr>
+          </table>
+        </td>
+      </tr><!-- end tr -->
+      <tr>
+        <td valign="middle" class="hero bg_white" style="background-image: url(<%= URI.join(@host, asset_path('email/email-woman-shopping.jpg') ) -%>); background-size: cover; height: 250px;">
+        </td>
+      </tr><!-- end tr -->
+      <tr>
+        <td class="bg_white email-section">
+          <div class="heading-section" style="text-align: center; padding: 0 30px;">
+            <h2>Greetings <%= @user.username -%>, start filling your store up now!</h2>
+            <h3>Transfer your ratings and items to get a jumpstart.</h3>
+          </div>
+          <br/>
+          <a href="<%= @url.to_s.html_safe -%>" class="btn btn-primary btn-center">Login and Get Started</a>
+          <br/>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <img src="https://ssl.google-analytics.com/collect?v=1&t=event&ec=email&ea=open&t=event&tid=UA-166264208-1&z=1590071342&cid=bef30d4b-d02c-16d0-80e1-0687eaac9fd4&dt=seller-onboarding&dp=/email/seller-onboarding">
+</div>

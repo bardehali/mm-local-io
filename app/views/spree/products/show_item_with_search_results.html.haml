@@ -1,0 +1,56 @@
+:ruby
+  # With basic parts of show.html.erb without debug or list same item
+  @body_id = 'product-details'
+  should_cache = params[:skip_cache].nil? && !debugging? && Time.now < Time.local(2022,4,15)
+  ip_country = Rails.env.development? ? '127.0.0.1' : find_country
+  show_cart_form_variants_to_guest = true
+
+
+%div(class="container pl-3 pr-3 product-details")
+  .pb-4
+    = spree_breadcrumbs(@taxon, '', @product)
+
+  .row(data-hook="product_show")
+    %div(class="col-12 col-md-7 col-lg-7" data-hook="product_left_part")
+      = render partial: 'gallery'
+
+    %div(class="col-12 col-md-5" data-hook="product_right_part")
+      - if can? :admin, @product
+        .text-right
+          = link_to('Item Detail', product_path(@product), class:'btn btn-secondary' )
+        %br/
+      %div(id="product-description" data-hook="product_right_part_wrap")
+        %h1(class="mt-3 mt-md-0 text-center text-md-left product-details-title")
+          = @product.name
+        - if spree_current_user || show_cart_form_variants_to_guest || !params[:show_cart_form].nil? ####################
+          %div(id="cart-form" data-hook="cart_form")
+            - cache_if should_cache, "product.#{@product.id}.cart_form#{'.for_others' unless @product.user_id==spree_current_user&.id}", skip_digest: true do
+              = render 'cart_form', variant_change_identifier: 'productCarousel'
+        - else
+          = render 'spree/shared/rating', product: @product, review: 0, shortened: true
+          %div(id="product-price" class="mb-2 text-center text-md-left add-to-cart-form-price" data-hook="product_price")
+            %span(class="price selling" content="<%= display_variant_or_master_price(@product.best_price_record) %>")
+              = t('product.from')
+              = display_variant_or_master_price(@product.best_price_record)
+              %span(content="#{current_currency}")
+          %a(href="#{ signup_path(return_to: request.url) }")
+            - if !spree_current_user&.seller?
+              = button_tag class: 'btn btn-primary w-100 text-uppercase font-weight-bold add-to-cart-button', id: '', type: :submit do
+                = Spree.t(:add_to_cart)
+          - if !spree_current_user&.seller? && ['united states', 'united states of america'].exclude?(ip_country&.downcase)
+            = image_tag(asset_path('payment_methods/secured_payments.png'), class:'product-detail-secure-payments mt-2', title: '')
+
+
+  = render partial: 'gallery_modal'
+
+  - if @products.present?
+    .row
+      .col-md-12.col-lg-9.p-3
+        %h5(class="pt-4 product-details-subtitle")
+        Other results for &quot;#{(@page_title || params[:item_id] ).try(:titleize)}&quot;
+    .row
+      .col-md-0.col-lg-1
+      = render partial:'spree/shared/products.html.haml', locals:{ products: @products, show_products_search_results_conditions: false }
+
+= render 'spree/shared/product_added_modal'
+%div(id="variant_added_wrapper")

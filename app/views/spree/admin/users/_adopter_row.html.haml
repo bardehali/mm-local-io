@@ -1,0 +1,69 @@
+:ruby
+  # CSS rules moved to app/assets/stylesheets/spree/record_reviews.css.scss for only 1 time load
+  # 
+  # Required locals:
+  #   variant [Spree::Variant]
+  #   either user [Spree::User] or variant [Spree::Variant] or order [Spree::Order]
+  # Optional locals:
+  #   show_admin_actions [Boolean]
+  #   
+  #   paypal [Spree::PaymentMethod] Paypal; if nil, would fetch locally
+  #   highlight_matched_words [String]
+
+  line_item = nil
+  paypal = Spree::PaymentMethod.paypal unless defined?(paypal) && paypal
+  variant_or_adoption = nil
+  if defined?(variant_adoption) && variant_adoption.is_a?(Spree::VariantAdoption)
+    user = variant_adoption.user unless defined?(user) && user.is_a?(Spree::User)
+    variant_or_adoption = variant_adoption
+  elsif defined?(variant) && variant.is_a?(Spree::Variant)
+    user = variant.user unless defined?(user) && user.is_a?(Spree::User)
+    variant_or_adoption = variant
+  end
+  if defined?(order) && order.is_a?(Spree::Order)
+    user = order.seller
+    line_item = order.line_item_of_product(variant.product_id)
+    variant_or_adoption = line_item ? (line_item.variant_adoption || line_item.variant) : nil
+  end
+  paypal_store_pm = user.store ? user.store.store_payment_methods.where(payment_method_id: paypal.id).last : nil
+  paypal_account_id = paypal_store_pm&.account_id_in_parameters
+
+  is_bad_seller = ( user.seller_rank.to_i < 0)
+  @has_hidden_seller_rows = true if is_bad_seller
+  highlight_matched_words = '' unless defined?(highlight_matched_words) && highlight_matched_words
+  other_hl_args = [ highlight_matched_words, { prefix:"<span class='text-highlight'>", postfix:'</span>'} ]
+
+%div(class="seller-row w-100 row #{'bad-seller-row ' if is_bad_seller}#{user.has_role_of_name?('hp_seller') ? 'border-highlight' : 'border-top'} pb-2 pt-1 shadow" data-user-id="#{user.id}") 
+  %div(class="col-12 col-md-6")
+    = country_flag_icon_of(user, { class:'mini-icon' })
+    &nbsp;
+    - if user.username.present?
+      = link_to user.username, spree.edit_admin_user_path(user), title:'username'
+      &nbsp;
+    - modded_email = highlight_keywords user.email, *other_hl_args
+    = link_to modded_email, spree.edit_admin_user_path(user), title:'email'
+    &nbsp
+    - if user.spree_roles.size > 0
+      - user.spree_roles.each_with_index do|role, role_index|
+        %strong.text-small.ml-1(title="#{role.name}")= role.name.gsub(/(_seller|_user)\Z/i, '').titleize + (role_index == user.spree_roles.size - 1 ? ':' : '')
+    %span.text-small(title='Seller Rank')= user.seller_rank
+    %br/
+    = render partial: 'spree/admin/users/payment_service_complaint_info', locals:{ user: user, highlight_matched_words: highlight_matched_words, paypal: paypal }
+  %div(class="col-12 col-md-6 small-border-top text-small")
+    %strong Last Active:
+    &nbsp;
+    - if user.last_active_at
+      %label(title="#{user.last_active_at.to_mid_s}")= pluralize(user.last_active_at.relatively_days_ago, 'Day')
+      &nbsp;
+    - if variant_or_adoption
+      - relative_time = defined?(order) && order.is_a?(Spree::Order) ? order.completed_at : nil
+      - relative_time ||= variant_or_adoption.created_at
+      %span.float-right
+        %h4.font-weight-bold= '$%.2f' % [variant_or_adoption.price.to_f]
+        %span.text-right(title="#{relative_time.to_mid_s}")= distance_of_time_in_shorts(relative_time).titleize + ' Ago'
+  %div(class="col-12 col-md-6 small-border-top mt-2 text-right")
+  - if paypal_store_pm&.instruction.present?
+    %div(class="col-12 mt-2 text-small text-secondary")
+      = highlight_keywords paypal_store_pm&.instruction, *other_hl_args
+.medium-d-none
+  %br/

@@ -1,0 +1,50 @@
+- if debugging?
+  :ruby
+    ##
+    # Would look for setting of @search_query
+    fields = nil
+    if @search_query.present?
+      if params[:text_fields].present?
+        fields = params[:text_fields]
+      elsif @search_query.is_a?(::Elasticsearch::Model::Response::Response)
+        fields = Hash.find_value_in('fields', @search_query.search.definition)
+      elsif @search_query.is_a?(Hash)
+        fields = Hash.find_value_in('fields', @search_query)
+      end
+      fields ||= %w(name) + Spree::OptionType.where(searchable_text:true).collect(&:presentation) + [Spree::CategoryTaxon.root.name]
+    end
+  .col-sm-12
+    - if @search_query
+      %h5(style="color: #666666;")
+        %strong Query:
+        = @search_query
+      %h6(style="color: navy;")
+        %strong Available fields:
+        _id user_id name description brand option_values predicate_text other_text view_count transaction_count iqs price best_price created_at taxon_ids option_type_ids option_value_ids _score
+    = form_tag products_path, method:'get' do
+      %label
+        %strong Keywords
+        = text_field_tag(:keywords, h(params[:keywords]), placeholder:'Query', style:'width: 30rem;' )
+      %label
+        %strong Query Type:
+        = select_tag(:query_type, options_for_select([ ['dis_max', 'dis_max'], ['multi_match', 'multi_match'] ], params[:query_type] ) )
+      %label
+        %strong Fields
+        = text_field_tag(:text_fields, params[:text_fields], placeholder:'Text matching fields', title:'Field names separated by space', style:'width: 30rem;')
+      %span.text-info= 'field w/ "option_values^1.5" would boost matching score'
+      %br/
+      %label
+        %strong Sort Orders:
+        = text_field_tag(:sort, params[:sort], placeholder:'Sort Orders', style:'width: 30rem;')
+        %span.text-info= "Wrapped w/ [ ] like: [ {'_score': {order:'desc'}}, { '_id':{order:'desc'}} ]"
+      %br/
+      %label
+        %strong Score:
+        = text_field_tag(:script_score_source, params[:script_score_source], placeholder:'Score function', style:'width: 40rem;')
+      %button(type='submit') Search Again
+    = form_tag products_path, method:'get' do
+      %label
+        %strong Search Override:
+        = text_field_tag(:search_override, params[:search_override], placeholder:'ElasticSearch Json', style:'width: 40rem;')
+      %button(type='submit') ES Search
+    %br/

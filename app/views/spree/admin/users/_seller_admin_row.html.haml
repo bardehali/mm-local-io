@@ -1,0 +1,97 @@
+:ruby
+  # CSS rules moved to app/assets/stylesheets/spree/record_reviews.css.scss for only 1 time load
+  #
+  # Required locals:
+  #   either user [Spree::User] or variant [Spree::Variant]
+  # Optional locals:
+  #   show_admin_actions [Boolean]
+  #   paypal [Spree::PaymentMethod] Paypal; if nil, would fetch locally
+  show_admin_actions = true unless defined?(show_admin_actions)
+  paypal = Spree::PaymentMethod.paypal unless defined?(paypal) && paypal
+  if defined?(variant) && variant.is_a?(Spree::Variant)
+    user = variant.user
+    user.variant = variant
+  end
+  paypal_spm = user.store&.paypal_store_payment_method
+  paypal_account_id = paypal_spm&.account_id_in_parameters
+  paypal_store_pm = user.store ? user.store.store_payment_methods.find{|spm| spm.payment_method_id == paypal.id } : nil
+  is_bad_seller = ( (user.variant_adoption || user.variant)&.seller_based_sort_rank == 0)
+  @has_hidden_seller_rows = true if is_bad_seller
+%div(class="seller-row row #{'bad-seller-row ' if is_bad_seller}#{user.has_role_of_name?('hp_seller') ? 'border-highlight' : 'border-top'} pb-1 pt-1" data-user-id="#{user.id}")
+  %div(class="col-#{show_admin_actions ? '9 col-md-10' : '12'}")
+    .row
+      .col-2.col-xs-auto
+        %div.img-container
+          = country_flag_icon_of(user, { class:'' }) do
+            - if paypal_store_pm
+              = image_tag(asset_path('payment_methods/mini_avatar/paypal.svg'), class:'mini-avatar overlay-img white-bg', title:'Paypal')
+      .col.col-6.col-xs-auto
+        %div
+          %label.text-secondary Email &nbsp;
+          = link_to user.email, admin_users_path(q:{ email_eq: user.email.strip}), class:'mr-3'
+          = link_to main_app.new_user_message_path(user_message:{ recipient_user_id: user.id }, title:'Send Message to') do
+            %i(class="mr-2 icon icon-comment")
+        %div
+          %label.text-secondary PayPal &nbsp;
+          - if paypal_spm
+            = link_to paypal_account_id, admin_all_sellers_path(q:{ payment_method_id_eq: paypal_spm.payment_method_id, store_store_payment_methods_account_parameters_cont: paypal_account_id })
+          - else
+            = paypal_account_id
+          %span(class='ml-3 mr-3') &nbsp;
+        - if paypal_store_pm && paypal_store_pm.instruction.present?
+          %div
+            - if true # show_admin_actions # even product detail page wants to edit
+              = form_for([:admin, paypal_store_pm], remote: true ) do|store_pm_form|
+                = store_pm_form.text_area :instruction, class:'border-1 min-w-75 min-h-100 editable-field', disabled: true
+                &nbsp;&nbsp;
+                = link_to "##{paypal_store_pm.id}", class:'editable-edit' do
+                  %small Edit
+                = link_to "##{paypal_store_pm.id}", class:'editable-cancel-edit d-none', data:{ 'store-payment-method-id' => store_pm_form.object.id } do
+                  %span(class='icon icon-remove')
+                = store_pm_form.button type:'submit', class:'editable-update d-none border-0 bg-transparent' do
+                  %span(class='icon icon-floppy-disk')
+            - else
+              = paypal_store_pm.instruction
+      .col.col-xs-auto.text-right
+        %div
+          %span(title="ID #{ user.id } seller_rank #{user.seller_rank}#{ ' From iOffer' if user.ioffer_user }" data-toggle='tooltip')= link_to(user.real_username || '---', admin_user_path(user))
+          &nbsp;(
+          %span(class='' title='Positive' data-toggle='tooltip')= user.ioffer_user&.positive
+          = ' / '
+          %span(class='text-danger' title='Negative' data-toggle='tooltip')= user.ioffer_user&.negative
+          &nbsp;)
+          - seller_status_icons(user).each do|icon|
+            = icon.html_safe
+        .ml-1.mt-1
+          - months_of_reg = ((Time.now - user.created_at) / 1.month).round
+          &nbsp;
+          %span(class="absolute-right mr-3 one-quarter-opacity")
+            %i(data-feather="moon")
+          %strong.absolute-right.mr-3(title="Count of Months Registered")= months_of_reg
+        - if (vprices = (user.variant_adoption || user.variant)&.prices )
+          %br
+          %strong= display_price(user.variant_adoption || user.variant)
+    - prods = curated_products(user)
+    .row
+      .col-10.col-sm-8
+        - match_to_others_icons(user).each do|el|
+          = el.html_safe
+        %span.ml-1 &nbsp;
+        - if user.last_active_at
+          %span(title="Last active time: #{ user.last_active_at&.to_s(:db) }") Active #{time_ago_in_words(user.last_active_at) } ago
+        - else
+          %span.text-secondary(title='Inactive / No Login') ???
+        -# %strong(title='Current Sign In IP')= user.current_sign_in_ip ? link_to(user.current_sign_in_ip, admin_users_path(q:{ current_sign_in_ip_eq: user.current_sign_in_ip })) : ''
+        .seller-products.mt-2
+          - prods.each do |product|
+            = link_to product_path(product), target: '_blank' do
+              - image = default_image_for_product_or_variant(product)
+              = image_tag cdn_image_url(image, :product), class: 'image-style mr-1'
+
+          = link_to "#{user.count_of_products_created || user.products.count} Created", admin_products_path(q:{ user_id_eq: user.id })
+      .col-2.col-sm-4.text-right
+        = link_to "#{user.adopted_products_count} Adopted", admin_products_adopted_path(variant_adoptions_user_id_eq: user.id )
+  - if show_admin_actions
+    .col-3.col-md-2.text-right
+      = link_to_edit user, url: edit_admin_user_path(user), no_text: true if can?(:edit, user)
+      = link_to_delete user, url: admin_user_path(user), no_text: true if can?(:delete, user)

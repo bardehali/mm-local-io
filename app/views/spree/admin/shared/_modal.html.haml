@@ -1,0 +1,35 @@
+:ruby
+  ##
+  # Required locals: 
+  #   either content or partial [String] 
+  #     content: the HTML to print out
+  #     partial: path of the partial to render
+  # Opional locals:
+  #   partial_locals [Hash] those to pass into render partial: partial, locals: partial_locals
+  #   header_title [String]
+  #   show_footer [Boolean] default true
+  #   dialog_style [String] CSS to use for wrapping tag of dialog inside, not shady BG
+  header_title = '' unless defined?(header_title)
+  target = 'basic_modal' unless target.present?
+  content = '' unless defined?(content)
+  partial = nil unless defined?(partial)
+  partial_locals = {} unless defined?(partial_locals)
+  show_footer = true unless defined?(show_footer) && show_footer == false
+  dialog_style = '' unless defined?(dialog_style)
+.modal(tabindex="-1" role="dialog" id="#{target}" aria-labelledby="#{target}")
+  .modal-dialog(role="document" style="#{dialog_style}")
+    .modal-content
+      .modal-header
+        %h5(class="modal-title")=header_title
+        %button(type="button" class="close" data-dismiss="modal" aria-label="Close")
+          %span(aria-hidden="true")
+            &times;
+      .modal-body
+        - if content.present? # && content =~ /^\s*</
+          =content.html_safe
+        - if partial && partial.present?
+          = render partial: partial, locals: partial_locals
+      - if show_footer
+        .modal-footer
+          %button(type="button" class="btn btn-secondary" data-dismiss="modal")Close
+          -#%button(type="button" class="btn btn-primary")Save changes

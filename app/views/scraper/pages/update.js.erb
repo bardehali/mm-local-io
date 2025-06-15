@@ -1,0 +1,30 @@
+var col = $("#page_row_<%= resource.id -%> td:last-child");
+$("#page_row_<%= resource.id -%>").attr('data-file-status', '<%= resource.file_status -%>');
+<%
+if resource.file_path.present? -%>
+	col.html("<%= escape_javascript(link_to(' ', scraper_page_show_product_path(id: resource.id), remote:true, method:'get', class:'fa fa-check', 'data-toggle'=>'tooltip', title:'Product from parsing') ) -%>");
+<% elsif resource.file_status == 'PAGE_NOT_FOUND' -%>
+	col.html("<i class='fa fa-times'/>");
+	window.setTimeout(function(){ $("#page_row_<%= resource.id -%>").fadeOut(); }, 1500 );
+<%
+ else -%>
+	col.html("<%= escape_javascript(link_to(' ', scraper_page_path(resource), remote:true, method:'put', title:'Fetch the page', class:'fa fa-download text-info').html_safe ) -%>");
+<% end -%>
+<% 
+if params[:update_product_container].present?
+	if resource.spree_products.present? -%>
+		$("<%= params[:update_product_container] %>").html("<div class='d-flex justify-content-center' style='margin: 0; background-color:#eeeeee; height:50%; padding: 10%;'><div class='spinner-border' role='status'><span class='sr-only'>Reparsing ...</span></div></div>");
+		<%
+		resource.spree_products.each do|product| -%>
+			$("<%= params[:update_product_container] %>").append("<%= escape_javascript(render(partial:'retail/products/card', locals:{ product: product } )) %>");
+<%
+		end # resource.spree_products.each 
+	elsif @exception -%>
+		alert("Error: <%= @exception.message -%> ");
+		$("<%= params[:update_product_container] %>").html("<div class='d-flex justify-content-center' style='margin: 0; background-color:#eeeeee; height:50%; padding: 10%;'><div class='spinner-border' role='status'><span class='sr-only'>Reparsing ...</span></div></div>");
+		$("<%= params[:update_product_container] %>").html("<code><%= @exception.message -%></code>");
+<% end -%>
+<% end # update_product_container -%>
+<% if params[:update_links_container].present? -%>
+	$("<%= params[:update_links_container] %>").html("<%= escape_javascript(render(partial:'scraper/pages/links_from_mechanize_page', locals:{ scraper: resource.scraper, mechanize_page: resource.make_mechanize_page } )) %>");
+<% end -%>

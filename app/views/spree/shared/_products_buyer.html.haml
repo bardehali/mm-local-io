@@ -1,0 +1,208 @@
+:ruby
+  # Required locals:
+  #   products
+  # Optional locals:
+  #   show_pagination [Boolean] default false
+  #   thumbnail_type [String] either 'zoomable' or 'simple' passed onto product_card
+  #   specific_seller [Spree::User] render product_card differently according this user, probably being searched
+  show_products_search_results_conditions = true unless defined?(show_products_search_results_conditions) && show_products_search_results_conditions == false
+  show_pagination = true unless defined?(show_pagination) && show_pagination == false
+  highlight_matched_words = ( params[:keywords] || '')
+  is_admin = spree_current_user&.admin?
+  thumbnail_type = 'zoomable' unless defined?(thumbnail_type) && thumbnail_type.present?
+  specific_seller = nil unless defined?(specific_seller)
+  is_related = false unless defined?(is_related) && is_related == true
+
+- content_for :head do
+  - if products.respond_to?(:total_pages)
+    = rel_next_prev_link_tags products
+
+:css
+  .custom-card-buyer {
+    /*box-shadow: 0 0px 5px 1px rgba(0, 0, 0, 0.05)*/
+    background-color: #ffffff;
+    height: 150px;
+    overflow: hidden;
+    border-width: 0px;
+  }
+  .custom-card-buyer-footer {
+    border-width:0px;
+    background-color: #FFFFFF
+    font-size: 1.1em;
+    text-align: left;
+    padding-left: 0px;
+    padding-top: 0px;
+  }
+  .p-image-container-buyer {
+    height: 280px;
+    width: 100%;
+    position: relative;
+    text-align:center;
+    overflow: hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius: 18px;
+    background-color: #f2f2f2;
+  }
+  .p-image-container-buyer img {
+    mix-blend-mode: multiply;
+    width: 100%; /* Makes the image span the full width */
+    /* height: 100%;  Makes the image span the full height */
+    object-fit: cover;  Ensures the image covers the container without distortion
+  }
+  .price-pill {
+    bottom: 8px;
+    right: 8px;
+    background: rgba(0, 0, 0, 0.75);
+    /*background: #5D5E5F;*/
+    padding: 4px 10px;
+    border-radius: 50px;
+    text-align: center;
+    color: #FFF;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .price-pill .price {
+    font-weight: medium;
+  }
+  @media only screen and (max-width: 320px){
+    .taxon-title {
+      font-size: 24px;
+    }
+    .p-image-container-buyer {
+      height: 160px;
+    }
+    .price-pill {
+      bottom: 6px;
+      right: 6px;
+      padding: 4px 8px;
+      border-radius: 32px;
+      font-size: 10px;
+      font-weight: 400;
+    }
+  }
+  @media only screen and (min-width: 321px) and (max-width: 375px){
+    .p-image-container-buyer {
+      height: 180px;
+    }
+  }
+  @media only screen and (min-width: 376px) and (max-width: 430px){
+    .p-image-container-buyer {
+      height: 190px;
+    }
+    .taxon-title {
+      font-size: 28px;
+    }
+    .price-pill {
+      bottom: 6px;
+      right: 6px;
+      background: rgba(0, 0, 0, 0.75);
+      padding: 4px 8px;
+      border-radius: 40px;
+      font-size: 12px;
+      font-weight: 400;
+    }
+  }
+  @media only screen and (min-device-width: 431px) and (max-device-width: 575px){
+    .taxon-title {
+      font-size: 28px;
+    }
+    .p-image-container-buyer {
+      height: 220px;
+    }
+  }
+  .info-buyer {
+    line-clamp: 1;
+    max-lines: 1;
+    -webkit-line-clamp: 1;
+    font-size: 12px;
+    height: 22px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    text-decoration: none;
+    color: black;
+  }
+
+  @media only screen and (min-width: 576px){
+    .selling-buyer {
+      font-size: 14px;
+    }
+    .info-buyer {
+      font-size: 16px;
+      height: 46px;
+    }
+  }
+  .p-image-container-buyer img.square-image {
+    /* padding: 10px;  Use relative units if necessary */
+  }
+
+
+%div(data-hook="homepage_products" class="col-12")
+  - if show_products_search_results_conditions
+    .row(data-hook="products_search_results_conditions")
+      - if spree_current_user&.full_seller? || spree_current_user&.approved_seller? ##Seller banner
+        .seller-item-banner= t('seller.find_these_items')
+      - if products.empty?
+        .col-sm-12
+          %div(data-hook="products_search_results_heading_no_results_found")
+            = t('spree.no_products_found')
+      - elsif params.key?(:keywords) || spree_current_user.try(:admin?)
+        .col-sm-12(:keywords)
+          %div(data-hook="products_search_results_heading_results_found")
+            %h6.mt-3.search-results-title #{ spree_current_user.try(:admin?) ? (products.respond_to?(:total_count) ? "#{products.total_count} " : '') : ''}#{ t('spree.search_results', keywords: h(params[:keywords] ) ) }
+      -#= render partial: 'spree/shared/products_search_conditions'
+  .row(id="products_search_results" data-hook="products_search_results_heading")
+    - if params[:display_mode] == 'list'
+      %table.table.sortable
+        %thead
+          %th
+          %th Name
+          %th Hit
+          %th Curation Score
+          %th GMS
+          %th
+            %span(title='Transaction Count') Txn Count
+          %th View Count
+        %tbody
+          - if products.respond_to?(:map_with_hit)
+            - products.map_with_hit do |product, hit|
+              %tr
+                %td
+                  %i.fa.fa-grip-vertical &nbsp;
+                %td #{product.name}
+          - else
+            - products.each do |product|
+              %tr
+                %td
+                  %i.fa.fa-grip-vertical &nbsp;
+                %td #{product.name}
+    - else # card code
+      -# cache_if !spree_current_user.try(:admin?), cache_key_from_filters, expires_in: 6.hours do
+      - if products.respond_to?(:map_with_hit)
+        - index = 0
+        - products.map_with_hit do |product, hit|
+          = render partial: 'spree/shared/product_card_buyer', locals:{ product: product, index: index, is_related: is_related }
+          - index += 1
+      - else
+        - products.each do |product|
+          = render partial: 'spree/shared/product_card_buyer', locals:{ product: product, is_related: is_related  }
+  .text-center.pt-1.mb-4
+    - if show_pagination && products.respond_to?(:total_pages)
+      - unless is_admin
+        - params.delete(:script_score_source)
+        - params.delete(:sort)
+        - params.delete(:text_fields)
+        - params.delete(:search_override)
+        - params.delete(:query_type)
+      %div(class="row pl-md-4 pl-sm-4")
+        .col-12
+          %div(class="plp-pagination d-none d-lg-flex")
+            = paginate products, window: 4, theme: 'twitter-bootstrap-4', param_name: 'page', params: request.query_parameters.merge(only_path: true, url: m_products_path)
+
+          %div(class="plp-pagination d-lg-none")
+            = paginate products, window: 2, theme: 'twitter-bootstrap-4', param_name: 'page', params: request.query_parameters.merge(only_path: true, url: m_products_path)
+
+
+- reset_cycle('classes')

@@ -1,0 +1,32 @@
+default: &default
+  host: 'http://elasticsearch:9200/' #{ ENV.fetch('ELASTIC_SEARCH_URL'){ 'http://elasticsearch:9200/' } }
+  transport_options:
+    request:
+      timeout: 300
+development:
+  <<: *default
+test:
+  <<: *default
+staging:
+  host: 'https://136.244.97.33:9200'
+  transport_options:
+    request:
+      timeout: 300
+    ssl: {
+      ca_file: '/var/www/certs/ca.crt',
+      verify: true
+    }
+  user: elastic
+  password: 05nvs3FXmrDSt17RS3JjUhHm
+production:
+  host: 'https://136.244.97.33:9200'
+  transport_options:
+    request:
+      timeout: 300
+    ssl: {
+      ca_file: '/var/www/certs/ca.crt',
+      verify: true
+    }
+  user: elastic
+  password: 05nvs3FXmrDSt17RS3JjUhHm
+  #password: p6f2ued8cyTUsEYFLo1R

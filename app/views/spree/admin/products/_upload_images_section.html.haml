@@ -1,0 +1,77 @@
+:ruby
+  ##
+  # Required locals:
+  #   product [Spree::Product]
+  variants = product.variants_including_master_for_user(spree_current_user).includes(option_values: :option_type)
+  has_variants = variants.present?
+  variant_images = product.variant_images_for_user(spree_current_user)
+  images_sortable = !product.id.nil?
+
+- content_for :head do
+  :css
+    td.handle-col, th.handle-col { width: 5%; }
+    td.image { width: 5%; padding: 0.2em; }
+    td.variant { min-width: 20%; }
+    td.alt { width: 10%; }
+    td.actions { min-width: 25%; }
+
+    .paste-target {
+      border: solid 1px #aaa;
+      min-width: 50px;
+      min-height: 50px;
+      max-height: 200px;
+      margin-top: 1em;
+      margin-bottom: 1em;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: 300ms all;
+      position: relative;
+    }
+    .pasted-target {
+      min-height: 100px !important;
+      min-width: 100px !important;
+      width: auto !important;
+    }
+
+    .contain {
+      background-size: cover;
+      position: relative;
+      z-index: 10;
+      top: 0px;
+      left: 0px;
+    }
+    textarea {
+      background-color: white;
+    }
+
+    .paste-target-active {
+      border: solid 3px rgba(0,0,255,.4);
+      box-shadow: 0px 0px 10px 10px rgba(0,0,255,.4);
+    }
+
+  = javascript_include_tag asset_path('spree/backend/images/jquery.paste_image_reader.js')
+
+.heading
+  %h6.font-weight-bold=t('spree.admin.products.image_section_title')
+  %p=t('spree.admin.products.image_section_subtitle')
+%a(name='upload_images_table')
+%table(class="table #{'sortable' if images_sortable} scrollable" data-hook="images_table" data-sortable-link="#{update_positions_admin_product_images_url(product) if images_sortable }")
+  %thead
+    %tr(data-hook="images_header")
+      %th.handle-col
+      %th= Spree.t(:thumbnail)
+      - if has_variants
+        %th= Spree::Variant.model_name.human
+      %th(class="actions")
+  %tbody
+    = render partial:'spree/admin/images/image_row', collection: variant_images, as:'image', locals:{ variants: variants }
+    - if variant_images.size == 0
+      - 1.upto(3) do|new_image_index|
+        = render partial:'spree/admin/images/image_row', locals:{ image: Spree::Image.new, variants: variants, row_id: "new_product_image_row_#{new_image_index}" }
+    = render partial:'spree/admin/images/image_row', locals:{ image: Spree::Image.new, variants: variants, row_id:'new_product_image_row' }
+
+.text-right
+  %button(type='button' class='btn btn-secondary' onclick="addMoreProductImageRow()")= Spree.t(:new_image)
+.clearfix
+.mt-4
+  %br/

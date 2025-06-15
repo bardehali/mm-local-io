@@ -1,0 +1,40 @@
+:ruby
+  sign_in_logs = user.request_logs.on_sign_in.order('id desc')
+
+%div(data-hook="admin_user_general_info" class="card")
+  .card-header
+    %h1(class="cart-title mb-0 h5")= Spree.t(:activity_info)
+  .card-body
+    %table(class="table table-borderless")
+      %tbody
+        %tr
+          %th.text-right Last email:
+          %td= timestamp_with_slashes(user.last_email_at)
+        %tr
+          %th.text-right Visit from email:
+          %td= timestamp_with_slashes(user.request_logs.on_reset_password.last&.created_at)
+        %tr
+          %th.text-right Last Active:
+          %td(colspan='2')
+            - if user.last_active_at
+              = pluralize(user.last_active_at.relatively_days_ago, 'Day')
+        %tr
+          %th.text-right Last login:
+          %td(colspan='2')
+            - if user.current_sign_in_at
+              = timestamp_with_slashes(user.current_sign_in_at)
+        %tr
+          %td(colspan='3' class="text-monospace text-right")
+            - if sign_in_logs.present? && sign_in_logs.first.ip.present?
+              %span(class="text-primary")= sign_in_logs.first.ip 
+              %span(class="text-info")  in #{sign_in_logs.first.location_combined} 
+              %a(class="icon icon-chevron-down" data-toggle="collapse" href="#sign_in_request_logs" role="button" aria-expanded="false" aria-controls="sign_in_request_logs") &nbsp;
+            - elsif user.current_sign_in_ip
+              = link_to user.current_sign_in_ip, "https://whatismyipaddress.com/ip/#{user.current_sign_in_ip}", target:'_blank', title:'Check IP info'
+            
+        %tr(id="sign_in_request_logs" class="collapse")
+          %td(colspan='3')
+            = request_logs_list(sign_in_logs, 1)
+        %tr
+          %th.text-right Reset password request:
+          %td(colspan='2')= timestamp_with_slashes(user.reset_password_sent_at)

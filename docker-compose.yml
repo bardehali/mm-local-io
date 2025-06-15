@@ -1,0 +1,92 @@
+# docker-compose.yml
+version: '3.3'
+
+name: mm-local-io
+services:
+# mysql:
+#   image: mysql:latest
+#   platform: linux/amd64
+#   restart: unless-stopped
+#   ports:
+#     - 3306:3306
+#   tty: true
+#   volumes:
+#     - mysql_store:/var/run/mysqld
+#   environment:
+#     MYSQL_ROOT_PASSWORD: root
+#     MYSQL_DATABASE: mm-local-io-DB
+#     MYSQL_USER: root
+#     MYSQL_AUTHENTICATION_PLUGIN: mysql_native_password
+
+  redis:
+    image: redis:6.2.7-alpine
+    ports:
+      - 6379:6379
+    tty: true
+    volumes:
+      - ./doc/config/redis.conf.development:/redis.conf
+    command: [ "redis-server", "/redis.conf" ]
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.16.2
+    environment:
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - discovery.type=single-node
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+      - 9300:9300
+    tty: true
+    # networks:
+    #   - esnet
+    # elastic:test1234
+  # minio:
+  #   image: minio/minio:latest
+  #   ports:
+  #     - 9000:9000
+  #     - 9001:9001
+  #   environment:
+  #     MINIO_ROOT_USER: root
+  #     MINIO_ROOT_PASSWORD: miniotest
+  #   command: ['minio', 'server', '--console-address', ':9001', '/data']
+    # production server should add --address :80
+  rails:
+    build:
+      context: .
+      dockerfile: Dockerfile.ruby
+    command: /bin/sh -c "ps ax | grep rails && rm -f /var/www/mm-local-io/tmp/pids/server.pid && rm -f /var/www/mm-local-io/shared/pids/puma* && bundle exec rails s -p 8000 -b '0.0.0.0'"
+    depends_on:
+    # - mysql
+      - redis
+      - elasticsearch
+    environment:
+      - ELASTIC_SEARCH_URL=http://elasticsearch:9200
+    # - MYSQL_HOST=localhost
+      - RAILS_ENV=development
+    # - MYSQL_HOST=localhost
+    # - MYSQL_SOCKET=/var/run/mysqld/mysqld.sock
+
+    ports:
+      - 8000:8000
+    tty: true
+    volumes:
+    # - mysql_store:/var/run/mysqld
+      - ./:/var/www/mm-local-io
+      - bundler_gems:/usr/local/bundle/
+      - assets_store:/var/www/mm-local-io/public/
+volumes:
+  #database_run:
+  #  driver: local
+  bundler_gems:
+  assets_store:
+  mysql_store:
+  esdata:
+    driver: local
+networks:
+  esnet:

@@ -1,0 +1,461 @@
+<% content_for :head do %>
+
+  <%= stylesheet_link_tag('ioffer/seller_landing') %>
+  <%= javascript_include_tag('ioffer/seller_landing') %>
+
+<% end # head -%>
+
+<!--====== PRELOADER PART START ======-->
+
+<div class="preloader">
+    <div class="loader">
+        <div class="ytp-spinner">
+            <div class="ytp-spinner-container">
+                <div class="ytp-spinner-rotator">
+                    <div class="ytp-spinner-left">
+                        <div class="ytp-spinner-circle"></div>
+                    </div>
+                    <div class="ytp-spinner-right">
+                        <div class="ytp-spinner-circle"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--====== PRELOADER PART ENDS ======-->
+
+<!--====== NAVBAR PART START ======-->
+
+<section class="header-area">
+    <div class="navbar-area">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <nav class="navbar navbar-expand-lg">
+                        <a class="navbar-brand" href="#">
+                            <img src="<%= asset_path('logo/iOffer_logo_color_plain.png') %>" alt="Logo">
+                        </a>
+
+                        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarEight" aria-controls="navbarEight" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="toggler-icon"></span>
+                            <span class="toggler-icon"></span>
+                            <span class="toggler-icon"></span>
+                        </button>
+
+                        <div class="collapse navbar-collapse sub-menu-bar" id="navbarEight">
+                            <ul class="navbar-nav ml-auto">
+                                <li class="nav-item">
+                                    <a class="page-scroll" href="/getting_started?utm_source=seller_landing&utm_medium=login_button&utm_campaign=seller_onboarding_fall_21_02&utm_id=091421.000002&utm_content=items_wanted">Login</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="page-scroll" href="/seller_signup?utm_source=seller_landing&utm_medium=register_button&utm_campaign=seller_onboarding_fall_21_02&utm_id=091421.000002&utm_content=items_wanted">Register</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </nav> <!-- navbar -->
+                </div>
+            </div> <!-- row -->
+        </div> <!-- container -->
+    </div> <!-- navbar area -->
+</section>
+
+<!--====== NAVBAR PART ENDS ======-->
+
+<!--====== ABOUT PART START ======-->
+
+<section id="about" class="about-area">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-8 col-lg-10">
+              <div class="about-video wow fadeInUp mt-90" data-wow-duration="1.5s" data-wow-offset="100">
+                <%= video_tag('seller-landing-video.mp4', id: 'onboarding-video', playsinline: true, autoplay: true, loop: true, muted: true, alt:'iOffer') %>
+              </div>
+              <div class="section-title text-center mt-30 pb-40">
+                  <h3 class="title wow fadeInUp" data-wow-duration="1.5s" data-wow-delay="0.6s">It's as simple as Opening Your Shop, Listing Your Items and Start Selling.</h3>
+              </div> <!-- section title -->
+
+              <div class="pricing-btn rounded-buttons text-center">
+                  <a class="main-btn rounded-three mb-5 px-5 cta-btn" href="/seller_signup??utm_source=seller_landing&utm_medium=cta_button&utm_campaign=seller_onboarding_fall_21_02&utm_id=091421.000002&utm_content=items_wanted">Start Selling - 开始销售</a>
+              </div>
+
+            </div>
+        </div> <!-- row -->
+    </div> <!-- container -->
+</section>
+<!--====== ABOUT PART ENDS ======-->
+
+<!--====== PRINICNG STYLE EIGHT START ======-->
+
+<section id="pricing" class="pricing-area">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-4 col-md-7 col-sm-9">
+                <div class="pricing-style-one wow fadeIn pricing-height" data-wow-duration="1.2s" data-wow-delay="0.2s">
+                    <div class="pricing-header text-center">
+                        <h5 class="sub-title">Reach Millions</h5>
+                    </div>
+                    <div class="pricing-icon text-center pricing-icon-small">
+                        <img src="<%= asset_path('seller-panel-final-2.png') %>" alt="">
+                    </div>
+                </div> <!-- pricing style one -->
+            </div>
+
+            <div class="col-lg-4 col-md-7 col-sm-9">
+                <div class="pricing-style-one wow fadeIn pricing-height" data-wow-duration="1.2s" data-wow-delay="0.2s">
+                  <div class="pricing-header text-center">
+                      <h5 class="sub-title">Sell More</h5>
+                  </div>
+                  <div class="pricing-icon text-center mt-5 pricing-icon-small">
+                      <img src="<%= asset_path('sell-more-van.png') %>" alt="">
+                  </div>
+                </div> <!-- pricing style one -->
+            </div>
+
+            <div class="col-lg-4 col-md-7 col-sm-9">
+                <div class="pricing-style-one wow fadeIn pricing-height" data-wow-duration="1.2s" data-wow-delay="0.2s">
+                  <div class="pricing-header text-center">
+                      <h5 class="sub-title">Make Money</h5>
+                  </div>
+                  <div class="pricing-icon text-center mt-3 pricing-icon-small">
+                      <img src="<%= asset_path('cash-make-money.png') %>" alt="">
+                  </div>
+                </div> <!-- pricing style one -->
+            </div>
+        </div> <!-- row -->
+    </div> <!-- container -->
+</section>
+
+<!--====== PRINICNG STYLE EIGHT ENDS ======-->
+
+<!--====== ABOUT PART START ======-->
+
+<section id="about" class="about-area">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-12 col-lg-12">
+                <div class="about-image text-center mb-30" data-wow-duration="1.5s" data-wow-offset="100">
+                    <img src="<%= asset_path('get-paid-quicker.png') %>" alt="services">
+                </div>
+            </div>
+        </div> <!-- row -->
+    </div> <!-- container -->
+</section>
+
+<!--====== ABOUT PART ENDS ======-->
+
+<!--====== FOOTER FOUR PART ENDS ======-->
+
+<!--====== BACK TOP TOP PART START ======-->
+
+<a href="#" class="back-to-top"><i class="lni-chevron-up"></i></a>
+
+<!--====== BACK TOP TOP PART ENDS ======-->
+
+<!--====== PRINICNG STYLE EIGHT START ======-->
+
+<section id="pricing" class="pricing-area">
+    <div class="container">
+        <div class="section-title text-center mt-30 pb-40">
+            <h3 class="title pt-5">Buyers are looking for these items right now!</h3>
+        </div> <!-- section title -->
+        <div class="row justify-content-center">
+          <div class="col-lg-4 col-md-7 col-sm-9">
+              <div class="interested-bubble-overlay">
+                <div class="pricing-style-one m-2 wow fadeIn" data-wow-duration="1.2s" data-wow-delay="0.8s">
+                    <div class="pricing-icon text-center">
+                        <img src="https://ioffer.com/rails/active_storage/representations/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBOFdmQ3c9PSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--dbb41fc173b7f5b0e8523f20202a8f419b8f6e8b/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaDdCam9MY21WemFYcGxTU0lOTmpVd2VEZzNNRDRHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6InZhcmlhdGlvbiJ9fQ==--f742933d0b386540fca97a367c47c785cfb0efe9/COCO-CHANEL-MADEMOISELLE-100ML-EDP-600x600.jpg" alt="">
+                    </div>
+                    <div class="pricing-header text-center">
+                        <h5 class="sub-title">Perfume</h5>
+                    </div>
+                    <div class="pricing-btn rounded-buttons text-center">
+                        <a class="main-btn rounded-three white-text icon-btn"><img src="<%= asset_path('icon/circle-flame.png') %>" alt="services">6552 interested!</a>
+                    </div>
+                </div> <!-- pricing style one -->
+            </div>
+          </div>
+
+            <div class="col-lg-4 col-md-7 col-sm-9">
+                <div class="interested-bubble-overlay">
+                  <div class="pricing-style-one m-2 wow fadeIn" data-wow-duration="1.2s" data-wow-delay="0.2s">
+                      <div class="pricing-icon text-center">
+                          <img src="https://ioffer.com/rails/active_storage/representations/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBeEYyQ3c9PSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--bfc3442a7d451fbd7516fa4fd6c10ad183079098/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaDdCam9MY21WemFYcGxTU0lOTmpVd2VEZzNNRDRHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6InZhcmlhdGlvbiJ9fQ==--f742933d0b386540fca97a367c47c785cfb0efe9/1955-horsebit-leather-tote-bag-73135.1.png" alt="">
+                      </div>
+                      <div class="pricing-header text-center">
+                          <h5 class="sub-title">Purses</h5>
+                      </div>
+                      <div class="pricing-btn rounded-buttons text-center">
+                          <a class="main-btn rounded-three white-text icon-btn"><img src="<%= asset_path('icon/circle-flame.png') %>" alt="services">5072 interested!</a>
+                      </div>
+                  </div> <!-- pricing style one -->
+              </div>
+            </div>
+
+            <div class="col-lg-4 col-md-7 col-sm-9">
+                <div class="interested-bubble-overlay">
+                  <div class="pricing-style-one m-2 wow fadeIn" data-wow-duration="1.2s" data-wow-delay="0.2s">
+                      <div class="pricing-icon text-center">
+                          <img src="https://ioffer.com/rails/active_storage/representations/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBK2ZnQ3c9PSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--e23f224af80fbd04b559d0180d68e8d5847a3740/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaDdCam9MY21WemFYcGxTU0lOTmpVd2VEZzNNRDRHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6InZhcmlhdGlvbiJ9fQ==--f742933d0b386540fca97a367c47c785cfb0efe9/501a0619caa1474faf04bb4a523ba99f.jpg" alt="">
+                      </div>
+                      <div class="pricing-header text-center">
+                          <h5 class="sub-title">Men's Sneakers</h5>
+                      </div>
+                      <div class="pricing-btn rounded-buttons text-center">
+                          <a class="main-btn rounded-three white-text icon-btn"><img src="<%= asset_path('icon/circle-flame.png') %>" alt="services">12338 interested!</a>
+                      </div>
+                  </div> <!-- pricing style one -->
+              </div>
+            </div>
+        </div> <!-- row -->
+        <div class="row justify-content-center">
+          <div class="col-lg-4 col-md-7 col-sm-9">
+              <div class="interested-bubble-overlay">
+                <div class="pricing-style-one m-2 wow fadeIn" data-wow-duration="1.2s" data-wow-delay="0.2s">
+                    <div class="pricing-icon text-center">
+                        <img src="https://ioffer.com/rails/active_storage/representations/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBN01UQ3c9PSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--db289a568eb6a0bc7ee8ba1a9242bf6d9b283698/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaDdCam9MY21WemFYcGxTU0lOTmpBd2VEWXdNRDRHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6InZhcmlhdGlvbiJ9fQ==--63a3b5f97ae9837bfddcc95409683247329f9511/cq4277_001.png.png" alt="">
+                    </div>
+                    <div class="pricing-header text-center">
+                        <h5 class="sub-title">Casual Shoes</h5>
+                    </div>
+                    <div class="pricing-btn rounded-buttons text-center">
+                        <a class="main-btn rounded-three white-text icon-btn"><img src="<%= asset_path('icon/circle-flame.png') %>" alt="services">7791 interested!</a>
+                    </div>
+                </div> <!-- pricing style one -->
+            </div>
+          </div>
+            <div class="col-lg-4 col-md-7 col-sm-9">
+                <div class="interested-bubble-overlay">
+                  <div class="pricing-style-one m-2 wow fadeIn" data-wow-duration="1.2s" data-wow-delay="0.2s">
+                      <div class="pricing-icon text-center">
+                          <img src="https://ioffer.com/rails/active_storage/representations/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBNk9mQnc9PSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--914db9dccc84b8f8069e67a1f458d2769b15dbe2/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaDdCam9MY21WemFYcGxTU0lOTmpBd2VEWXdNRDRHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6InZhcmlhdGlvbiJ9fQ==--63a3b5f97ae9837bfddcc95409683247329f9511/open-uri20200705-1736-vo2avk.jpeg" alt="">
+                      </div>
+                      <div class="pricing-header text-center">
+                          <h5 class="sub-title">Hats</h5>
+                      </div>
+                      <div class="pricing-btn rounded-buttons text-center">
+                          <a class="main-btn rounded-three white-text icon-btn"><img src="<%= asset_path('icon/circle-flame.png') %>" alt="services">1884 interested!</a>
+                      </div>
+                  </div> <!-- pricing style one -->
+              </div>
+            </div>
+
+            <div class="col-lg-4 col-md-7 col-sm-9">
+                <div class="interested-bubble-overlay">
+                  <div class="pricing-style-one m-2 wow fadeIn" data-wow-duration="1.2s" data-wow-delay="0.2s">
+                      <div class="pricing-icon text-center">
+                          <img src="https://ioffer.com/rails/active_storage/representations/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBMS8rQnc9PSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--1484973414e379e290dbc300e0a0a1f402500cf1/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaDdCam9MY21WemFYcGxTU0lOTmpBd2VEWXdNRDRHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6InZhcmlhdGlvbiJ9fQ==--63a3b5f97ae9837bfddcc95409683247329f9511/open-uri20200707-21159-10iqeze.jpeg" alt="">
+                      </div>
+                      <div class="pricing-header text-center">
+                          <h5 class="sub-title">Streetwear</h5>
+                      </div>
+                      <div class="pricing-btn rounded-buttons text-center">
+                          <a class="main-btn rounded-three white-text icon-btn"><img src="<%= asset_path('icon/circle-flame.png') %>" alt="services">17691 interested!</a>
+                      </div>
+                  </div> <!-- pricing style one -->
+              </div>
+            </div>
+        </div> <!-- row -->
+        <div class="row justify-content-center">
+          <div class="col-lg-4 col-md-7 col-sm-9">
+              <div class="interested-bubble-overlay">
+                <div class="pricing-style-one m-2 wow fadeIn" data-wow-duration="1.2s" data-wow-delay="0.2s">
+                    <div class="pricing-icon text-center">
+                        <img src="https://ioffer.com/rails/active_storage/representations/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBMGlvQ3c9PSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--2ea5fb943ddbd4aa24fdaab9701ea182f336b344/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaDdCam9MY21WemFYcGxTU0lOTmpVd2VEZzNNRDRHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6InZhcmlhdGlvbiJ9fQ==--f742933d0b386540fca97a367c47c785cfb0efe9/AC%20Milan%20Home%20Authentic%20Jersey%202021-22%20(3).jpg" alt="">
+                    </div>
+                    <div class="pricing-header text-center">
+                        <h5 class="sub-title">Soccer Jerseys</h5>
+                    </div>
+                    <div class="pricing-btn rounded-buttons text-center">
+                        <a class="main-btn rounded-three white-text icon-btn"><img src="<%= asset_path('icon/circle-flame.png') %>" alt="services">8754 interested!</a>
+                    </div>
+                </div> <!-- pricing style one -->
+            </div>
+          </div>
+
+            <div class="col-lg-4 col-md-7 col-sm-9">
+                <div class="interested-bubble-overlay">
+                  <div class="pricing-style-one m-2 wow fadeIn" data-wow-duration="1.2s" data-wow-delay="0.2s">
+                      <div class="pricing-icon text-center">
+                          <img src="https://ioffer.com/rails/active_storage/representations/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBeTdwQ3c9PSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--f114b1c67ea78fba3935436e12b61436dd15fdbe/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaDdCam9MY21WemFYcGxTU0lOTmpVd2VEZzNNRDRHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6InZhcmlhdGlvbiJ9fQ==--f742933d0b386540fca97a367c47c785cfb0efe9/1044b9747f784df5acfee0064cf8f440.jpg" alt="">
+                      </div>
+                      <div class="pricing-header text-center">
+                          <h5 class="sub-title">Athleisure</h5>
+                      </div>
+                      <div class="pricing-btn rounded-buttons text-center">
+                          <a class="main-btn rounded-three white-text icon-btn"><img src="<%= asset_path('icon/circle-flame.png') %>" alt="services">5107 interested!</a>
+                      </div>
+                  </div> <!-- pricing style one -->
+              </div>
+            </div>
+
+            <div class="col-lg-4 col-md-7 col-sm-9">
+                <div class="interested-bubble-overlay">
+                  <div class="pricing-style-one m-2 wow fadeIn" data-wow-duration="1.2s" data-wow-delay="0.2s">
+                      <div class="pricing-icon text-center">
+                          <img src="https://ioffer.com/rails/active_storage/representations/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBeHhPQ2c9PSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--8d7b0a817d4994d6c0f1efdfe2e1442516dca2b2/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaDdCam9MY21WemFYcGxTU0lOTmpVd2VEZzNNRDRHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6InZhcmlhdGlvbiJ9fQ==--f742933d0b386540fca97a367c47c785cfb0efe9/desc_louis-vuitton-sunglasses_0.jpg" alt="">
+                      </div>
+                      <div class="pricing-header text-center">
+                          <h5 class="sub-title">Sunglasses</h5>
+                      </div>
+                      <div class="pricing-btn rounded-buttons text-center">
+                          <a class="main-btn rounded-three white-text icon-btn"><img src="<%= asset_path('icon/circle-flame.png') %>" alt="services">1204 interested!</a>
+                      </div>
+                  </div> <!-- pricing style one -->
+              </div>
+            </div>
+        </div> <!-- row -->
+        <div class="row justify-content-center">
+          <div class="col-lg-4 col-md-7 col-sm-9">
+              <div class="interested-bubble-overlay">
+                <div class="pricing-style-one m-2 wow fadeIn" data-wow-duration="1.2s" data-wow-delay="0.2s">
+                    <div class="pricing-icon text-center">
+                        <img src="https://ioffer.com/rails/active_storage/representations/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBeEhpQ3c9PSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--b8c5199341e7a838bd7cd362a8c2fc0f7908728d/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaDdCam9MY21WemFYcGxTU0lOTmpVd2VEZzNNRDRHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6InZhcmlhdGlvbiJ9fQ==--f742933d0b386540fca97a367c47c785cfb0efe9/9d903b4f4bf942668630fee2a7b28757.jpg" alt="">
+                    </div>
+                    <div class="pricing-header text-center">
+                        <h5 class="sub-title">Trainers</h5>
+                    </div>
+                    <div class="pricing-btn rounded-buttons text-center">
+                        <a class="main-btn rounded-three white-text icon-btn"><img src="<%= asset_path('icon/circle-flame.png') %>" alt="services">2197 interested!</a>
+                    </div>
+                </div> <!-- pricing style one -->
+            </div>
+          </div>
+            <div class="col-lg-4 col-md-7 col-sm-9">
+                <div class="interested-bubble-overlay">
+                  <div class="pricing-style-one m-2 wow fadeIn" data-wow-duration="1.2s" data-wow-delay="0.2s">
+                      <div class="pricing-icon text-center">
+                          <img src="https://ioffer.com/rails/active_storage/representations/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBeTZ0Q3c9PSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--c650cf91fedd5819b1ef33be17af981c141ed68c/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaDdCam9MY21WemFYcGxTU0lOTmpBd2VEWXdNRDRHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6InZhcmlhdGlvbiJ9fQ==--63a3b5f97ae9837bfddcc95409683247329f9511/c1950373.jpg" alt="">
+                      </div>
+                      <div class="pricing-header text-center">
+                          <h5 class="sub-title">Leather Belts</h5>
+                      </div>
+                      <div class="pricing-btn rounded-buttons text-center">
+                          <a class="main-btn rounded-three white-text icon-btn"><img src="<%= asset_path('icon/circle-flame.png') %>" alt="services">2014 interested!</a>
+                      </div>
+                  </div> <!-- pricing style one -->
+              </div>
+            </div>
+
+            <div class="col-lg-4 col-md-7 col-sm-9">
+                <div class="interested-bubble-overlay">
+                  <div class="pricing-style-one m-2 wow fadeIn" data-wow-duration="1.2s" data-wow-delay="0.2s">
+                      <div class="pricing-icon text-center">
+                          <img src="https://ioffer.com/rails/active_storage/representations/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBODExQ3c9PSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--1f5bba21866937923b2765e49300ecb3543d772e/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaDdCam9MY21WemFYcGxTU0lOTmpVd2VEZzNNRDRHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6InZhcmlhdGlvbiJ9fQ==--f742933d0b386540fca97a367c47c785cfb0efe9/1955-horsebit-gg-tote-bag-brown-73157.1.png" alt="">
+                      </div>
+                      <div class="pricing-header text-center">
+                          <h5 class="sub-title">Leather Bags</h5>
+                      </div>
+                      <div class="pricing-btn rounded-buttons text-center">
+                          <a class="main-btn rounded-three white-text icon-btn"><img src="<%= asset_path('icon/circle-flame.png') %>" alt="services">5908 interested!</a>
+                      </div>
+                  </div> <!-- pricing style one -->
+              </div>
+            </div>
+        </div> <!-- row -->
+        <div class="row justify-content-center">
+          <div class="col-lg-4 col-md-7 col-sm-9">
+              <div class="interested-bubble-overlay">
+                <div class="pricing-style-one m-2 wow fadeIn" data-wow-duration="1.2s" data-wow-delay="0.2s">
+                    <div class="pricing-icon text-center">
+                        <img src="https://ioffer.com/rails/active_storage/representations/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBei8rQ3c9PSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--a867fbb72419e804ef0a7cc6b680bdd58a92a4fd/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaDdCam9MY21WemFYcGxTU0lOTmpVd2VEZzNNRDRHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6InZhcmlhdGlvbiJ9fQ==--f742933d0b386540fca97a367c47c785cfb0efe9/KAWS-x-Uniqlo-Tokyo-First-Mori-Arts-Gallery-Exclusive-Tee-Japanese-Sizing-White.jpg" alt="">
+                    </div>
+                    <div class="pricing-header text-center">
+                        <h5 class="sub-title">Men's T-Shirts</h5>
+                    </div>
+                    <div class="pricing-btn rounded-buttons text-center">
+                        <a class="main-btn rounded-three white-text icon-btn"><img src="<%= asset_path('icon/circle-flame.png') %>" alt="services">4442 interested!</a>
+                    </div>
+                </div> <!-- pricing style one -->
+            </div>
+          </div>
+            <div class="col-lg-4 col-md-7 col-sm-9">
+                <div class="interested-bubble-overlay">
+                  <div class="pricing-style-one m-2 wow fadeIn" data-wow-duration="1.2s" data-wow-delay="0.2s">
+                      <div class="pricing-icon text-center">
+                          <img src="https://ioffer.com/rails/active_storage/representations/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBK3VOQ3c9PSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--3e2c3f36a79d7844cd5da35f857ae4ad2a479d58/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaDdCam9MY21WemFYcGxTU0lOTmpVd2VEZzNNRDRHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6InZhcmlhdGlvbiJ9fQ==--f742933d0b386540fca97a367c47c785cfb0efe9/O1CN012CMhv11rfPZN6e0lx_!!139935658.jpg" alt="">
+                      </div>
+                      <div class="pricing-header text-center">
+                          <h5 class="sub-title">Women's Clothing</h5>
+                      </div>
+                      <div class="pricing-btn rounded-buttons text-center">
+                          <a class="main-btn rounded-three white-text icon-btn"><img src="<%= asset_path('icon/circle-flame.png') %>" alt="services">12395 interested!</a>
+                      </div>
+                  </div> <!-- pricing style one -->
+              </div>
+            </div>
+
+            <div class="col-lg-4 col-md-7 col-sm-9">
+                <div class="interested-bubble-overlay">
+                  <div class="pricing-style-one m-2 wow fadeIn" data-wow-duration="1.2s" data-wow-delay="0.2s">
+                      <div class="pricing-icon text-center">
+                          <img src="https://ioffer.com/rails/active_storage/representations/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBNFptQ2c9PSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--008118c725c99c5770262b6687ee2196c30cd68d/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaDdCam9MY21WemFYcGxTU0lOTmpVd2VEZzNNRDRHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6InZhcmlhdGlvbiJ9fQ==--f742933d0b386540fca97a367c47c785cfb0efe9/supreme-bandana-box-logo-tee-in-red_1.jpg" alt="">
+                      </div>
+                      <div class="pricing-header text-center">
+                          <h5 class="sub-title">Fashion Tees</h5>
+                      </div>
+                      <div class="pricing-btn rounded-buttons text-center">
+                          <a class="main-btn rounded-three white-text icon-btn"><img src="<%= asset_path('icon/circle-flame.png') %>" alt="services">3094 interested!</a>
+                      </div>
+                  </div> <!-- pricing style one -->
+              </div>
+            </div>
+        </div> <!-- row -->
+        <div class="row justify-content-center">
+          <div class="col-lg-4 col-md-7 col-sm-9">
+              <div class="interested-bubble-overlay">
+                <div class="pricing-style-one m-2 wow fadeIn" data-wow-duration="1.2s" data-wow-delay="0.2s">
+                    <div class="pricing-icon text-center">
+                        <img src="https://ioffer.com/rails/active_storage/representations/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBMW9WQ3c9PSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--f26c561e98f5361cff70396378c13663d20282ba/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaDdCam9MY21WemFYcGxTU0lOTmpVd2VEZzNNRDRHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6InZhcmlhdGlvbiJ9fQ==--f742933d0b386540fca97a367c47c785cfb0efe9/dd48e2544b8ab96e372f7fba8baea5e8.jpeg" alt="">
+                    </div>
+                    <div class="pricing-header text-center">
+                        <h5 class="sub-title">Fashion Sneakers</h5>
+                    </div>
+                    <div class="pricing-btn rounded-buttons text-center">
+                        <a class="main-btn rounded-three white-text icon-btn"><img src="<%= asset_path('icon/circle-flame.png') %>" alt="services">6909 interested!</a>
+                    </div>
+                </div> <!-- pricing style one -->
+            </div>
+          </div>
+            <div class="col-lg-4 col-md-7 col-sm-9">
+                <div class="interested-bubble-overlay">
+                  <div class="pricing-style-one m-2 wow fadeIn" data-wow-duration="1.2s" data-wow-delay="0.2s">
+                      <div class="pricing-icon text-center">
+                          <img src="https://ioffer.com/rails/active_storage/representations/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBM3p1Q3c9PSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--f052d9fdb782697d023ab097838c72586a4ecb5a/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaDdCam9MY21WemFYcGxTU0lOTmpVd2VEZzNNRDRHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6InZhcmlhdGlvbiJ9fQ==--f742933d0b386540fca97a367c47c785cfb0efe9/f860a83461e54fd888db4fe97e6c71af.jpg" alt="">
+                      </div>
+                      <div class="pricing-header text-center">
+                          <h5 class="sub-title">Women's Sunglasses</h5>
+                      </div>
+                      <div class="pricing-btn rounded-buttons text-center">
+                          <a class="main-btn rounded-three white-text icon-btn"><img src="<%= asset_path('icon/circle-flame.png') %>" alt="services">4127 interested!</a>
+                      </div>
+                  </div> <!-- pricing style one -->
+              </div>
+            </div>
+
+            <div class="col-lg-4 col-md-7 col-sm-9">
+                <div class="interested-bubble-overlay">
+                  <div class="pricing-style-one m-2 wow fadeIn" data-wow-duration="1.2s" data-wow-delay="0.2s">
+                      <div class="pricing-icon text-center">
+                          <img src="https://ioffer.com/rails/active_storage/representations/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBMDhaQ3c9PSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--a3b03c2fc80258ad5c79c443f1112f613c635aab/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaDdCam9MY21WemFYcGxTU0lOTmpVd2VEZzNNRDRHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6InZhcmlhdGlvbiJ9fQ==--f742933d0b386540fca97a367c47c785cfb0efe9/458198_01.jpg.jpeg" alt="">
+                      </div>
+                      <div class="pricing-header text-center">
+                          <h5 class="sub-title">Men's Sneakers</h5>
+                      </div>
+                      <div class="pricing-btn rounded-buttons text-center">
+                          <a class="main-btn rounded-three white-text icon-btn"><img src="<%= asset_path('icon/circle-flame.png') %>" alt="services">3492 interested!</a>
+                      </div>
+                  </div> <!-- pricing style one -->
+              </div>
+            </div>
+        </div> <!-- row -->
+      <div class="pricing-btn rounded-buttons text-center mb-5 mt-5">
+          <a class="main-btn rounded-three mb-5 px-5 cta-btn" href="/seller_signup??utm_source=seller_landing&utm_medium=cta_button&utm_campaign=seller_onboarding_fall_21_02&utm_id=091421.000002&utm_content=items_wanted">Start Selling - 开始销售</a>
+      </div>
+      <br/>
+    </div> <!-- container -->
+    <img src="https://www.google-analytics.com/collect?v=1&tid=UA-166264208-1&cid=091421.000002&t=event&ec=seller_landing&ea=visit&el=recipient_id&cs=seller_landing&cm=webpage_seller_landing&cn=seller_onboarding_fall_21_02">
+</section>
+
+<!--====== PRINICNG STYLE EIGHT ENDS ======-->

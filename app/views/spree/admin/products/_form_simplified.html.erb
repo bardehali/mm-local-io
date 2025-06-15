@@ -1,0 +1,74 @@
+<%
+  is_owner = spree_current_user.try(:id) == @product.user_id || spree_current_user.admin?
+-%>
+<div data-hook="admin_product_form_fields">
+
+  <div class="row">
+    <div class="col-12 col-md-8" data-hook="admin_product_form_left">
+      <div data-hook="admin_product_form_name">
+        <%= f.field_container :name, class: ['form-group'] do %>
+          <%= f.label :name, raw(Spree.t(:name) + required_span_tag) %>
+          <%= f.text_field :name, class: 'form-control title', disabled: !is_owner %>
+          <%= f.error_message_on :name %>
+        <% end %>
+      </div>
+    </div>
+    <div class="col-12 col-md-4">
+      <div data-hook="admin_product_form_price">
+        <%= f.field_container :price, class: ['form-group'] do %>
+          <%= f.label :price, raw(Spree.t(:master_price) + required_span_tag) %>
+          <%= f.text_field :price, value: number_to_currency(@product.price, unit: ''), class: 'form-control', disabled: (cannot? :update, @product.master.default_price) %>
+          <%= f.error_message_on :price %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12 col-md-12" data-hook="admin_product_form_description">
+      <%= f.field_container :description, class: ['form-group'] do %>
+        <%= f.label :description, Spree.t(:description) %>
+        <%= f.text_area :description, { rows: "#{unless @product.has_variants? then '10' else '8' end}", class: 'form-control', disabled: !is_owner } %>
+        <%= f.error_message_on :description %>
+      <% end %>
+    </div>
+
+  </div>
+
+  <div data-hook="admin_product_form_taxons">
+    <%= f.field_container :taxons, class: ['form-group'] do %>
+      <%= f.label :taxon_ids, Spree.t(:taxons) %>
+
+      <% if can? :modify, Spree::Classification || is_owner %>
+        <%= f.hidden_field :taxon_ids, value: @product.taxon_ids.join(',') %>
+      <% elsif @product.taxons.any? %>
+        <ul class="text_list">
+          <% @product.taxons.each do |taxon| %>
+            <li><%= taxon.name %></li>
+          <% end %>
+        </ul>
+      <% else %>
+        <div class="alert alert-info"><%= Spree.t(:no_resource_found, resource: :taxons) %></div>
+      <% end %>
+
+    <% end %>
+  </div>
+
+  <div data-hook="admin_product_form_option_types">
+    <%= f.field_container :option_types, class: ['form-group'] do %>
+      <%= f.label :option_type_ids, Spree.t(:option_types) %>
+
+      <% if can? :modify, Spree::ProductOptionType || is_owner %>
+        <%= f.hidden_field :option_type_ids, value: @product.option_type_ids.join(',') %>
+      <% elsif @product.option_types.any? %>
+        <ul class="text_list">
+          <% @product.option_types.each do |type| %>
+            <li><%= type.presentation %> (<%= type.name %>)</li>
+          <% end %>
+        </ul>
+      <% else %>
+        <div class="alert alert-info"><%= Spree.t(:no_resource_found, resource: :option_types) %></div>
+      <% end %>
+
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,14 @@
+:ruby
+  # Required locals
+  #   option_value [Spree::OptionValue]
+%div.variant-one-box
+  = render partial: 'spree/admin/shared/color_box', locals: { option_value: option_value, input:'checkbox', var_ids: Rails.env.development? ? "#{option_value.id}" : '' }
+  - if can? :manage, option_value
+    .variant-description.box-shadow
+      .variant-heading
+        %span=t('spree.variant_name')
+      .variant-body
+        - readonly = (can? :manage, option_value) ? nil : 'readonly'
+        = text_field_tag('option_value[presentation]', option_value.presentation, readonly: readonly, class:'variant-name instant-update', 'option-value-id' => option_value.id)
+      .variant-footer
+        .cover

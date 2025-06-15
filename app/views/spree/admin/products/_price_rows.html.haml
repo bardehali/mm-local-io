@@ -1,0 +1,14 @@
+:ruby
+  # Required locals:
+  #   product [Spree::Product]
+  #   f [FormBuilder]
+  @price_record ||= product.best_price_record
+.row.price-row
+  %h5.bold-title.text-right= t('store.your_price')
+  %div(class="form-group#{' withError' if product.errors.include?(:variant_price)}")
+    = text_field_tag('product[variant_price]', @variant_price ? number_to_currency(@variant_price, unit:'') : '', placeholder:'$xx.xx', 'data-type'=>'price-only', required: true)
+  %span
+    %h5=t('to worldwide')
+    = hidden_field_tag('prices[0][country_iso]', '')
+  %h5.mt-3.bold-title=t('seller.include_shipping')
+  %h5{ :style => "color: red;" }=t('seller.include_shipping_subtitle')

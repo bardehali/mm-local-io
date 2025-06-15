@@ -1,0 +1,16 @@
+%ul.list-unstyled
+  - orders.to_a.each do|order|
+    - one_product = product_to_represent_order(order)
+    - next if one_product.nil?
+    = link_to spree.product_path(id: one_product.id), :action => 'go' do
+      %li.recent-order-card.border-0.mb-4.p-2(id="recent_order_#{order.id}")
+        .row
+          .col-4
+            = order.user.username_or_email.split('@').first.censored_middle(8)
+            %br/
+            = country_flag_icon(order.user.country_code) || order.user.country
+          .col-4.text-center
+            - if (image = one_product.variant_images.first)
+              = image_tag(cdn_image_url(image, :pdp_thumbnail), id:"variant_thumbnail_#{image.id}", class:"product-thumbnail #{'main-image' if image.position==1}",  'data-toggle'=>'popover',  'data-img'=> "#{ cdn_image_url(image, :pdp_thumbnail) }" )
+          .col-4.text-right.source-country-title-header
+            = display_price(one_product)

@@ -1,0 +1,19 @@
+- content_for :head do
+  :css
+    .user-message { font-weight: 700; }
+    .user-message + .viewed { font-weight: 500; color: #666666; }
+%h3 Messages
+.mt-3
+  %table.table
+    %thead.thead-light
+      %tr
+        %th From
+        %th Subject
+        %th When
+    %tbody
+      - collection.each do|message|
+        %tr.user-message
+          %td= message.sender.to_s
+          %td
+            = link_to(message.subject_evaluated, user_message_path(message), class:"#{'viewed' if message.last_viewed_at }")
+          %td= relative_short_time(message.created_at)

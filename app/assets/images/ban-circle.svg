@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="110" height="110" viewBox="0 0 110 110">
+  <defs>
+    <clipPath id="clip-path">
+      <rect id="Rectangle_4" data-name="Rectangle 4" width="110" height="110" transform="translate(0 -0.139)" fill="none"/>
+    </clipPath>
+    <clipPath id="clip-path-2">
+      <path id="Path_6" data-name="Path 6" d="M16.437,54.789A38.352,38.352,0,1,1,54.789,93.141,38.352,38.352,0,0,1,16.437,54.789M54.789,0a54.789,54.789,0,1,0,54.789,54.789A54.795,54.795,0,0,0,54.789,0Z" fill="none"/>
+    </clipPath>
+    <linearGradient id="linear-gradient" x1="0.146" y1="0.854" x2="0.182" y2="0.854" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#f44f5a"/>
+      <stop offset="0.443" stop-color="#ee3d4a"/>
+      <stop offset="1" stop-color="#e52030"/>
+    </linearGradient>
+    <clipPath id="clip-path-3">
+      <rect id="Rectangle_7" data-name="Rectangle 7" width="98.791" height="16.442" transform="translate(0 69.856) rotate(-45)" fill="none"/>
+    </clipPath>
+    <linearGradient id="linear-gradient-2" x1="0.025" y1="0.975" x2="0.072" y2="0.975" xlink:href="#linear-gradient"/>
+  </defs>
+  <g id="Group_10" data-name="Group 10" transform="translate(0 0.139)">
+    <g id="Group_5" data-name="Group 5">
+      <g id="Group_4" data-name="Group 4" clip-path="url(#clip-path)">
+        <path id="Path_5" data-name="Path 5" d="M109.578,54.789A54.789,54.789,0,1,1,54.789,0a54.795,54.795,0,0,1,54.789,54.789" fill="#fff"/>
+      </g>
+    </g>
+    <g id="Group_7" data-name="Group 7">
+      <g id="Group_6" data-name="Group 6" clip-path="url(#clip-path-2)">
+        <rect id="Rectangle_5" data-name="Rectangle 5" width="154.967" height="154.967" transform="matrix(0.707, -0.707, 0.707, 0.707, -54.789, 54.793)" fill="url(#linear-gradient)"/>
+      </g>
+    </g>
+    <g id="Group_9" data-name="Group 9" transform="translate(14.048 14.048)">
+      <g id="Group_8" data-name="Group 8" transform="translate(0)" clip-path="url(#clip-path-3)">
+        <rect id="Rectangle_6" data-name="Rectangle 6" width="115.233" height="115.233" transform="translate(-40.741 40.741) rotate(-45)" fill="url(#linear-gradient-2)"/>
+      </g>
+    </g>
+  </g>
+</svg>

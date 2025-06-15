@@ -1,0 +1,75 @@
+:ruby
+  # Require locals:
+  #   order or messages
+  # Optional locals:
+  #   show_user_and_timestamp [Boolean] default false; columns of buyer/seller, and timestamp
+  #   image_link_content [Symbol :medium, :thumbnail, :icon] default :icon
+  show_user_and_timestamp = false unless defined?(show_user_and_timestamp) && show_user_and_timestamp == true
+  messages = order.messages.all.reject(&:initial_show_only? ) unless defined?(messages) && messages
+  has_warning = messages.find{|m| m.should_highlight? && !m.show_only_to_recipient? } unless defined?(has_warning) && !has_warning.nil?
+  has_corrected_tracking_number = !order.messages.find{|m| m.is_a?(User::OrderCorrectedTrackingNumber ) }.nil?
+  image_link_content = :icon unless defined?(image_link_content) || image_link_use_thumbnail == true
+  viewer_user_id = spree_current_user&.id
+  is_viewer_seller = (spree_current_user&.id == order.seller_user_id)
+  viewer_is_admin = spree_current_user&.admin?
+  can_view_seller_info = (is_viewer_seller || viewer_is_admin)
+
+%div(class="order-messages#{' wrapped-with-warning' if has_warning} p-0 #{show_user_and_timestamp ? 'w-100' : 'col-12 col-md-8'}" id="order_messages_#{order.id}")
+  - last_msg_time = order.completed_at
+  - messages.each_with_index do|message, idx|
+    - next if message.initial_show_only? || (message.show_only_to_recipient? && viewer_user_id != message.recipient_user_id && !viewer_is_admin)
+    - message_subject_addition = message.recipient_must_respond? && message.recipient_user_id == viewer_user_id ? ' - ' + content_tag(:span, class:'text-dark-warning'){ t('message.you_must_respond') }.html_safe : ''
+    - subject = message.respond_to?(:subject_in_html) ? message.subject_in_html : message.subject_evaluated.gsub("\n", '</br>')
+    - next if (subject.blank? && message.comment.to_s.strip.blank?)
+    %div(class="row message-row#{' message-highlight' if message.should_highlight?}" data-message="#{message.id}")
+      - if show_user_and_timestamp
+        .col-2.col-md-2
+          %strong= message.sender_user_id == order.seller_user_id ? t('user.seller') : t('user.buyer')
+      - if message.is_a?(::User::OrderProvidedTrackingNumber) && spree_current_user&.id == message.recipient_user_id
+        %div(class="col-12")
+          %h4
+            = subject.html_safe
+          .float-right
+            %br/
+            = link_to t('order.tracking_broken'), order_help_path(order, type:'order_broken_tracking_number'), class:'text-uppercase text-dark-warning'
+            %br/
+            %br/
+      - else # normal message
+        %div(class="col#{' col-10 col-md-7' if show_user_and_timestamp}")
+          - if subject.present?
+            %strong.text-uppercase= subject.html_safe
+            %strong= message_subject_addition.html_safe
+            - if is_viewer_seller && message.image && message.image.url.present?
+              %strong.text-dark-warning " - ***#{ t('order.proof_of_payment_submitted_by_buyer') }***"
+          %span.timestamp(title="#{ timestamp_with_slashes( message.created_at ) }")
+            - if last_msg_time
+              = distance_of_time_in_abbr(message.created_at, last_msg_time)
+            - else
+              = timestamp_with_slashes( message.created_at )
+          %br/
+          - if (instruction = message.instruction).present?
+            = instruction
+            %br/
+          - if message.comment_evaluated.present?
+            %i.text-secondary= message.comment_evaluated&.humanize
+            %br/
+            %br/
+        .col-3.text-right
+          - if idx == 0 && has_warning && !show_user_and_timestamp
+            %button.round-warning-button.top-right-overlay='!'
+          .float-right
+    - image_uploader = message.image&.url.present? ? message.image : nil
+    -# image_uploader ||= (message.class == User::OrderNeedTrackingNumber) ? order.proof_of_payment : nil
+    - if image_uploader && (image_url = image_uploader.url(:thumb) ).present?
+      %div(class="row message-row#{' message-highlight' if message.should_highlight?}" data-message="#{message.id}")
+        - image_modal_id = "message_image_modal_#{message.id}"
+        .col-12.text-center
+          = link_to '#', title:'View full size image', class:'m-3', data:{ toggle:'modal', target: "##{image_modal_id}"} do
+            - if image_link_content == :product
+              = image_tag( image_uploader.public_url, style:"max-width: 640px;")
+            - elsif image_link_content == :thumbnail
+              = image_tag( image_uploader.public_url(:thumb) )
+            - else
+              %img(src="#{asset_path('icon/camera-with-one-count.svg')}" alt="Has image" class="float-right")
+        = render partial:'spree/shared/full_modal', locals:{ target: image_modal_id, content: image_tag( image_uploader.public_url, alt:'Message picture', class:'mw-100 mh-100')  }
+    - last_msg_time = message.created_at

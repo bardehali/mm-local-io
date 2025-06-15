@@ -1,0 +1,26 @@
+:ruby
+  # Required locals
+  #   order [Spree::Order]
+- order.messages.each do|message|
+  - message_subject_addition = message.recipient_must_respond? ? ' - ' + content_tag(:span, class:'text-dangerous'){ t('message.you_must_respond') }.html_safe : ''
+  - subject = message.respond_to?(:subject_in_html) ? message.subject_in_html : message.subject_evaluated.gsub("\n", '</br>')
+  %div(class="row message-row#{' bg-highlight' if message.should_highlight?}")
+    .col-2.col-md-2
+      %strong= message.sender_user_id == order.seller_user_id ? t('user.seller') : t('user.buyer')
+    .col-10.col-md-7
+      - if subject.present?
+        %strong= subject.html_safe + message_subject_addition
+        %br/
+      - if (instruction = message.instruction).present?
+        = instruction
+        %br/
+      - if message.comment_evaluated.present?
+        %i= message.comment_evaluated
+        %br/
+    .col-12.col-md-3.text-right
+      %span.timestamp= timestamp_with_slashes( message.created_at )
+- if false && order.messages.size > 0 && spree_current_user&.admin?
+  .mb-3.text-right
+    %small
+      %i.icon.icon-eye-close
+      = link_to('Hide Above Messages', admin_order_update_messages_path(order, order:{ admin_last_viewed_at: 'now'}, messages_selector:"#order_messages_#{order.id}", order_info_selector:"#first_row_of_#{order.id}" ), remote: true, method: :put)

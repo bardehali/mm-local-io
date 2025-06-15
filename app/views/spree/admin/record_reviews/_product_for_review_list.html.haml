@@ -1,0 +1,89 @@
+:ruby
+  ##
+  # Required locals:
+  #   product [Spree::Product]
+  # Optional locals:
+  #   is_admin [Boolean] whether to show admin options
+  #   extra_css_class [String]
+  #   hide_same_seller_stats [Boolean] default: false
+  #   
+  is_admin = nil unless defined?(is_admin)
+  is_admin ||= spree_current_user.try(:admin?) if is_admin.nil?
+  extra_css_class = '' unless defined?(extra_css_class)
+  hide_same_seller_stats = false unless defined?(hide_same_seller_stats)
+  show_new_seller_stats = !hide_same_seller_stats || @previous_seller_stats_user_id != product.user_id
+  
+  stats = seller_stats(product.user_id)
+
+%li(class="#{hide_same_seller_stats && show_new_seller_stats && @previous_seller_stats_user_id ? 'border-top-black' : 'border-top'} record-review #{extra_css_class}" id="product_card_#{product.id}")
+  .row
+    %div(class="col col-md-2 col-sm-3 text-center")
+      - if (image = product.variant_images.first)
+        = image_tag(main_app.url_for(image.url(:small)), id:"variant_thumbnail_#{image.id}", class:"product-thumbnail #{'main-image' if image.position==1}",  'data-toggle'=>'popover',  'data-img'=> "#{ main_app.url_for(image.url(:large)) }" )
+      %br/
+      IQS #{product.iqs}
+    %div(class="col col-md-7 col-sm-5")
+      .product-categories.product-title.with-danger-highlight
+        %i(class="icon icon-remove record-review-icon-set-bad")
+        - product.categories.each do|cat_taxon|
+          %span.category-breadcrumb-label= cat_taxon.collect(&:name).join(' > ')
+        %br/
+        = link_to edit_admin_product_path(product), title: "#{"site: #{product.retail_site.name}" if product.retail_site}", target:'_blank' do
+          = highlight_text_according_to(product.name).html_safe
+      .product-description.with-danger-highlight
+        %span(class="record-review-icon-off") @ 
+        - if product.description && product.description&.size > 160
+          %div(class='text-limited-lines' id="product_description_#{product.id}")
+            = highlight_text_according_to(product.description.to_s).html_safe
+          %button(class="btn btn-sm to-collapse-limited-lines" type="button" data-target="#product_description_#{product.id}")
+            %i(class="icon icon-chevron-down")
+            Show All ..
+        - else
+          = highlight_text_according_to(product.description.to_s).html_safe
+      .product-record-ratings
+        = record_review_with_iqs_link(product, 0, class:'', title:"Set IQS to 0", 'data-toggle'=>'tooltip') do
+          %i(class="icon icon-picture record-review-icon-set-bad#{' record-review-icon-bad' if product.iqs && product.iqs == 0}")
+        - 1.upto(5) do|rating_i|
+          - target_iqs = rating_i * 10
+          = record_review_with_iqs_link(product, target_iqs, class:'', title:"IQS #{target_iqs}+") do
+            %i(class="icon icon-star record-review-icon-off#{' record-review-icon-on' if product.iqs >= target_iqs}")
+    %div(class="col col-md-3 col-sm-4")
+      - if show_new_seller_stats
+        - @previous_seller_stats_user_id = product.user_id
+        %div(class="seller-stats-container text-right seller-stats-of-#{product.user_id}#{' half-opacity' if product.user.email.starts_with?('admin@') }")
+          .user-stats.mb-2
+            %span(title='Count of Pictures')
+              = product.user.count_of_pictures
+              %i.icon.icon-picture.text-secondary
+            &nbsp;&nbsp;
+            %span(title='Count of Bad/Banned Words')
+              %label.text-danger= product.user.count_of_bad_banned_words
+              %i.icon.icon-remove.text-secondary
+            &nbsp;&nbsp;
+            %span(title='Count of Contact Info Infringements')
+              %span.text-danger= product.user.count_of_contact_info_infringements
+              %span.text-secondary= '@'
+          .seller-ratings
+            = link_to(product.user.username_or_email, edit_admin_user_path(product.user)) 
+            (
+            %span.text-positive(title='Positive')= product.user.ioffer_user&.positive || 0
+            \/
+            %span.text-negative(title='Negative')= product.user.ioffer_user&.negative || 0
+            \/
+            %span= product.user.ioffer_user&.rating&.round || 0
+            )
+            = country_flag_icon_of(product.user) || product.user.country
+            - if product.user.store&.has_paypal?
+              = image_tag(asset_path('payment_methods/mini_avatar/paypal.svg'), class:'mini-avatar', title:'Paypal')
+          %div(title="Old iOffer GMS: #{Spree::Money.new(product.user.ioffer_user&.gms, no_cents: true)}" data-toggle='tooltip')
+            %label.text-secondary.text-small GMS 
+            %strong #{Spree::Money.new( stats[:all_gross_sales].to_f, no_cents: true)}
+          %div(title='Count of Transactions')
+            %label.text-secondary.text-small TRX 
+            %strong= stats[:all_sales_count]
+          %div(title='Sales per day for recent 30 days')
+            %label.text-secondary.text-small PD 
+            %strong #{Spree::Money.new( stats[:month_gross_sales].to_f / 30, no_cents: true) }
+          %div(title='Count of Member Days')
+            %label.text-secondary.text-small MD
+            %strong #{((Time.now - product.user.created_at) / 1.day).to_i }

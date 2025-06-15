@@ -1,0 +1,45 @@
+:ruby
+  dropdown_menu_id = "product_status_menu_#{product.id}"
+  product_tooltip = "#{product.name} | IQS: #{product.iqs}#{' | Last review: ' + product.record_review.updated_at.to_s(:db) if product.record_review}"
+%div(class="col-lg-2 col-md-3 col-sm-3 col-4 d-flex align-items-stretch" id="product_card_#{product.id}")
+  %div(class="record-review product-card mb-30 #{status_css_class(product)}" data-product-id="#{product.id}")
+    %div.status-icon
+      = status_icon(product).html_safe
+    = update_record_review_link(product, 'good-image', class:'dropdown-item') do
+      = render('spree/shared/image', image: product.gallery.images.first, size: :large, itemprop: 'image')
+    %h5.record-review-title(title="#{product_tooltip}" data-toggle='tooltip')
+      = link_to(product.name.truncate(40), edit_admin_product_path(product), target:'_blank')
+      &nbsp;
+      %span.badge.badge-info(title='Number of Images' data-toggle='tooltip') #{product.images.count}
+    .record-review-body.text-center
+      %span.small-status-action-inline
+        = update_record_review_link(product, 'ok-image', class:'', title:'OK Image', 'data-toggle'=>'tooltip') do
+          %span.text-info OK
+      %span.small-status-action-inline
+        = update_record_review_link(product, 'bad-main-image', class:'', title:'Bad Main Image', 'data-toggle'=>'tooltip') do
+          = image_tag('icon/bad-image.png', alt:'Bad Main Image')
+      %span.small-status-action-inline
+        %span.price-label
+          = product.display_price.to_html
+      %span.small-status-action-inline
+        %a(href="#" id="#{dropdown_menu_id}_link" role='button' data-toggle="menu" title='Remove Item Options' data-target="##{dropdown_menu_id}" aria-haspopup="true" aria-expanded="false")
+          = image_tag('icon/x-icon.png', alt:'More Options')
+    .status-dropdown-menu(id="#{dropdown_menu_id}" aria-labelledby="#{dropdown_menu_id}_link")
+      .dropdown-header
+        %h6 Remove Item
+      - ['Prohibited', 'Contact Info', 'Listing Violation', 'Custom Watermarks'].each do|status_name|
+        .dropdown-item
+          = menu_item_status_icon(status_name, class:'dropdown-item-icon')
+          = link_to(admin_record_reviews_path(update_link_params(product, status_name)), remote: true, method:'post') { status_name }
+      .dropdown-header
+        %h6
+          Reduce Score
+          - if product.respond_to?(:iqs)
+            %span.badge.badge-light(title='Image Quality Score (IQS)' data-toggle='tooltip') #{product.iqs }
+      - ['Bad Main Image', 'Wrong Category', 'Catalog Listing', 'Keyword Spam'].each do|status_name|
+        .dropdown-item
+          = menu_item_status_icon(status_name, class:'dropdown-item-icon')
+          = link_to(admin_record_reviews_path(update_link_params(product, status_name)), remote: true, method:'post') { status_name }
+    .status-overlay(data-target-status='default-status' style="#{'display:none;' if default_status?(product)}" data-url="#{revert_record_review_url(product)}" title="#{product_tooltip}" data-toggle='tooltip')
+      = link_to('', revert_record_review_url(product, format:'js', authenticity_token: form_authenticity_token), remote: true, class:'revert-record-review-link')
+    .status-overlay.temp-status-overlay(data-product-id="#{product.id}" style="#{'display:none;' if product.record_review && !product.record_review.record_removeable?}" title="#{product_tooltip}" data-toggle='tooltip')

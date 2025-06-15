@@ -1,0 +1,55 @@
+:ruby
+  show_restart_option = (params[:restart].present?)
+- content_for :head do
+  :css
+    .process-running { color: #093; }
+    .load-medium { color: orange; }
+    .load-heavy { color: #c03; }
+    .process-not-running { color: #999; opacity: 1.0; }
+  :javascript
+    $(function() {
+      $('.confirmation').on('click', function() {
+        event.preventDefault();
+        return confirm('Are you sure?');
+      });
+    });
+
+.p-0.w-100.text-center.bg-light.border-bottom
+  %strong Delayed Jobs (#{Delayed::Job.count}): 
+  - Delayed::Job.group('queue').count.each_pair do|q, cnt|
+    %button(type='button' class='btn border m-2')
+      #{q || '*'}
+      %span.badge.bg-light.m-1 #{cnt}
+.row.bg-light
+  - @servers.each do|server|
+    - next if server.hostname == 'staging' && !Rails.env.development?
+    .col.col-md-4.col-sm-6
+      - load_stats = server.load_stats
+      %table.table
+        %thead
+          %th(colspan='2')
+            %h5= server.hostname
+        %tbody
+          %tr
+            %th.text-right Load
+            %td
+              %span(class="load-#{server_load_level(server.current_load)}" title='#{load_stats.as_json}')= server.current_load
+            - if show_restart_option
+              %td
+          %tr
+            %th.text-right Running for
+            %td= load_stats[:running_time]
+          - server.running_proccesses.each do|process|
+            - server_pname = "#{server.hostname}_#{process.command_name.to_underscore_id}"
+            %tr
+              %th.text-right= process.command_name
+              %td(id="#{server_pname}_status")
+                - if process.running
+                  %span(class="process process-running load-#{process_load_level(process[:cpu])}" title="CPU usage: #{process[:cpu]}") Running
+                - else
+                  %span(class="process process-not-running") Not running
+              - if show_restart_option
+                %td
+                  - if process.can_be_restarted?
+                    = link_to(main_app.admin_server_restart_process_path(server_hostname: server.hostname, process_name: process.command_name), remote: true, title:'Restart Process', class:'confirmation') do
+                      %span.icon.icon-refresh 

@@ -1,0 +1,75 @@
+:ruby
+  show_table_head = false unless defined?(show_table_head) && show_table_head == true
+  table_head_extra_words = '' unless defined?(table_head_extra_words)
+  extra_css_class = '' unless defined?(extra_css_class)
+%a(name="spree_variant_#{variant.id}")
+%table(class="table table-bordered #{extra_css_class}")
+  - if show_table_head
+    %thead
+      %tr
+        %th(colspan="2" style="") spree_variants #{table_head_extra_words}
+  %tbody
+    %tr
+      %th id
+      %td= variant.id
+    %tr
+      %th is_master
+      %td
+        - if variant.is_master
+          %strong= variant.is_master
+        - else
+          = variant.is_master
+    %tr
+      %th product_id
+      %td= link_to( variant.product_id, '#spree_products' )
+    %tr
+      %th position
+      %td= variant.position
+    %tr
+      %th user_id
+      %td
+        %button(type='button' data-container='body' data-toggle='popover' data-content="#{variant.user&.to_s}")= variant.user_id
+    %tr
+      %th view_count
+      %td= variant.view_count
+    %tr
+      %th transaction_count
+      %td= variant.transaction_count
+    %tr
+      %th sorting_rank
+      %td
+        %button(type='button' data-container='body' data-toggle='popover' data-content="= transaction_count x 0.5 x view_count, 1000000 - price")= variant.sorting_rank
+    %tr
+      %th prices
+      %td.m-2
+        - variant.prices.each do|price|
+          %table.table-bordered
+            %thead
+              %tr
+                %th(colspan="2") spree_prices
+            %tbody
+              %tr
+                %th variant_id
+                %td= link_to(price.variant.id, "#spree_variant_#{price.variant_id}" )
+              %tr
+                %th amount
+                %td= price.amount
+              %tr
+                %th currency
+                %td= price.currency
+    %tr
+      %th option_values
+      %td.m-2
+        - variant.option_value_variants.includes(:option_value => [:option_type]).each do|ovv|
+          %table.table-bordered.mb-3
+            %thead
+              %tr
+                %th(colspan="2") spree_option_values_variants
+            %tbody
+              %tr
+                %th variant_id
+                %td= link_to(ovv.variant.id, "#spree_variant_#{ovv.variant_id}" )
+              %tr
+                %th option_value_id
+                %td
+                  %button(type='button' data-container='body' data-toggle='popover' data-content="#{ ovv.option_value.presentation} (in #{ovv.option_value.option_type.name})")= ovv.option_value_id

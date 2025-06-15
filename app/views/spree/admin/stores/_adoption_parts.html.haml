@@ -1,0 +1,71 @@
+:javascript
+  function focusedAdoptionPrice() {
+    $(this).addClass('active-adoption-price');
+    $("#product_adoption_card_" + $(this).data('product-id') ).css('border', 'solid 3px orange');
+  }
+  function blurredAdoptionPrice() {
+    $("#product_adoption_card_" + $(this).data('product-id') ).css('border', 'none');
+  }
+
+  function autoLoadNextPage(ev) {
+    if ( $("#product_adoption_cards") ) {
+      if ((window.innerHeight + window.scrollY) >= $("#product_adoption_cards").height() + $("#product_adoption_cards")[0].offsetTop + 100 ) {
+        if (!areProductsLoading && $(".product-pagination a:last").length > 0) {
+          $(".product-pagination a:last")[0].click();
+          areProductsLoading = true;
+        }
+      }
+    }
+  }
+
+- content_for :footer do
+  :javascript
+    var areProductsLoading = false;
+    $( function(){
+
+      $("[data-toggle='tooltip']").tooltip();
+      $("[data-toggle='popover']").popover({ html: true, trigger:'hover', placement:'bottom',
+          content:function(){ return "<img class='image-flex' src='" + $(this).data('img') + "'>" } }
+        );
+      $("input[name='variant[price]']").focus(focusedAdoptionPrice);
+      $("input[name='variant[price]']").blur(blurredAdoptionPrice);
+
+      // window.onscroll = autoLoadNextPage;
+    } );
+
+.container-flex
+  .selling-taxons.spree-mb-small.spree-mt-small(style="margin-bottom: 2.0rem;")
+    %br/
+    %h3= t('store.fill_your_store').html_safe
+    %h5= t('store.enter_your_best_price')
+
+  .row
+    .col-2
+      .sticky
+        .filter-title
+          =t('store.category_title')
+        .ul
+        - Spree::CategoryTaxon.most_product_top_categories.where('record_count > ?', (Rails.env.production? ? 400 : 0) ).to_a.each do|selling_taxon|
+          .li
+          = link_to admin_wanted_products_path(taxon_id: selling_taxon.id, products_container_selector:'#product_adoption_cards', collection: params[:collection] ), method:'get' do
+            %span(class="filter-link" title="#{selling_taxon.permalink}" id="selling_taxon_#{ selling_taxon.id }")= selling_taxon.name
+        .filter-title
+          =t('store.brands_title')
+        .ul
+        - Spree::OptionValue.most_product_option_values('brand').where('record_count > ?', (Rails.env.production? ? 400 : 0) ).each do|ov|
+          .li
+          = link_to admin_wanted_products_path(option_value_id: ov.id, products_container_selector:'#product_adoption_cards', collection: params[:collection] ), method:'get' do
+            %span(class="filter-link" title="#{ov.presentation}" id="selling_optin_value_#{ ov.id }")= ov.presentation
+    .col-10
+      .row.row-eq-height.product-adoption-cards.mt-4(id="product_adoption_cards")
+        - if @previous_collection
+          = render partial: 'spree/admin/products/adoption_card', collection: @previous_collection, as: :product, locals:{ show_user_info: false }
+        = render partial: 'spree/admin/products/adoption_card', collection: @collection, as: :product, locals:{ show_user_info: false }
+      .row.mr-2.product-pagination.mt-2
+        - if @collection.respond_to?(:total_pages)
+          .col-3
+          .col-6(class="plp-pagination text-center")
+            = paginate(@collection, remote: true, window: 4, class:'page-link', theme: 'twitter-bootstrap-4')
+
+  .row.mt-8
+    %br/

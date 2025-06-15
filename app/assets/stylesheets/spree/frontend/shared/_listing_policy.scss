@@ -1,0 +1,116 @@
+.wrap-collabsible {
+  margin-bottom: 1.2rem 0;
+}
+
+.wrap-collabsible input[type='checkbox'] {
+  display: none;
+}
+
+.lbl-toggle {
+  display: block;
+
+  font-weight: bold;
+  font-family: monospace;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  text-align: left;
+  padding: 1rem;
+  padding-left: 3em;
+
+
+
+  color: #000;
+  background: #FFF;
+
+  cursor: pointer;
+
+  border-radius: 7px;
+  transition: all 0.25s ease-out;
+}
+
+.lbl-toggle:hover {
+  color: #7C5A0B;
+}
+
+.lbl-toggle::after {
+  content: ' ';
+  display: inline-block;
+
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 5px solid currentColor;
+  vertical-align: middle;
+  margin-left: .7rem;
+  transform: translateY(-2px);
+
+  transition: transform .2s ease-out;
+}
+
+.toggle:checked + .lbl-toggle::after {
+  transform: rotate(90deg) translateX(-3px);
+}
+
+.collapsible-content {
+  max-height: 0px;
+  overflow: hidden;
+  transition: max-height .25s ease-in-out;
+}
+
+.toggle:checked + .lbl-toggle + .collapsible-content {
+  max-height: 100vh;
+}
+
+.toggle:checked + .lbl-toggle {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.collapsible-content .content-inner {
+  background: rgba(250, 224, 66, .2);
+  border-bottom: 1px solid rgba(250, 224, 66, .45);
+  border-bottom-left-radius: 7px;
+  border-bottom-right-radius: 7px;
+  padding: .5rem 1rem;
+}
+
+.number-icon::before {
+  font-weight: bold;
+  display: inline-block;
+  background-color: green;
+  color: white;
+  border-radius: 50%;
+  border: 0px;
+  width: 30px;
+  height:30px;
+  line-height: 30px;
+  text-align: center;
+  margin-right: 1em;
+}
+
+.red-dot::before {
+background-color: $ioffer-red;
+}
+.content-1::before {
+  content: "1";
+}
+.content-2::before {
+  content: "2";
+}
+.content-3::before {
+  content: "3";
+}
+.content-4::before {
+  content: "4";
+}
+.content-5::before {
+  content: "5";
+}
+
+.tacbox {
+  margin: auto;
+  display:block;
+  padding: 1em;
+  border: 3px solid #ddd;
+  background-color: #eee;
+  max-width: 800px;
+}

@@ -1,0 +1,28 @@
+:ruby
+  admin_breadcrumb link_to(resource.retail_site.domain, resource.retail_site)
+  admin_breadcrumb link_to('< Back to Page', resource)
+  
+.row
+  %nav(aria-label="breadcrumb")
+    %ol.breadcrumb.admins-breadcrumb
+      %li.breadcrumb-item
+        Site:
+        = link_to resource.retail_site.domain, retail_site_path(resource.retail_site)
+      %li.breadcrumb-item
+        = link_to resource.relative_page_url.gsub(/\A(\/)/,''), resource.retail_site.abs_url(resource.page_url), target:'_blank'
+
+%nav
+  %ul(class="tabs justify-content-center")
+    %li(class="#{params[:source_format] == 'html' ? ' active' : ''}")
+      = link_to 'HTML', resource.page_file_relative_url || page_source_file_path(id: resource.id, source_format: 'html')
+    %li(class="#{params[:source_format] != 'html' ? ' active' : ''}")
+      = link_to 'Raw', scraper_page_source_file_path(id: resource.id, source_format: 'raw')
+- if params[:source_format].blank? || params[:source_format] == 'raw'
+  %code
+    = @source
+- elsif resource.page_file_relative_url.present?
+  .row
+    .col-12
+      %iframe(id="scraper_page_iframe" style="width:95%; height:600px;" src="#{resource.page_file_relative_url}")
+- else
+  = strip_page_source( @source ).html_safe

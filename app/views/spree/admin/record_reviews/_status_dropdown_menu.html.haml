@@ -1,0 +1,41 @@
+:ruby
+  # Would require RecordReviewsHelper methods
+  # Required locals:
+  #   product: [Spree::Product]
+  #   dropdown_menu_id [String]
+  # Optional locals:
+  #   show_good_status_options [Boolean] default: false. Whether to include good status options
+  #     like OK and Good Image
+  show_good_status_options = false unless defined?(show_good_status_options)
+.status-dropdown-menu.dropdown-menu{"aria-labelledby" => "#{dropdown_menu_id}_link", id: dropdown_menu_id}
+  .dropdown-header
+    %h6 Status
+  .dropdown-item
+    IQS: 
+    %label(id='iqs_#{product.id}')= product.iqs
+  .dropdown-item
+    status_code: 
+    %label(id='status_code_#{product.id}')= product.status_code
+  - if show_good_status_options
+    .dropdown-header
+      %h6 Approve Item
+    .dropdown-item
+      = update_record_review_link(product, 'ok-image', class:'small-status-action-inline', title:'OK Image', 'data-toggle'=>'tooltip') do
+        %span.text-info OK
+      = update_record_review_link(product, 'good-image', class:'small-status-action-inline', title:'Good Image', 'data-toggle'=>'tooltip') do
+        = image_tag('icon/star-gold-border.png', alt:'Good Image')
+  .dropdown-header
+    %h6 Remove Item
+  - ['Prohibited', 'Contact Info', 'Listing Violation', 'Custom Watermarks'].each do|status_name|
+    .dropdown-item
+      = menu_item_status_icon(status_name, class:'dropdown-item-icon')
+      = link_to(admin_record_reviews_path(update_link_params(product, status_name)), remote: true, method:'post') { status_name }
+  .dropdown-header
+    %h6
+      Reduce Score
+      - if product.respond_to?(:iqs)
+        %span{class: "badge badge-light", "data-toggle" => "tooltip", title: "Image Quality Score (IQS)"}= product.iqs
+  - ['Bad Main Image', 'Wrong Category', 'Catalog Listing', 'Keyword Spam'].each do|status_name|
+    .dropdown-item
+      = menu_item_status_icon(status_name, class:'dropdown-item-icon')
+      = link_to(admin_record_reviews_path(update_link_params(product, status_name)), remote: true, method:'post') { status_name }

@@ -1,0 +1,58 @@
+<style>
+  .seller-dropdown-item {
+    padding: 0.5em;
+  }
+  .navbar-rounded-button {
+    background: blue;
+  }
+</style>
+
+
+<ul id="nav-bar" class="nav align-items-center d-flex justify-content-end navbar-right">
+  <li>
+    <div class="navbar-right-search-menu">
+      <div id="search-dropdown" class="p-0 px-md-4 py-md-2 w-100 shadow navbar-right-search-menu-dropdown hide-on-esc">
+        <%= render partial: 'spree/shared/search' %>
+      </div>
+      <div id="search-inline" class="d-none d-sm-inline-block">
+        <%= render partial: 'spree/shared/search_inline' %>
+      </div>
+    </div>
+  </li>
+  <li>
+  </li>
+  <% if defined?(spree.account_link_path) %>
+    <li>
+      <div class="dropdown navbar-right-dropdown mr-1">
+        <button id="account-button" type="button" data-toggle="dropdown" class="navbar-right-dropdown-toggle" aria-label="<%= Spree.t('nav_bar.show_user_menu')%>" title="<%= spree_current_user.try(:login) unless Rails.env.production? -%>">
+
+          <%= inline_svg_tag('icon/instacons/user-icon.svg', width: 28, height: 28, class: 'd-none d-xl-inline-block', style: 'width:28px; height: 28px;') %>
+          <%= inline_svg_tag('icon/instacons/user-icon.svg', width: 28, height: 28, class: 'd-lg-inline-block d-xl-none', style: 'width:28px; height: 28px;') %>
+
+        </button>
+
+        <div id="link-to-account" class="dropdown-menu dropdown-menu-right text-right">
+        </div>
+      </div>
+    </li>
+  <% end %>
+  <% if spree_current_user.try(:seller?)%>
+  <button id="seller-admin-button" type="button" class="btn mr-1" title="Store Manager" onclick="location.href='/admin/sales/payment';" style="margin-left: 0.5em; background-color: #25567C; color: white; font-weight: bold; border-radius: 8px; padding: 8px 16px;">
+  <div>Store Manager</div>
+</button>
+  <% elsif not spree_current_user.try(:admin?) %>
+    <li id="link-to-cart" class="mr-1">
+      <%= render 'spree/shared/cart', class: 'd-none d-xl-inline-block cart-icon--xl', size: 28, item_count: @count_of_line_items || 0 %>
+      <%= render 'spree/shared/cart', class: 'd-xl-none', size: 24, item_count: @count_of_line_items || 0 %>
+    </li>
+  <% elsif spree_current_user.try(:admin?) %>
+    <button id="seller-admin-button" type="button" class="btn mr-1" id="seller-admin-button" type="button" title="Admin" onclick="location.href='/account';"> <div id="link-to-account" class="">Admin</div> </button>
+  <% end %>
+  <li>
+    <div class="d-xl-none header-spree-fluid-mobile-menu-toggler">
+      <button class="navbar-toggler border-0 px-0 d-flex" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-label="<%= Spree.t('nav_bar.show_menu') %>">
+        <%= image_tag 'icon/more-menu.svg', style: 'height:16px;width:auto;' %>
+      </button>
+    </div>
+  </li>
+</ul>

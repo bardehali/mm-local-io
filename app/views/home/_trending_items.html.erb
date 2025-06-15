@@ -1,0 +1,38 @@
+<div class="<%= extended_class %>" style="">
+  <div class="row io-trending-container pb-4 px-1 pt-2">
+    <% if @tiles_data && @tiles_data['trending'] %>
+      <%
+        batch_size = 8
+        total_items = @tiles_data['trending'].size
+        total_batches = (total_items.to_f / batch_size).ceil
+        start_index = (Time.now.hour % total_batches) * batch_size
+        # Use modular arithmetic to wrap around
+        batch = (0...batch_size).map do |i|
+          @tiles_data['trending'][(start_index + i) % total_items]
+        end
+      %>
+      <% batch.each do |tile| %>
+        <div class="col-md-3 col-6 col-xl-3 mt-3">
+          <a href="<%= tile['tile_url'] %>">
+            <div class="io-trending-item position-relative">
+              <div class="io-trending-item-img-container text-center">
+                <%= image_tag(tile['image_url'], title: tile['image_title']) %>
+              </div>
+              <div class="recent-sale-info-box">
+                <span class="title" content="">
+                  <%= tile['image_title'] %>
+                </span>
+                <div class="price-info">
+                  <span class="from-label">From</span>
+                  <span class="price" content="">
+                    <%= tile['from_price'] %>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+      <% end %>
+    <% end %>
+  </div> <!-- container -->
+</div>

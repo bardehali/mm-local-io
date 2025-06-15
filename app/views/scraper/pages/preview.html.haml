@@ -1,0 +1,100 @@
+:ruby
+  agent = @retail_site.try(:scraper)
+- content_for :head do
+  :css
+    .product-photos-container { text-align: center; }
+    .product-photos-container img {
+      margin: 0.5rem;
+      max-width: 100px;
+    }
+    #page_preview_result_wrapper ul > li { border-top: solid 1px #eeeeee; }
+    #page_preview_result_wrapper h4 { padding: 0.5rem 1.5rem; }
+  :javascript
+    $(function(){ 
+      $('[data-toggle="popover-hover"]').popover({
+        html: true,
+        trigger: 'hover',
+        placement: 'bottom',
+        content: function () { return '<img src="' + $(this).data('img') + '" />'; }
+      });
+
+      $('[data-toggle="popover-click"]').popover({
+        html: true,
+        trigger: 'click',
+        placement: 'bottom',
+        content: function () { return '<img class="img-fluid" src="' + $(this).data('img') + '" />'; }
+      });
+    });
+- content_for :footer do
+  :javascript
+    function switchPagePreviewTabs(){
+      var target = $(this).attr('data-target');
+      $('#page_preview_tabs li.active').each(function(i, obj) {
+        var targetPanelSelector = $(obj).children("a[data-target]").attr('data-target');
+        $(targetPanelSelector).hide();
+        console.log("Hide " + targetPanelSelector);
+        $(obj).removeClass('active');
+      } );
+      $(this).parent().addClass('active');
+      $(target).show();
+      console.log("target: "+ target);
+    }
+    $(function() {
+      $('#page_preview_tabs li > a').click(switchPagePreviewTabs);
+    });
+
+= form_tag(scraper_page_preview_path) do
+  %nav
+    %ul(id="page_preview_tabs" class="tabs justify-content-center")
+      %li(class="#{'active' if @mechanize_page.nil? || params[:tab] == 'source'}")
+        %a(href='javascript:void(0);' id='page_preview_source_tab' data-target='#page_preview_source_wrapper') Source
+      - if @mechanize_page
+        %li.active
+          %a(href='javascript:void(0);' id='page_preview_result_tab' data-target='#page_preview_result_wrapper') Result
+  %div(id="page_preview_source_wrapper" style="#{'display:none' if @mechanize_page}")
+    %label(for='source') Page Source Code
+    %br/
+    = text_area_tag(:source, @source, style:'width: 100%; height: 30rem;')
+    %br/
+    %br/
+    %label
+      %strong Which site? 
+    = select_tag('retail_site_id', select_options_of_retail_sites )
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    %button(type="submit" class="") Preview
+%div(id="page_preview_result_wrapper")
+  - if @mechanize_page
+    .shadow
+      %h4 Stores Info
+      %ul
+        - agent.find_retail_store_attributes(@mechanize_page).each_pair do|k,v|
+          %li
+            %strong #{k}:
+            = v
+    .shadow
+      %h4 Product Info
+      %ul
+        - agent.find_product_attributes(@mechanize_page).each_pair do|k,v|
+          - next if v.nil?
+          %li
+            %strong #{k}:
+            - if k.to_s == 'photos'
+              .product-photos-container
+                - v.each do|photo_url|
+                  = image_tag(photo_url, class:"product-thumbnail", 'data-toggle'=>'popover-hover', 'data-img'=> photo_url )
+            - elsif v.is_a?(Array) || v.is_a?(Set)
+              %ul
+                - v.each do|subv|
+                  %li
+                    - if subv =~ /\.(jpe?g|gif|png)\Z/i
+                      %i.fa.fa-image &nbsp;
+                      %a(href="#{subv}" target='_blank')=subv
+                    - else
+                      = subv
+            - else
+              - if v.is_a?(String)
+                =v.encode_to_ascii
+              - else
+                =v
+    .shadow
+      = render partial:'scraper/pages/links_from_mechanize_page', locals:{ scraper: agent, mechanize_page: @mechanize_page }

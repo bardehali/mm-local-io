@@ -1,0 +1,8 @@
+<% 
+  mail = Spree::OrderMailer.with(order: @order).invoice_to_buyer
+-%>
+var frame = $("#basic_modal iframe").contents().find('body');
+console.log("Got frame? " + frame);
+if (frame == undefined) { frame = $("#basic_modal .modal-body"); }
+frame.html("<%= escape_javascript(mail.body.to_s).html_safe %>");
+$("#basic_modal").modal('show');

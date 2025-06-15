@@ -1,0 +1,77 @@
+:ruby
+  plps = Spree::ProductListProduct.where(product_list_id: @product_list.id).includes(:product).page(params[:page] || 1)
+:css
+  .product-row h6, .product-row h5 {
+    font-weight: 600;
+  }
+  .product-row .small-number-field {
+    width: 4.0em !important;
+  }
+.row
+  .col-6
+    %h4
+      = link_to 'Product Lists', admin_product_lists_path
+      &gt; #{@product_list.name}
+  .col-6.text-right
+    = form_for(Spree::ProductList.new, url: admin_product_lists_path) do|f|
+      = f.text_field :name, placeholder:"List name", 'aria-label'=>"List name"
+      = f.submit('Create List', class:"btn btn-outline-secondary")
+
+- if params[:view] == 'table'
+  .table-responsive
+    %table(class="table" id="product_list_#{@product_list.id}" data-hook)
+      %thead
+        %tr(data-hook="admin_products_index_headers")
+          %th ID
+          %th Image
+          %th= Spree.t(:name)
+          %th Price
+          %th IQS
+          %th Views
+          -#%th
+            %span(title="Depends on availble_on and IQS > 0" data-toggle="tooltip" class="with-tip action-search") Searcable?
+                  -#%th= Spree.t(:user)
+          %th
+      %tbody
+        - plps.each do|plp|
+          - product = plp.product
+          - next if product.nil?
+          = form_for(product, url: edit_admin_product_path(product), remote: true) do|f|
+            %tr.product-row(id="product_row_#{product.id}")
+              %td
+                %span(title="Created on #{product.created_at.to_s(:db)}, updated on #{product.updated_at.to_s(:db)}")= link_to(product.id, product_path(product), title:'View Product' )
+              %td
+                - image = default_image_for_product_or_variant(product)
+                = image_tag cdn_image_url(image, :small)
+              %td
+                %h6
+                  %a(href="#{edit_admin_product_path(product)}" title="#{product.name}")
+                    = product.name.truncate(60)
+                %div(class='row' id="search_index_json_#{product.id}")
+                  .col-6
+                    %strong Data Number
+                    = product.data_number
+                    %br/
+                    %strong Brands:
+                    = product.brands.collect(&:presentation).join(', ')
+                    %br/
+                    #{product.master.images.count } Images
+                  .col-6
+                    %br/
+                    %strong Category:
+                    %span(title="Category ID #{product.taxons.first.id}")= product.taxons.first.breadcrumb
+                  -#%span.text-secondary= product.as_indexed_json
+              %td= display_price(product)
+              %td= f.text_field :iqs, placeholder: 'IQS', class:'small-number-field'
+              %td= f.text_field :view_count, placeholder: 'View Count', class:'small-number-field'
+              -#%td= product.user.display_name
+              %td
+                %button(type='submit' class='btn btn-success icon icon-save' title='Save Changes')
+                = link_to(admin_remove_product_list_product_path(id: @product_list, product_id: product.id, selector:"#product_row_#{product.id}"), title:'Remove From This List', method:'delete', remote: true, confirm:'Are you sure?' ) do
+                  %i.btn.btn-warning.icon.icon-trash
+- else
+  = render partial:'spree/shared/products.html.haml', locals:{ products: plps.collect(&:product), thumbnail_type:'simple' }
+  .row
+  .col-4
+  .col-4.text-center
+    = paginate plps, theme: 'twitter-bootstrap-4' if plps

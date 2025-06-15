@@ -1,0 +1,50 @@
+<div class="<%= extended_class %>" style="overflow: hidden;">
+  <div class="row io-category-container io-jagged-bottom pb-md-2 px-3 pb-lg-5 pt-2 g-0">
+    <% if @tiles_data && @tiles_data['tiles'] %>
+    <% @tiles_data['tiles'].each_with_index do |tile, index| %>
+        <div class="col-6 col-md-3 my-0 p-1">
+          <a href="<%= tile['tile_url'] %>" class="io-banner-btn position-relative d-block">
+            <div class="io-banner-btn-img-container text-center position-relative">
+              <%= image_tag(tile['image_url'], title: tile['image_title'], class: "img-fluid") %>
+              <div class="position-absolute p-1 text-bold"
+                   style="color: <%= tile['text_color'] %>; font-size: 12pt; bottom: 2px; left: 6px; text-decoration: none;">
+                <%= tile['tile_name'] %>
+              </div>
+            </div>
+          </a>
+        </div>
+      <% end %>
+
+      <% @tiles_data['buttons'].each_with_index do |tile, index| %>
+          <div class="col-4 col-md-2 mt-1 p-1">
+            <a href="<%= tile['tile_url'] %>">
+              <div class="io-banner-btn">
+                <div class="io-banner-btn-img-container  text-center">
+                  <%= image_tag(tile['image_url'], title: tile['image_title']) %>
+                </div>
+              </div>
+            </a>
+            <a href="<%= tile['tile_url'] %>">
+              <div class="io-category-label text-center">
+                  <%= tile['tile_name'] %>
+              </div>
+            </a>
+          </div>
+        <% end %>
+    <div class="w-100 mt-3 mb-1 ml-2 text-bold">Shop by category</div>
+    <% @tiles_data['categories'].each_with_index do |tile, index| %>
+        <div class="col-4 col-md-4 mt-2 mb-3">
+          <a href="<%= tile['tile_url'] %>" class="io-cat-btn position-relative d-block">
+            <div class="io-cat-btn-img-container text-center position-relative">
+              <%= image_tag(tile['image_url'], title: tile['image_title'], class: "img-fluid", style: "border-radius: 12px;") %>
+              <div class="position-absolute p-1 px-2 text-bold text-center"
+                   style="left: 50%; transform: translateX(-50%); color: <%= tile['text_color'] %>; font-weight: 600; font-size: 10pt; bottom: 6px; text-decoration: none; background-color: white; border-radius: 18px">
+                <%= tile['tile_name'] %>
+              </div>
+            </div>
+          </a>
+        </div>
+      <% end %>
+      <% end %>
+  </div> <!-- container -->
+</div>

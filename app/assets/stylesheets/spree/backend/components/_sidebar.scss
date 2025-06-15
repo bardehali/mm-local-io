@@ -1,0 +1,114 @@
+.sidebar {
+  overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+  background-color: white;
+  border-right: 0px solid $gray-100;
+  margin-top: 50px;
+  height: calc(100% - 50px);
+  z-index: 999;
+
+  overflow: -moz-scrollbars-none;  /* For Firefox */
+  -ms-overflow-style: none;        /* For Internet Explorer and Edge */
+  scrollbar-width: none;           /* For Firefox */
+
+  /* For WebKit-based browsers (Chrome, Safari, etc.) */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  a.sidebar-submenu-item {
+    color: $gray-700;
+    font-weight:300;
+    border-top-left-radius: 16pt;
+    border-bottom-left-radius: 16pt;
+
+    &:hover {
+      text-decoration: none;
+      background: linear-gradient(to left, $gray-100 30%, $gray-200 70%);
+      cursor: pointer
+    }
+  }
+
+  ul.nav-sidebar {
+    > li {
+      padding-left: 1.5em;
+
+      > a {
+        border-top-left-radius: 28pt;
+        border-bottom-left-radius: 28pt;
+        color: $black;
+        padding-left: 2.0em;
+        background-color: transparent; /* Set initial background color */
+        transition: background-color 0.3s ease-in-out; /* Add transition for background */
+
+        &:hover,
+        &[aria-expanded="true"],
+        &[aria-selected="true"] {
+          text-decoration: none;
+          background: linear-gradient(to left, $gray-100 30%, $gray-200 70%); /* Background color on hover or expanded */
+        }
+
+        .icon-chevron-left,
+        .icon-chevron-down {
+          font-size: .5rem;
+          line-height: 2;
+          right: 1rem;
+          top: 50%;
+          margin-top: -.5rem;
+        }
+      }
+    }
+  }
+}
+
+#wrapper.sidebar-minimized #main-sidebar {
+  width: 50px;
+  overflow: visible;
+
+  li {
+    padding-left: 0em;
+    &:hover, &.menu-active {
+      background-color: $gray-100;
+    }
+  }
+
+  .icon-link, [data-toggle="collapse"] {
+    text-align: center;
+
+    .icon {
+      padding: 0;
+    }
+
+    .text, .icon-chevron-left, .icon-chevron-down {
+      display: none;
+    }
+  }
+
+  .visual-categories-container {
+    display: none;
+  }
+
+  ul.collapse.in {
+    display: none;
+  }
+
+  .submenu-active {
+    display: block !important;
+    height: auto !important;
+    position: fixed;
+    top: 50px;
+    bottom: 0;
+    left: 0;
+    padding: 0pt;
+    z-index: 1000;
+    display: block;
+    overflow-x: hidden;
+    overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+    left: 50px;
+    min-width: 180px;
+    visibility: visible;
+    background-color: $gray-100;
+    border-top: none;
+    border-right: 1px solid $gray-200;
+    padding-top: 5px;
+  }
+}

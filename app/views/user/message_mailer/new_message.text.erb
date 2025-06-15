@@ -1,0 +1,10 @@
+Hello <%= @user.try_display_name %>,
+
+<%= @message.comment %>
+
+
+Thank you,
+iOffer Helper
+<% if @url.present? -%>
+Login Here - <%= @url %>
+<% end -%>

@@ -1,0 +1,61 @@
+<% # Name of file to differentiate from relative form of option_values 
+  option_values = ( @option_values || @option_type.option_values ).page(params[:page]).per(25) #unless defined?(option_values)
+-%>
+<% content_for :head do -%>
+<style type="text/css">
+  #option_values tr:first-child {
+    box-shadow: 0 0 1em #00b327;
+  }
+</style>
+<% end -%>
+
+<%= form_for [:admin, @option_type] do |f| %>
+  <div class="card mb-3">
+    <div class="card-header">
+      <h1 class="card-title mb-0 h5">
+        <%= Spree.t(:option_type) %>
+      </h1>
+    </div>
+    <div class="card-body">
+      <%= render partial: 'form', locals: { f: f } %>
+    </div>
+    <a name="option_values_section"></a>
+    <div class="card-header">
+      <h1 class="card-title mb-0 h5">
+        <%= Spree.t(:option_values) %>
+      </h1>
+    </div>
+    <a name="option_values_table"></a>
+    <table class="table table-condensed table-bordered sortable" data-hook data-sortable-link="<%= update_values_positions_admin_option_types_url %>">
+      <thead data-hook="option_header">
+        <tr>
+          <th colspan="2"><%= Spree.t(:name) %> <span class="required">*</span></th>
+          <th><%= Spree.t(:display) %> <span class="required">*</span></th>
+          <th title="<%= Spree.t(:extra_value_tip) %>" data-toggle='tooltip'><%= Spree.t(:extra_value) %></th>
+          <th class="actions"></th>
+        </tr>
+      </thead>
+      <tbody id="option_values">
+        <% if @option_type.option_values.count.zero? %>
+          <%= f.fields_for :option_values, [Spree::OptionValue.new] do |option_value_form| %>
+            <%= render partial: 'option_value_fields', locals: { f: option_value_form } %>
+          <% end %>
+        <% else %>
+          <% if @option_type.option_values.present? %>
+            <tr id="fake-row" style="display:none;">
+            </tr>
+          <% end -%>
+          <%= f.fields_for :option_values, option_values do |option_value_form| %>
+            <%= render partial: 'option_value_fields', locals: { f: option_value_form } %>
+          <% end %>
+        <% end %>
+      </tbody>
+    </table>
+    <div class="card-footer text-center">
+      <div class="text-center mb-5">
+        <%= paginate option_values, remote: true, window: 5, theme: 'twitter-bootstrap-4' %>
+      </div>
+      <%= render partial: 'spree/admin/shared/edit_resource_links' %>
+    </div>
+  </div>
+<% end %>

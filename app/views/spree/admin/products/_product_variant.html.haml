@@ -1,0 +1,82 @@
+:ruby
+  ##
+  # Require locals:
+  #   f [FormBuilder]
+  @color_option_type ||= ::Spree::OptionType.color
+  @color_option_values ||= @color_option_type.option_values.accessible_by( current_ability )
+  show_heading = true unless defined?(show_heading) && show_heading == false
+  show_row_of_colors = false unless defined?(show_row_of_colors) && !show_row_of_colors.nil?
+
+- content_for :footer do
+  -# From app/views/spree/admin/products/_form_with_option_types.html.haml
+  :javascript
+    function selectAllCheckBoxes() {
+      if (event != undefined) { event.preventDefault(); }
+      var selectNone = $(this).hasClass('select-none');
+      if (selectNone) {
+        $("input[data-option-type='" + $(this).attr('data-target') +"']").prop('checked', false);
+        $(this).removeClass('select-none').addClass('select-all').text('Select All');
+      } else {
+        $("input[data-option-type='" + $(this).attr('data-target') +"']").prop('checked', true);
+        $(this).removeClass('select-all').addClass('select-none').text('Deselect All');
+      }
+    }
+
+    function changedComboOptionValueIds() {
+      var otherOvId = $(this).attr('data-other-ov-id');
+      if (otherOvId != undefined) {
+        var oneValueInput;
+        var nonOneValueChecked = 0;
+        $("input[data-other-ov-id='" + otherOvId + "']").each(function(){
+          if( $(this).attr('data-ov-type') == 'one-value') {
+            oneValueInput = $(this);
+          } else {
+            if( $(this).prop('checked') ) { nonOneValueChecked += 1; }
+          }
+        });
+        if (oneValueInput) {
+          oneValueInput.prop('checked', (nonOneValueChecked > 0) ? '' : true );
+        } else {
+          $("input[data-ov-type='one-value']").prop('checked', true);
+        }
+      }
+    }
+
+    $(function(){
+      $('.select-all-check-boxes').click(selectAllCheckBoxes);
+      $(".variant-option-box input[name='combo_option_value_ids[]']").change(changedComboOptionValueIds);
+
+      // Preselect all checkboxes for colors_by_sizes when the form loads
+      $("input[data-option-type='colors_by_sizes']").prop('checked', true);
+
+      // Change the button text to "Deselect All" if all checkboxes are checked
+      var allSelected = $("input[data-option-type='colors_by_sizes']").length === $("input[data-option-type='colors_by_sizes']:checked").length;
+      if (allSelected) {
+        $('.select-all-check-boxes').removeClass('select-all').addClass('select-none').text('Deselect All');
+      }
+    });
+
+
+%div(id="product_variant" class="#{'border border-danger border-3 p-2' if @product.errors[:option_types].present?}")
+  .variant-box(id="variant_colors" style="#{'display:none;' unless show_row_of_colors}")
+    - if show_heading
+      .variant-box-head.d-flex.jc-sb
+        .heading
+          %p= t('spree.admin.products.choose_all_variants_supply')
+        .action-group
+          -#%a.btn.btn-bg-white.w-16.brnd-6.add-variant= t('spree.add_variant')
+          -#%a.btn.btn-bg-black.brnd-6.confirm-variant
+            -#%i.fa.fa-check
+    .variant-box-body.d-flex.f-wrap.p-4(id="option_type_body_#{@color_option_type.id}")
+      = render partial: 'spree/admin/shared/color_box', collection: @color_option_values, as: :option_value, locals:{ input:'checkbox' }
+
+  %div(class="sizes-box" id="variant_colors_sizes" style="#{'display:none;' unless @color_option_values.find(&:selected) }")
+    .sizes-box-head.d-flex.jc-sb(style="#{'display: none;' unless @size_option_type}")
+      - if show_heading
+        .heading
+          %h6.d-flex.va-m.lh-2.font-weight-bold(title="#{@size_option_type.try(:presentation)}")
+            = t('spree.sizes')
+      %a.btn.btn-bg-black.w-16.brnd-6.add-all
+    .sizes-box-body.d-flex.f-wrap.mr-13m.ml-13m(id="option_type_body_#{@size_option_type.try(:id)}")
+      - if @size_option_type
+        = render partial: 'spree/admin/products/variant_colors_by_sizes_table', locals: { product: f.object, size_option_type: @size_option_type, size_option_values: @size_option_values, other_option_values: @color_option_values, show_only_selected: current_ability.can?(:manage, @product) } if @size_option_type

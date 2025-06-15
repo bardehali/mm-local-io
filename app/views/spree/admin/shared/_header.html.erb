@@ -1,0 +1,45 @@
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+
+<style>
+  .navbar_shadow {
+    background-color: #fff;
+    background: #fff;
+    clip-path: inset(-8px 0px -500px 0px);
+    height: 55px;
+  }
+
+  .navbar_toggle_btn {
+    color: #000;
+    fill: #000;
+  }
+
+</style>
+
+
+<header class="header logged-in">
+
+  <nav class="navbar fixed-top navbar-light align-items-stretch" role="navigation">
+    <div class="navbar-header col-3 col-md-2 navbar_shadow">
+      <button
+        id="sidebar-toggle"
+        class="navbar-toggler h-100 m-0 p-0 navbar_toggle_btn"
+        type="button"
+        aria-expanded="false"
+        aria-label="Toggle navigation">
+        <span class="navbar_toggle_btn"><i class="fas fa-bars"></i></span>
+      </button>
+      <%= link_to spree.root_path, class: "logo navbar-brand small-d-none ml-2" do
+          image_tag( asset_path('logo/iOffer_logo_color_plain.png'), id:'logo' )
+        end
+      -%>
+      <%= link_to spree.root_path, class: "logo navbar-brand small-only-inline-block medium-d-none" do
+          image_tag('/favicon-32x32.png', id:'logo' )
+        end
+      -%>
+    </div>
+    <div class="col-9 col-md-10 pr-0 navbar_shadow">
+      <%= render partial: 'spree/admin/shared/account_nav' %>
+    </div>
+  </nav>
+
+</header>

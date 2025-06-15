@@ -1,0 +1,24 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Store:</strong>
+  <%= @spree_store_payment_method.store_id %>
+</p>
+
+<p>
+  <strong>Payment method:</strong>
+  <%= @spree_store_payment_method.payment_method_id %>
+</p>
+
+<p>
+  <strong>Account parameters:</strong>
+  <%= @spree_store_payment_method.account_parameters %>
+</p>
+
+<p>
+  <strong>Account label:</strong>
+  <%= @spree_store_payment_method.account_label %>
+</p>
+
+<%= link_to 'Edit', edit_spree_store_payment_method_path(@spree_store_payment_method) %> |
+<%= link_to 'Back', spree_store_payment_methods_path %>

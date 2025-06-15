@@ -1,0 +1,2 @@
+$("#shared_product_modal").replaceWith("<%= escape_javascript( render(partial: 'retail/products/modal', locals:{ modal_id: 'shared_product_modal', product: @product, page: resource }) ) -%>");
+$("#shared_product_modal").modal('show');

@@ -1,0 +1,122 @@
+:ruby
+  # Required locals
+  #   product [Spree::Product]
+  # Optional locals
+
+  index ||= 0
+  allowed_params = params.permit(:utm_source, :utm_term, :sid, :keywords, :verified)
+
+  # Override utm_source if is_related is true
+  allowed_params[:utm_source] = "related" if is_related
+
+  url = main_app.show_product_by_variant_adoption_path(
+    variant_adoption_id: product.display_variant_adoption_slug,
+    taxon_id: @taxon.try(:id),
+    **allowed_params.to_h
+  )
+
+  price = display_price(product.best_price_record)
+
+%div(class="col-6 col-sm-4 col-md-4 col-lg-3 col-xs-3 mt-3 mb-lg-3 mt-md-3 pr-sm-0 pr-md-0 pl-md-3 pl-sm-3 #{index&1 == 0 ? 'pl-0 pr-1' : 'pr-0 pl-1'}")
+  .card.custom-card-buyer.w-100.h-100.position-relative
+    %div(class="product-body custom-product-body")
+      = link_to url, class: 'd-block d-flex flex-column justify-content-between', 'data-turbolinks'=>false do
+        .p-image-container-buyer.zoom-hover
+          = plp_and_carousel_image(product, class: "d-block mx-auto image-style lazyloaded")
+          - if price
+            %div(class="price-pill position-absolute")
+              %span(class="price selling-buyer" content="#{price.nil? ? 0 : price.to_d}")
+                = price
+              %span(content="#{current_currency}")
+        = content_tag(:span, extra_product_name(product), class: 'info-buyer m-1 d-block', title: product.name)
+        - if !is_related
+          .sshare-button-buyer-container.position-absolute{ style: "top: 6px; right: 6px; z-index: 2;" }
+            - uri = URI(request.url)
+            - uri.query = URI.encode_www_form(utm_source: "shares") # Clears all params and sets only utm_source
+            %button{ class: "share-button-buyer btn p-0 d-flex align-items-center justify-content-center",
+                     type: "button",
+                     data: { product_name: product.name.to_s, url: uri.to_s, code: product.display_variant_adoption_code },
+                     style: "width: 36px; height: 36px; cursor: pointer; display: none;" }
+              = inline_svg_tag("icon/instacons/heart-comment-hollow-red.svg", width: 32, height: 32, class: "custom-icon", style: "color: black;")
+:javascript
+  document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll(".share-button-buyer").forEach(function(button) {
+      button.addEventListener("click", function(event) {
+        event.stopPropagation();
+      });
+    });
+  });
+
+  document.addEventListener("turbolinks:load", function() {
+    let isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+
+    if (isMobile && navigator.share || true) {
+      document.querySelectorAll(".share-button-buyer").forEach(btn => {
+        btn.style.display = "flex"; // Show share button on mobile
+
+        // Remove any existing event listener before adding a new one
+        btn.removeEventListener("click", shareFunction);
+        btn.addEventListener("click", shareFunction);
+      });
+    } else {
+      document.querySelectorAll(".copy-link-button").forEach(btn => {
+        btn.style.display = "flex"; // Show copy button on desktop
+
+        // Remove existing event listener before adding a new one
+        btn.removeEventListener("click", copyLinkFunction);
+        btn.addEventListener("click", copyLinkFunction);
+      });
+    }
+  });
+
+  // Function to handle sharing and log the event
+  function shareFunction(event) {
+    event.stopPropagation();
+    event.preventDefault();
+
+    let btn = event.currentTarget;
+    let productCode = btn.dataset.code; // Get product code for logging
+    let shareUrl = btn.dataset.url;
+    let category = btn.dataset.category || "Deals";
+
+    if (productCode) {
+      logShareClick(productCode); // Log to nginx
+    }
+
+    if (navigator.share) {
+      navigator.share({
+        title: `Check Out These ${category} on iOffer!`,
+        url: shareUrl
+      }).catch(error => console.error("Error sharing:", error));
+    }
+  }
+
+  // Function to handle link copying
+  function copyLinkFunction(event) {
+    event.stopPropagation();
+    event.preventDefault();
+
+    let btn = event.currentTarget;
+    let url = btn.dataset.url;
+
+    navigator.clipboard.writeText(url).then(() => {
+      alert("Link copied to clipboard!");
+    }).catch(error => {
+      console.error("Error copying link:", error);
+      alert("Failed to copy link.");
+    });
+  }
+
+  // Function to log the share event by making a silent GET request
+  function logShareClick(productCode) {
+    let trackingUrl = `/shares/${productCode}`;
+
+    // Backup: Create a hidden image request (ensures it logs in nginx without console errors)
+    let img = document.createElement("img");
+    img.src = trackingUrl;
+    img.style.display = "none"; // Prevents it from affecting UI
+    img.onerror = function () {
+      this.remove(); // Clean up the DOM if 404 occurs
+    };
+    document.body.appendChild(img);
+  }

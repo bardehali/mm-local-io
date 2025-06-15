@@ -1,0 +1,88 @@
+<%
+is_admin = is_admin?
+is_seller = spree_current_user&.seller?
+using_adopted_admin = %w(adopted other_listings).include?(params[:action]) unless defined?(using_adopted_admin) && !using_adopted_admin.nil?
+-%>
+
+<table class="table" id="listing_products">
+    <thead>
+      <tr data-hook="admin_products_index_headers">
+        <th><%= sort_link(@search, :id, 'ID', default_order: :desc) %></th>
+        <th colspan="2"><%= sort_link @search,:name, Spree.t(:name), { default_order: "desc" }, {title: 'admin_products_listing_name_title'} %></th>
+        <th class="text-center">
+          <%= Spree.t(:master_price) %>
+        </th>
+        <% if is_admin -%>
+          <th>IQS</th>
+        <% end -%>
+        <th data-hook="admin_products_index_header_actions" class="actions"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% products.each do |product|
+          is_creator_of_product = (product.user_id == spree_current_user&.id)
+          prod_path = if is_admin
+              product_path(product)
+            elsif is_creator_of_product
+              edit_admin_product_path(product)
+            elsif is_seller
+              admin_list_same_item_path(product, utm_source: 'ptable', utm_medium: 'list', utm_campaign: spree_current_user&.id)
+            else
+              product_path(product)
+            end
+      -%>
+          <tr <%== "style='color: red;'" if product.deleted? %> id="<%= spree_dom_id product %>" data-hook="admin_products_index_rows" class="product-row <%= cycle('odd', 'even') %>">
+            <td class="status">
+              <span data-toggle='tooltip' title="Created <%= time_ago_in_words(product.created_at) %> ago">
+                <%= is_admin ? status_label(product.status).html_safe : product.id %></span>
+            </td>
+            <td class="image">
+              <%= image_tag cdn_image_url(default_image_for_product_or_variant(product), :small), class: 'image-style' %>
+            </td>
+            <td>
+              <h6><%= link_to product.try(:name), prod_path %></h6>
+              <% if false && valid_creator?(product.user) && product.user_id != spree_current_user&.id -%>
+                <span>
+                  Created by <%= product.user_id && is_admin ? link_to( user_label(product.user), edit_admin_user_path(id: product.user_id), class:(product.user.test_or_fake_user? ? 'not-real-user' : '') ) : product.user.try(:username) %>
+                </span>
+              <% end -%>
+              <% if is_admin && using_adopted_admin -%>
+                <div class='text-secondary'>
+                  Adopted by
+                  <a href='javascript:void(0)' class='toggle-adopted-by'>More</a> &downarrow;
+                  <div class="users-adopted less-detail">
+                    <%
+                    product.variants.each do|v|
+                      v.variant_adoptions.includes(:default_price, :prices, user:[:role_users, store:[:store_payment_methods]], variant:[:tax_category]).group_by(&:user).each_pair do|adopted_user, variant_adoptions|
+                        next if adopted_user.nil?
+                        sorted_variants = variant_adoptions.uniq(&:price).sort_by(&:price)
+                      -%>
+                        <span class="user-label <%= 'not-real-user' if adopted_user.id == Spree::User.fetch_admin.id ||  adopted_user.test_or_fake_user? %>">
+                          <a href="<%= edit_admin_user_path(adopted_user) -%>" class="icon icon-info-sign ml-3" title="User Info"></a>
+                          <%= adopted_user ? link_to(user_label(adopted_user), admin_products_adopted_path(variant_adoptions_user_id_eq: adopted_user.id), title:"User's adopted products" ) : '' %>
+                          <span class='price'>&hyphen; <%= sorted_variants.length == 1 ? display_price(sorted_variants.first) : "#{display_price(sorted_variants.first)} to #{display_price(sorted_variants.last)}" %></span>
+                          <span class='payment-methods'><%= 'PP' if adopted_user.store&.store_payment_methods.to_a.collect(&:payment_method_id).include?(paypal.id) %></span>
+                        </span>
+                      <% end -%>
+                    <% end -%>
+                    </div>
+                </div>
+              <% end -%>
+            </td>
+            <td class="text-right"><%= product.display_price_for(spree_current_user).to_html rescue '' %></td>
+            <% if is_admin -%>
+              <td class="text-right"><%= product.iqs %></td>
+            <% end -%>
+            <td class="actions actions-3 text-right" data-hook="admin_products_index_row_actions">
+              <% if using_adopted_admin %>
+                <%= link_to_edit product, url: admin_list_same_item_path(id: product.id, utm_source: 'ptable', utm_medium: 'list', utm_campaign: spree_current_user&.id), no_text: true, class: 'edit' if can?(:adopt, Spree::Product) -%>
+              <% else -%>
+                <%= link_to_edit product, no_text: true, class: 'edit' if can?(:edit, product) && !product.deleted? %>
+                <% # = link_to_clone product, no_text: true, class: 'clone' if can?(:clone, product) %>
+                <%= link_to_delete product, no_text: true if can?(:delete, product) && !product.deleted? %>
+              <% end -%>
+            </td>
+          </tr>
+      <% end %>
+    </tbody>
+  </table>

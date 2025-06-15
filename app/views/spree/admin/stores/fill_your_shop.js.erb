@@ -1,0 +1,29 @@
+<%
+  button_id = @user_selling_taxon ? "selling_taxon_#{@user_selling_taxon.taxon_id}" : nil
+  container = params[:products_container_selector]
+  container = '#product_adoption_cards' if container.blank?
+%>
+<% if button_id -%>
+  <% if @user_selling_taxon_new %>
+  $("#<%= button_id %>").addClass('secondary-pill-selected');
+  <% else %>
+  $("#<%= button_id %>").removeClass('secondary-pill-selected');
+    <% if @user_selling_taxon.taxon.depth > 1 -%>
+    $("#<%= button_id %>").fadeOut();
+    <% end # sublevel%>
+  <% end %>
+<% end # button_id %>
+<% if container.present? %>
+$("<%= container -%>").fadeOut();
+  <% if @collection.count > 0 %>
+    $("<%= container -%>").html("<%= escape_javascript( render(partial: 'spree/admin/products/adoption_card', collection: @collection.to_a, as: :product, locals:{ show_user_info: spree_current_user.try(:admin?) } ) ) %>").fadeIn('slow');
+  <% else # no products %>
+    $("<%= container -%>").html("<div class='text-center w-100'><h4>No match found.</h4></div>").fadeIn();
+  <% end -%>
+<% end # products_container_selector %>
+areProductsLoading = false;
+<% if @collection.respond_to?(:total_pages) %>
+  var pagination = $(".product-pagination .pagination");
+  pagination.html("<%= escape_javascript( paginate(@collection, remote: true, window: 4, class:'page-link', theme: 'twitter-bootstrap-4') ) -%>");
+<% end # pagination %>
+window.scrollTo({top: 0});

@@ -1,0 +1,120 @@
+<% content_for :page_title do %>
+  <%= link_to Spree.t(:users), spree.admin_users_path %> /
+<% end %>
+
+<% content_for :soft_delete_form do -%>
+  <%= form_tag(admin_soft_delete_user_path(@user), method: :put) do %>
+    <%= text_area_tag 'user_report[comment]', '', class:'w-100', style:'height: 10rem;', placeholder:'Explanation or reason' %>
+    <div class="text-center">
+      <br/>
+      <%= submit_tag(t('form.submit'), class:'btn btn-success min-w-75', data:{ disable_with:'Sending' } ) %>
+    </div>
+  <% end %>
+<% end -%>
+<% content_for :lock_down_user do -%>
+  <%= form_tag(admin_limit_user_path(@user), method: :put) do %>
+    <%= text_area_tag 'amount', '', class:'w-100', style:'height: 10rem;', placeholder:'Amount Owed Formatted in cents i.e. 5000 = $50.00' %>
+    <div class="text-center">
+      <br/>
+      <%= submit_tag(t('form.submit'), class:'btn btn-success min-w-75', data:{ disable_with:'Sending' } ) %>
+    </div>
+  <% end %>
+<% end -%>
+<% content_for :sidebar do %>
+  <ul class="nav flex-column nav-pills" data-hook="admin_user_tab_options">
+    <li>
+      <%= link_to_with_icon 'user',
+        Spree.t(:"admin.user.account"),
+        spree.edit_admin_user_path(@user),
+        class: "nav-link #{'active' if current == :account}" %>
+    </li>
+    <li>
+      <%= link_to_with_icon 'book',
+        Spree.t(:"admin.user.addresses"),
+        spree.addresses_admin_user_path(@user),
+        class: "nav-link #{'active' if current == :address}" %>
+    </li>
+    <% unless @user.seller? -%>
+    <li>
+      <%= link_to_with_icon 'shopping-cart',
+        Spree.t(:"admin.user.orders"),
+        spree.orders_admin_user_path(@user),
+        class: "nav-link #{'active' if current == :orders}" %>
+    </li>
+    <li>
+      <%= link_to_with_icon 'credit-card',
+        Spree.t(:"admin.user.items_purchased"),
+        spree.items_admin_user_path(@user),
+        class: "nav-link #{'active' if current == :items}" %>
+    </li>
+    <% else # seller -%>
+    <% complaint_count = @user.count_of_order_complaints
+      compaint_css_class = complaint_count ? ' text-danger' : ''
+    -%>
+    <li>
+      <%= link_to_with_icon 'file', complaint_count > 0 ? "Complaints (#{complaint_count})" : 'Complaints',
+        spree.admin_sales_in_state_path(state: 'complaints', q:{ seller_user_id_eq: @user.id }),
+        class: "nav-link #{'active' if current == :items}#{compaint_css_class}" %>
+    </li>
+    <li>
+      <%= link_to_with_icon 'list',
+        Spree.t("admin.user.selling_items"),
+        spree.admin_products_path(q:{ user_id_eq: @user.id }),
+        class: "nav-link #{'active' if current == :items}" %>
+    </li>
+    <li>
+      <%= link_to_with_icon 'usd', Spree.t('admin.sellers.sales') + " (#{@user.sales_count})", spree.admin_sales_path(q:{ seller_user_id_eq: @user.id }), class: "nav-link"
+        # Spree.t(:"admin.user.store_credits"),
+        # spree.admin_user_store_credits_path(@user),
+        # class: "nav-link #{'active' if current == :store_credits}"
+      %>
+    </li>
+    <% end -%>
+    <li>
+      <%= link_to main_app.new_user_message_path(user_message:{ recipient_user_id: @user.id }), class:'nav-link' do -%>
+        <span class='mr-2 icon icon-comment'></span>
+        Message to User
+      <% end -%>
+    </li>
+    <% if @user.passcode.present? -%>
+      <li>
+        <%= link_to user_onboarding_path(passcode: @user.passcode, skip_count: true), class:'nav-link', target:'_blank' do -%>
+          <span class='mr-2 icon icon-link'></span>
+          Onboarding Link
+        <% end -%>
+      </li>
+    <% end -%>
+    <% if @user.quarantined? -%>
+      <li>
+        <%= link_to admin_restore_user_path(@user), type:'button', class:'nav-link', method:'put', data:{ confirm:'Are you sure to restore this user?', disable_with:'Updating' } do -%>
+          <span class='mr-2 icon icon-ok-circle'></span>
+          Restore User
+        <% end -%>
+      </li>
+    <% else -%>
+      <li>
+        <a href="#" class='nav-link' data-toggle='modal' data-target="#soft_delete_modal_<%= @user.id %>">
+          <span class='mr-2 icon icon-ban-circle'></span>
+          <s>Soft Delete User</s>
+        </a>
+        <%= render partial:'spree/admin/shared/modal', locals:{ target:"soft_delete_modal_#{@user.id}", show_footer: false, content:(yield :soft_delete_form), header_title: "Are you sure to soft delete #{@user.login}?" } %>
+      </li>
+    <% end -%>
+    <% if @user.store.present? && @user.store.meta_keywords.to_i > 0 -%>
+      <li>
+        <%= link_to admin_remove_limit_path(@user), type:'button', class:'nav-link', method:'put', data:{ confirm:'Are you sure to restore this user?', disable_with:'Updating' } do -%>
+          <span class='mr-2 icon icon-ok-circle'></span>
+          <%= 'User Paid $%.2f' % ( @user.store.meta_keywords.to_f / 100 ) %>
+        <% end -%>
+      </li>
+    <% else -%>
+      <li>
+        <a href="#" class='nav-link' data-toggle='modal' data-target="#lock_down_user_<%= @user.id %>">
+          <span class='mr-2 icon icon-ban-circle'></span>
+          Lock Down User
+        </a>
+        <%= render partial:'spree/admin/shared/modal', locals:{ target:"lock_down_user_#{@user.id}", show_footer: false, content:(yield :lock_down_user), header_title: "How Much Does #{@user.login} Owe?" } %>
+      </li>
+    <% end -%>
+  </ul>
+<% end %>

@@ -1,0 +1,29 @@
+<%
+  is_admin = spree_current_user&.admin?
+-%>
+<ul id="sidebar-product" class="bg-white collapse nav nav-pills nav-stacked" data-hook="admin_product_sub_tabs">
+  <%= tab :products, match_path: '/products', label: is_admin ? t('spree.products') : t('product.my_products') %>
+  <% if is_admin -%>
+    <%= tab :products_adopted, match_path: '/products_adopted' %>
+  <% elsif can? :adopt, Spree::Product -%>
+    <%= tab :other_listings, match_path: '/other_listings', label: t('product.other_listings') %>
+  <% end -%>
+  <% if can? :admin, Spree::RecordReview %>
+    <%= tab :niir, url: spree.admin_niir_path, label: t('spree.admin.tools.curation_by_image'), match_path: /\/niir\Z/ %>
+    <%= tab :niir, url: spree.admin_niir_version_path(version:'old'), label: t('spree.admin.tools.curation_by_image') + ' OLD', match_path: '/niir/old' %>
+  <% end %>
+  <% if can? :admin, Spree::ScraperPageImport %>
+    <%= tab :imported_products, label: t('spree.admin.tools.imported_products_review'), match_path: '/products/imported' %>
+  <% end %>
+  <%= tab :option_types, match_path: '/option_types' %>
+  <% if can? :admin, Spree::Property %>
+    <%= tab :properties %>
+  <% end %>
+  <%= tab :prototypes %>
+  <%= tab :taxonomies, match_path: '/taxonomies' %>
+  <%= tab :taxons, match_path: '/taxons' %>
+  <% if can? :admin, Spree::ProductList %>
+    <%= tab :product_lists, url: spree.admin_product_lists_path, label: 'Product Lists', match_path: '/product_lists' %>
+    <%= tab :product_manager, url: spree.admin_product_manager_path, label: 'Product Takedown', match_path: '/product_manager' %>
+  <% end %>
+</ul>

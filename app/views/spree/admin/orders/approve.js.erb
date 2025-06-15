@@ -1,0 +1,9 @@
+<%
+Spree::Order.logger.debug "| order paid? #{@order.paid?}"
+-%>
+<% if @order.paid? -%>
+  $("#order_pay_with_button_<%= @order.id -%>").fadeTo('slow', 0.2, function(){
+    $("#order_pay_with_button_<%= @order.id -%>").replaceWith("<%= escape_javascript( display_pay_with_button(@order) ) %>");
+  });
+  $("#order_messages_<%= @order.id -%>").html("<%= escape_javascript( render(partial:'messages', locals:{ order: @order }) ) %>");
+<% end -%>

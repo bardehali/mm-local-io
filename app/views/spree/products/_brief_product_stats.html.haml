@@ -1,0 +1,64 @@
+:ruby
+  # Requires helper: app/helpers/controller_helpers/product_browser.rb
+  # Required locals:
+  #   product [Spree::Product]
+  # Option locals:
+  #   json [Hash] the data from as_indexed_json.  Pass over if already prepared
+  #   highlight_matched_words [String]
+  json = product.as_indexed_json unless defined?(json) && !json.nil?
+  product_stats = load_product_stats(product)
+  extra_css_style = product.indexable? ? '' : 'opacity: 50%;'
+  highlight_matched_words = '' unless defined?(highlight_matched_words) && highlight_matched_words
+%strong Stats
+%br/      
+%br/
+%span
+  TRX:
+  %strong= link_to json[:recent_transaction_count], admin_sales_path(with_product_id: product.id), style:'color:red !important;'
+%span.text-right(style="margin-left: 1.6em;")
+  - if json[:recent_transaction_count].to_i > 0
+    - last_o = product.last_completed_order
+    - this_item_of_last_o = last_o && (line_item = last_o.line_item_of_product(product.id))
+    - if this_item_of_last_o
+      Last: 
+      %strong= link_to("#{last_o.number} - #{((Time.now - last_o.completed_at) / 1.day).round} days ago - $#{line_item.price.to_f}", admin_order_path(last_o), title:"Completed at #{last_o.completed_at.to_s}")
+      - if this_item_of_last_o && last_o.seller
+        %br/
+        = admin_user_link_with_status(last_o.seller).html_safe
+%br/
+%span
+  VCD: 
+  %strong #{'%.2f' % [product_stats['VCD'] ] }
+%span(style="margin-left: 0.6em; margin-right: 0.6em;")
+  V2T: 
+  %strong #{'%.2f' % [product_stats['V2T'] ]}
+%span
+  V2C: 
+  %strong #{'%.2f' % [product_stats['V2C'] ]}
+%br/
+IQS:
+%strong= product.iqs
+%br/
+Views:
+= product.view_count
+%br/
+Cart:
+= product_stats['CART']
+%br/
+ID: 
+%strong= product.id
+%br/
+brand
+%strong= highlight_keywords json[:brand], highlight_matched_words, { prefix:"<span class='text-highlight'>", postfix:'</span>'}
+%br/
+Created 
+%span(title="#{ product.created_at.to_mid_s }")= time_ago_in_words(product.created_at)
+%br/
+Adopted:
+%strong
+  %span(title="Recalculated daily") #{product.viable_adopter_count} viable, 
+  %span(title="#{product.last_adopted_at&.to_mid_s}")
+  - if product.last_adopted_at 
+    Last at #{product.last_adopted_at ? time_ago_in_words(product.last_adopted_at) : nil} ago
+%br/
+Retail Site: #{product.retail_site&.name}

@@ -1,0 +1,17 @@
+/log/*
+/tmp/*
+/node_modules/
+/vendor/bundle/
+/.bundle/
+/.env
+.DS_Store
+*.swp
+*.swo
+/config/master.key
+/config/credentials.yml.enc
+/elasticsearch/*
+/public/assets/*
+/storage/*
+/coverage/
+/mysql-data/
+/.eslintcache

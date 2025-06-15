@@ -1,0 +1,79 @@
+##########################################
+# Docker usage for prebuilt OS environment w/ wanted servers
+
+====================================
+Use of docker-compose
+
+There's file ./docker-compose.yml
+
+After Docker app is running,
+
+first run, build 1st:
+docker-compose build
+
+Then run
+docker-compose up
+
+====================================
+References to guides
+
+https://anonoz.github.io/tech/2021/01/10/rails-docker-compose-yml.html
+
+https://marsbased.com/blog/2020/02/03/how-use-docker-for-rails-development/
+https://awesomeopensource.com/project/nullnull/docker_rails_sample?mode=
+
+https://gorails.com/episodes/docker-basics-for-rails?autoplay=1
+
+https://www.youtube.com/watch?v=XIjGbfcMAYM&t=329s
+  https://betterprogramming.pub/rails-6-development-with-docker-55437314a1ad
+
+----------------------
+elasticsearch
+* https://www.elastic.co/guide/en/elasticsearch/reference/6.8/docker.html
+
+
+=====================================
+Individual command run inside docker VM
+
+yarn docker:start
+
+docker ps -a
+
+--------------------------------
+Run command inside container:
+example container-id = c7b52acdef58
+docker run -it c7b52acdef58 ls -l /var/www/
+
+docker run -it c7b52acdef58 ps ax
+
+--------------------------------
+Mysql
+https://hub.docker.com/r/mysql/mysql-server/
+
+docker run --name mysql --platform linux/amd64 -p 3306:3306 -v database_data:/var/lib/mysql/ -d -e "MYSQL_ROOT_PASSWORD=temp123" mysql
+
+
+GRANT ALL PRIVILEGES ON *.* TO 'dbuser'@'%' WITH GRANT OPTION;
+
+mysql -h localhost -P 3306 --protocol=tcp -u dbuser -ptest
+
+---------------------------------
+ElasticSearch
+
+https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html
+https://github.com/toptal/chewy
+
+
+====================================
+Problems
+
+
+===========================================================
+Apple M1 or Silicon Problems
+* https://leonid.shevtsov.me/post/m1-for-ruby-developers/
+* https://betterprogramming.pub/ruby-on-apple-silicon-m1-macs-fb159849b2f5
+
+-------------------------------
+no matching manifest for linux/arm64/v8
+https://programmerah.com/no-matching-manifest-for-linux-arm64-v8-in-the-manifest-list-entries-34807/
+

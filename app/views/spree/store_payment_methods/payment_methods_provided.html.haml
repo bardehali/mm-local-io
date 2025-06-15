@@ -1,0 +1,96 @@
+:ruby
+  # Required instance variants
+  # @payment_methods [Collection of Spree::PaymentMethod] w/ store_payment_methods associated to user
+  payment_methods_by_name = {}
+  @payment_methods.each{|pm| payment_methods_by_name[pm.name.downcase] = pm }
+
+- content_for :footer do
+  :javascript
+    function paymentMethodChecking() {
+      var wrapper = $(this).parent();
+      if ( !wrapper.hasClass('payment-card-wrapper')) { wrapper = wrapper.parent(); }
+      if ( this.checked ) {
+        wrapper.addClass('payment-selected');
+      }
+      else {
+        wrapper.removeClass('payment-selected');
+      }
+    }
+
+    $(function() {
+      $(".payment-content input[type=checkbox]").change(paymentMethodChecking);
+    });
+
+    function scrollToTop(scrollDuration) {
+        var scrollStep = -window.scrollY / (scrollDuration / 15),
+          scrollInterval = setInterval(function(){
+          if ( window.scrollY != 0 ) {
+              window.scrollBy( 0, scrollStep );
+          }
+          else clearInterval(scrollInterval);
+          },15);
+    }
+
+    function validateBrands(minNumberOfPayments) {
+        var numPayments = $('input[name="payment_method_ids[]"]:checked').length;
+        if(numPayments < minNumberOfPayments){
+          scrollToTop(50);
+          $(".tagline").show();
+          $(".tagline").addClass('text-danger');
+          return false;
+        }
+        return true;
+    }
+
+- content_for :timeline do
+  = timeline_table do|timeline|
+    - timeline.step 1, t('user.registration'), true
+    - timeline.step 2, t('user.contact_info'), true
+    - timeline.step 3, t('user.payment_methods.payment_options'), true
+    - timeline.step 4, t('store.list_items'), false
+
+.container
+  = render partial:'home/logo_and_timeline'
+  .mt-3 &nbsp;
+  .row
+    .col-10.my-auto.title-container
+      .center-title
+        .py-5.py-md-0
+          %h1.mb-5(title="")= t('user.payment_methods.select_all_you_provide')
+          %h5(class="tagline" style="display: none;")= t('user.payment_methods.please_select_at_least', count: 2)
+.container
+  = form_tag(admin_payment_methods_and_retail_stores_path, method: :put) do
+    = hidden_field_tag('next_path', payment_method_accounts_path)
+    .row
+      - ['paypal', 'transferwise'].each do|pm_name|
+        - payment_method = payment_methods_by_name[pm_name]
+        - if payment_method
+          = payment_method_card(payment_method, nil, 'col-sm payment-card-wrapper')
+      .col-sm.payment-card-wrapper.other
+        = text_area_tag('other_payment_method', '', class:'form-control fully-filled', 'aria-describedby'=>'basic-addon', 'aria-label'=>'Submit other...', placeholder:'Submit other...' )
+    .row
+      - ['remitly', 'xendpay', 'worldpay'].each do|pm_name|
+        - payment_method = payment_methods_by_name[pm_name]
+        - if payment_method
+          = payment_method_card(payment_method, nil, 'col-sm payment-card-wrapper')
+    .row
+      - ['ipaylinks', 'western_union', 'bitcoin'].each do|pm_name|
+        - payment_method = payment_methods_by_name[pm_name]
+        - if payment_method
+          = payment_method_card(payment_method, nil, 'col-sm payment-card-wrapper')
+    .row
+      - ['paysend', 'scoinpay', 'ping'].each do|pm_name|
+        - payment_method = payment_methods_by_name[pm_name]
+        - if payment_method
+          = payment_method_card(payment_method, nil, 'col-sm payment-card-wrapper')
+    .row
+      - ['alipay', 'wechat', 'xoom'].each do|pm_name|
+        - payment_method = payment_methods_by_name[pm_name]
+        - if payment_method
+          = payment_method_card(payment_method, nil, 'col-sm payment-card-wrapper')
+    .row.mt-5
+      .col-3
+      .col-6
+        = submit_tag(t('form.submit'), class:'btn btn-primary btn-lg form-control center-in-div w-100', data:{ disable_with: t('form.submitting') }, onclick: "return validateBrands(2);")
+  %br/
+  %br/

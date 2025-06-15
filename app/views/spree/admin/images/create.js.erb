@@ -1,0 +1,10 @@
+<% 
+if @image.valid?
+-%>
+  $("#variant_images_<%= @image.viewable_id -%>").appendChild("<%= escape_javascript( render(partial: 'variant_image', locals:{ image: @image }) ) %>");
+  $("#image_<%= @image.id %>").css('display', 'inherit');
+<%
+else
+  Spree::Product.logger.debug "| image valid? #{@image.valid?}: #{@image.errors.messages}"
+end
+-%>

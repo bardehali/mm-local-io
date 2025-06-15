@@ -1,0 +1,99 @@
+:ruby
+  wechat_account_id = spree_current_user.other_site_accounts.where(site_name: 'wechat').first&.account_id
+  first_email_from_china = Filter::Domain.domain_from_china?(spree_current_user&.email)
+
+- content_for :head do
+  :css
+    .modal-dialog { max-width: 60%; }
+    .modal-body h4, .modal-body h5 { line-height: 1.5em; }
+  :javascript
+    var skipValidate = false;
+    function doubleCheckForm(e) {
+      var form = $(this);
+      var validationInput = $("form#user_form").find("input[name='skip_validation']")[0];
+      if (validationInput && validationInput.value != 'true') {
+        var foundAccountId;
+        var foundSecondaryEmail;
+        form.find("input").each(function(index, input)
+        {
+          if (input.value != undefined && input.value.match(/^(\S+)$/) != null) {
+
+            if (input.name.startsWith("user[other_site_account[") ) {
+              foundAccountId = input.value;
+            }
+            else if (input.name == 'user[secondary_email]') {
+              foundSecondaryEmail = input.value;
+              #{'if (!checkSecondaryEmail(input)) { e.preventDefault(); };' if first_email_from_china}
+            }
+          }
+        });
+        if (foundAccountId || foundSecondaryEmail) {
+        } else {
+          $('#payment_form_warning').modal('show');
+          skipValidate = true;
+          if (validationInput) { validationInput.value = 'true'; }
+          e.preventDefault();
+        }
+      }
+      else {
+        // skip validation
+      }
+    }
+
+    function checkSecondaryEmail(input) {
+      var validDomain = /#{Filter::Domain::DOMAINS_OF_CHINA_REGEXP.source}/i;
+      if (input.value && input.value.match(validDomain) ) {
+        $(input).addClass('is-invalid');
+        $(input).select();
+        $(input).siblings('h5').hide();
+        $(input).siblings('h5.text-danger').show();
+        return false;
+      } else {
+        return true;
+      }
+    }
+
+- content_for :footer do
+  :javascript
+    $(function(){
+      $("#user_form").submit(doubleCheckForm);
+    });
+
+- content_for :timeline do
+  = timeline_table do|timeline|
+    - timeline.step 1, t('user.registration'), true
+    - timeline.step 2, t('user.contact_info'), true
+    - timeline.step 3, t('user.payment_methods.payment_options'), false
+    - timeline.step 4, t('store.list_items'), false
+.container
+  = render partial:'home/logo_and_timeline'
+  .mt-3 &nbsp;
+  = form_tag(admin_payment_methods_and_retail_stores_path, method:'post', id:'user_form') do
+    = hidden_field_tag('skip_validation', false)
+    = hidden_field_tag('next_path', payment_options_path)
+    %div(class="row")
+      .col-3.col-xs-1
+      .col-6.col-xs-10
+        .text-center.mb-3
+          %h5= t('user.payment_methods.for_quicker_support')
+        .mb-5
+          = text_field_tag("other_site_accounts[wechat]", wechat_account_id, class:'form-control form-control-lg form-payment highlighted-form', 'aria-describedby'=>'basic-addon', 'aria-label'=>'Enter account', placeholder: I18n.t('user.payment_methods.your_service_id', service: 'WeChat') )
+        .text-center.mb-5
+          %h5.font-weight-500
+            = t('user.payment_methods.please_add')
+            %strong iOfferHelp
+            = t('user.payment_methods.to_your_service_id', service: 'WeChat')
+          %br/
+          = image_tag( asset_path('payment_methods/add_iofferhelp_in_wechat.png'), alt:'Add iOfferHelp to WeChat')
+        .text-center.mb-5
+          = text_field_tag('user[secondary_email]', spree_current_user&.secondary_email, class:'form-control form-control-lg mb-3 highlighted-form', placeholder: first_email_from_china ? t('user.non_mainland_email_address') : t('user.secondary_email') )
+          - if first_email_from_china
+            %h5= t('user.example_non_mainland_emails')
+          %h5.text-danger(style="display: none;")= t('user.contact_you_by_secondary_email')
+        %div
+          = submit_tag(t('form.submit'), class:'btn btn-primary btn-lg form-control center-in-div', data:{ disable_with: t('form.submitting') } )
+
+  .row.mb-5
+    %br/
+
+= render partial:'spree/admin/shared/modal.html.haml', locals:{ target:'payment_form_warning', content: "<div class='mt-3 mb-3 p-3'><h4>#{t('user.payment_methods.sales_notifications_quicker', service: 'WeChat') }</h4></div>" }

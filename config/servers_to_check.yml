@@ -1,0 +1,25 @@
+production:
+  host: 209.250.245.176
+  running:
+    - mysql
+    - elasticsearch
+web1:
+  host: 93.123.72.31
+  running:
+    - puma
+    - nginx
+web2:
+  host: 93.123.72.27
+  running:
+    - puma
+cache:
+  host: 45.32.187.192
+  running:
+    - redis
+    - delayed_job
+staging:
+  host: 140.82.56.18
+  running:
+    - puma
+    - elasticsearch
+    - delayed_job

@@ -1,0 +1,106 @@
+:css
+  .credit-alert {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 20px;
+    border-radius: 16px;
+    background-color: #d32f2f;
+    box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
+    color: white;
+    text-decoration: none !important;
+    transition: box-shadow 0.2s ease;
+    position: relative;
+    z-index: 2;
+  }
+
+  .credit-alert:hover {
+    box-shadow: -6px 0 16px rgba(0, 0, 0, 0.15);
+  }
+
+  .credit-alert .icon-box {
+    width: 48px;
+    height: 48px;
+    background-color: #b71c1c;
+    border-radius: 50%;
+    font-size: 24px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 20px;
+    flex-shrink: 0;
+  }
+
+  .credit-alert .text-box {
+    flex-grow: 1;
+  }
+
+  .credit-alert .text-box .title {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .credit-alert .text-box .subtitle {
+    font-size: 14px;
+    line-height: 1.2;
+    margin-top: 4px;
+  }
+
+  .credit-alert .arrow-box {
+    font-size: 24px;
+    margin-left: 20px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    background-color: #b71c1c;
+    padding: 10px 20px;
+    border-radius: 16px;
+    height: 100%;
+    animation: pulse-arrow 1.4s infinite ease-in-out;
+  }
+
+  @keyframes pulse-arrow {
+    0%   { transform: translateX(0); }
+    50%  { transform: translateX(4px); }
+    100% { transform: translateX(0); }
+  }
+
+  .credit-warning-detail {
+    background-color: white;
+    border: 1px solid #ccc;
+    border-top: none;
+    border-radius: 0 0 16px 16px;
+    padding: 16px 20px;
+    margin-top: -12px; // visually tucks under the red card
+    z-index: 1;
+    position: relative;
+  }
+
+  .credit-warning-detail .line {
+    font-size: 16px;
+    color: #111;
+    font-weight: 600;
+    line-height: 1.4;
+    text-align: center;
+  }
+
+- source_value = "t#{spree_current_user.id}"
+- code = spree_current_user&.store&.meta_keywords
+- amm_value = code.to_i > 0 ? "&amm2=#{code}" : ""
+
+.mt-3
+  %a.credit-alert{ href: "https://marketxyz.com/credits?source=#{source_value}#{amm_value}", rel: "noopener noreferrer" }
+    .icon-box !
+    .text-box
+      %div.title Advertising Credits Now Required for Buyer Info - Click Here - 点击这里
+      %div.subtitle Purchase Credits Now
+    .arrow-box Click Here 点击这里 →
+
+.credit-warning-detail
+  .line.mt-5 感谢您一直以来对我们平台的支持与信任。
+  .line 从现在开始，获取买家线索数据将需要购买广告积分。此项变更旨在帮助我们提升平台服务，更好地支持您的销售成功。
+  .line 您可以随时从账户后台购买积分，我们提供多种灵活的积分套餐，满足您的不同需求。
+  .line.mt-3 Thank you for being a valued user of our platform. Going forward, access to buyer data will require the purchase of advertising credits. This change helps us improve the platform and better support your success.
+  .line.mb-5 Your account is limited, to reinstate purchase credits now →

@@ -1,0 +1,9 @@
+<%
+container = params[:container] || '#related_products'
+-%>
+<% if @products.present? -%>
+$("<%= container -%>").siblings("h5").css('display', 'block')
+$("<%= container -%>").html("<%= escape_javascript( render(partial: 'spree/shared/products_buyer.html.haml', locals:{ products: @products, show_pagination: false, is_related: true } ) )%>")
+<% else -%>
+$("<%= container -%>").siblings("h5").css('display', 'none')
+<% end # no products -%>

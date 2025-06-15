@@ -1,0 +1,48 @@
+<% cache spree_nav_cache_key('footer') do %>
+  <footer id="footer" class="pt-2 mx-auto footer-spree" data-turbolinks-permanent>
+    <div class="container">
+      <div class="row d-xl-flex py-4 footer-spree-menu-links">
+        <% if spree_navigation_data.any? %>
+          <% spree_navigation_data.first(3).each do |root| %>
+            <div class="col-4 col-lg-3">
+              <div class="footer-spree-label">
+                <%= link_to root[:meta_title], root[:url], params: { utm_source: "foot" }%>
+              </div>
+              <% if  root[:items].present? %>
+                <% root[:items].first(4).each do |item| %>
+                  <div class="pt-2"><%= link_to item[:title], "#{item[:url]}&utm_source=foot"  %></div>
+                <% end %>
+              <% end %>
+            </div>
+          <% end %>
+        <% end %>
+      <div class="col-12 col-lg-3 pt-4">
+        <div class="row">
+            <div class="col-6 col-lg-12">
+              <% if spree.respond_to?(:account_path) %>
+                <div class="footer-spree-label">
+                  <%= Spree.t('nav_bar.my_account') %>
+                </div>
+                <div class="pt-1">
+                  <% if !spree_current_user %>
+                    <%= link_to Spree.t(:log_in), spree.login_path(return_to: params[:return_to]) %>
+                  <% else %>
+                    <%= link_to Spree.t('nav_bar.my_orders'), spree.account_path(anchor: "account-my-orders") %>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+            <div class="col-6 col-lg-12">
+              <div class="footer-spree-label">
+                <%= link_to 'Privacy', spree.privacy_path %>
+              </div>
+              <div class="footer-spree-label mb-3">
+                <%= link_to 'Terms of Use', spree.terms_path %>
+              </div>
+            </div>
+        </div>
+    </div>
+  </div>
+  <%= render 'spree/shared/copyright' %>
+  </footer>
+<% end %>

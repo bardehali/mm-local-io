@@ -1,0 +1,71 @@
+:ruby
+  ##
+  # Required locals:
+  #   :size_option_type [Spree::OptionType] some size related option type
+  # Optional locals:
+  #   :product [Spree::Product]
+  #   :other_option_values [Collection of Spree::OptionValue] if given would only display
+  #     these other option type, such as color, columns
+  #   :show_only_selected [Boolean] default false
+  other_option_values ||= []
+  count_of_non_one_other_ovs = other_option_values.reject(&:one_value?).size
+  @product_options_map ||= respond_to?(:product_options_map) ? product_options_map : 
+    product.try(:options_map, spree_current_user.try(:id))
+  collapsable = @product_options_map&.user_id == product&.user_id && @product_options_map.try(:size).to_i > 0
+  size_option_values = size_option_type.option_values.to_a unless defined?(size_option_values) && !size_option_values.nil?
+  show_only_selected = false unless defined?(show_only_selected)
+- if Rails.env.development?
+  %code
+    %p count_of_non_one_other_ovs #{count_of_non_one_other_ovs}
+    %p show_only_selected #{show_only_selected}
+    %p other_option_values #{other_option_values.collect(&:to_s)}
+    %p size_option_values #{size_option_values.collect(&:to_s)}
+    %p product_options_map.user_id #{@product_options_map&.user_id}
+    %p product_options_map.which_map.keys #{@product_options_map&.option_value_ids_to_which_map&.keys}
+- if other_option_values.present?
+  %table(id='variant_option_table_#{size_option_type.id}' class="table #{'table-rows-collapsable ' if collapsable}lh-4p mb-0 variant-option-box")
+    %thead.left
+      %tr.medium
+        %th.size-table-row
+          %br
+          =t('spree.admin.products.size_variant_title')
+        - other_option_values.each do|other_ov|
+          - next if show_only_selected && !other_ov.selected || (count_of_non_one_other_ovs > 0 && other_ov.one_value?)
+          %th
+            - if other_ov.option_type.presentation =~ /\bcolor\Z/i
+              = render partial:'spree/admin/shared/color_box', locals:{ option_value: other_ov, input:'checkbox', selected: other_ov.selected }
+            - else
+              = other_ov.presentation
+    %tbody
+      - total_size_values = size_option_values&.size.to_i
+      - selected_count = @product_options_map&.size.to_i
+      - size_option_values.each do|size_ov|
+        - selected_variant_ids = @product_options_map.try(:[], size_ov.id).to_a.collect(&:id)
+        -# next if show_only_selected && !size_ov.selected
+        %tr(id="size_option_row_#{size_ov.id}" class="size-option-row#{' d-none one-value-row' if size_ov.one_value?}#{'row-collapsable' if collapsable && selected_variant_ids.blank?}")
+          %td
+            .option-box.d-flex.jc-sb
+              %label= size_ov.presentation
+              &nbsp;&nbsp;
+              - if total_size_values > 1
+                %button.btn.icon.icon-delete.option-remove(type='button' onclick='removeRow(this)' title='Remove this size' data-id="#{size_ov.id}")
+          - other_option_values.each do|other_ov|
+            - next if count_of_non_one_other_ovs > 0 && (show_only_selected && !other_ov.selected || count_of_non_one_other_ovs > 0 && other_ov.one_value?)
+            - connected_variant_ids = @product_options_map.try(:[], [size_ov.id, other_ov.id].sort ).to_a.collect(&:id)
+            %td
+              - if Rails.env.development?
+                %code
+                  size_ov: #{size_ov}
+                  %br
+                  other_ov: #{other_ov}
+                  %br
+                  connected_variant_ids: #{connected_variant_ids}
+                  %br
+              = check_box_tag('combo_option_value_ids[]', "#{other_ov.id},#{size_ov.id}", size_ov.one_value? ? (selected_count == 0) : connected_variant_ids.present?, class:'combo-option-value', data:{ 'option-type'=> 'colors_by_sizes', 'other-ov-id'=> other_ov.id, 'ov-type'=> (size_ov.one_value? ? 'one-value' : '') })
+      - if collapsable
+        %tr
+          %td(colspan="#{other_option_values.size + 1}")
+            .text-center
+              %button(type='button' data-table-to-collapse='.variant-option-box' class="btn") 
+                Show All
+                %i(class="icon icon-chevron-down")

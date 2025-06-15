@@ -1,0 +1,281 @@
+For setups of development and server machines, read files
+  setup_environment.txt
+  setup_server.txt
+
+#######################################
+Current Server Map
+
+Based on configurations under config/deploy
+
+Roles/processes run in servers:
+
+production
+  MySQL
+  ElastichSearch
+
+web3
+  Nginx as load balancer that distributes to Rails servers (web3, etc.)
+
+web3, web4, web5
+  Rails puma
+
+cache_server
+  Redis memory cache
+
+staging
+  Database accesses that of production
+  Nginx
+  Rails puma - in staging environment
+  occasional tasks to export data
+
+backend_server
+  Delayed jobs - database-saved scheduled background tasks
+  scheduled cron jobs
+
+
+#######################################
+Source code management, github
+
+------------------------------
+Base deployment using capistrano
+
+  cap web3 deploy
+  cap web3 puma:restart
+
+  Repeat for:
+    web3, web4, web5, backend
+
+where web3 config files are located at config/deploy folder.  File of that name gets run "cap xxx deploy"
+
+------------------------------
+If to move to specific commit of changes in GIT branch, get the SHA code of commit:
+  git checkout 757c47d4
+
+  and if to re-deploy at this point of code changes, make another branch of master
+    git checkout -b master_at_757c47d4
+    git push origin master_at_757c47d4
+
+    and deploy using BRANCH environment var
+      BRANCH=master_at_757c47d4 cap web3 deploy
+
+
+#######################################
+Server Commands
+
+--------------------------------------
+Running puma, the Rails server
+
+as deploy user of the server
+at folder /var/www/shoppn_spree/current, start by:
+
+  bundle exec puma -C config/puma.rb --daemon
+
+If puma has been running without code change, might be able to restart gracefully:
+
+  bundle exec pumactl -P shared/pids/pumaproduction.pid restart
+
+  staging would have "pumastaging.pid" instead.
+
+If still server process still not dead, have to use system level kill:
+
+  ps ax | grep puma
+
+  may come with output:
+    5444 ?        Sl   181:03 puma 4.3.10 (tcp://0.0.0.0:8000,unix:///var/www/shoppn_spree/releases/20220602174330/shared/sockets/puma.sock) [20220602174330]
+  13029 pts/0    S+     0:00 grep puma
+
+  where "5444" is the process ID, so run this to kill
+
+    kill -s QUIT 5444
+
+--------------------------------------
+Running delayed_jobs
+
+as deploy user of server
+
+  bin/delayed_job start
+
+but if server has the resources to run multiple threads
+  bin/delayed_job -n 2 start
+
+run specific named queues
+  bin/delayed_job -queues=follow_up_email,stats start
+
+To stop
+  bin/delayed_job stop
+  but sometimes kill call might be needed to stop: kill -s SIGTERM 333
+    after "ps ax | grep delay" to find which delayed_job proccesses 
+
+--------------------------------------
+Running ElastichSearch
+
+library and data at folder like: /var/www/elasticsearch-7.5.0/
+Run by
+
+as deploy user of server
+
+  bin/elasticsearch -d
+
+To incrementally push each available product to search dindex, run
+
+  bundle exec rake es:reindex_products
+
+To totally rebuild products index from scratch (delete index, command ElastichSearch to import all)
+
+  bundle exec rake es:rebuild_products_index
+
+There is one script to run redundant checks to ensure each record changed since some time,
+run periodically like below.  This would be tedious task like rebuild_products_index if no time parameter
+
+  START_TIME_IN_RUBY="25.hours.ago" bundle exec rake es:sync_indices
+
+See actual RoR codes called in lib/tasks/es.rake
+
+
+--------------------------------------
+Running MySQL
+
+https://www.tutorialspoint.com/starting-and-stopping-mysql-server
+
+as root user of the server:
+
+  sudo service mysqld start
+
+--------------------------------------
+Running Redis
+
+https://redis.io/docs/getting-started/
+
+  cd /var/www/redis-stable/src
+  redis-server /var/www/redis-stable/redis.conf
+
+--------------------------------------
+Running minIO
+
+minio server --console-address :9001 /data
+
+or wherever to keep files saved instead of "/data"
+
+Create buckets for necessary environments
+ioffer-assets for production, staging
+ioffer-assets-#{Rails.env}
+
+Create access key for production, staging
+and another one w/ restricting Access Policy like:
+
+{
+ "Version": "2012-10-17",
+ "Statement": [
+  {
+   "Effect": "Allow",
+   "Action": [
+    "s3:DeleteObject",
+    "s3:GetObject",
+    "s3:PutObject",
+    "s3:GetObjectAttributes",
+    "s3:GetBucketLocation"
+   ],
+   "Resource": [
+    "arn:aws:s3:::ioffer-assets-development/*", "arn:aws:s3:::ioffer-assets-test/*"
+   ]
+  },
+  {
+   "Effect": "Deny",
+   "Action": [
+    "s3:DeleteObject",
+    "s3:GetObject",
+    "s3:PutObject"
+   ],
+   "Resource": [
+    "arn:aws:s3:::ioffer-assets/*"
+   ]
+  }
+ ]
+}
+
+#######################################
+Server Access
+
+Mainly needed:
+* ssh public key, as such those set within config/deploy/production.rb
+
+--------------------------------------
+On Linux or Mac computer, can setup saved settings for easier server access
+
+Login into server's terminal with ssh key (ask to for share):
+  ssh shoppn_web3
+
+with config in ~/.ssh/config
+
+
+Host shoppn_web3
+  Hostname 209.250.243.156
+  User deploy
+  IdentityFile ~/.ssh/tbdmarket
+  UseKeychain yes
+
+Host shoppn_web3_root
+  Hostname 209.250.243.156
+  User root
+  IdentityFile ~/.ssh/tbdmarket
+  UseKeychain yes
+
+Host shoppn_web4
+  Hostname 45.76.34.202
+  User deploy
+  IdentityFile ~/.ssh/tbdmarket
+  UseKeychain yes
+
+Host shoppn_web4_root
+  Hostname 45.76.34.202
+  User root
+  IdentityFile ~/.ssh/tbdmarket
+  UseKeychain yes
+
+Host shoppn_web5
+  Hostname 95.179.183.89
+  User deploy
+  IdentityFile ~/.ssh/tbdmarket
+  UseKeychain yes
+
+Host shoppn_web5_root
+  Hostname 95.179.183.89
+  User root
+  IdentityFile ~/.ssh/tbdmarket
+  UseKeychain yes
+
+Host shoppn_prod
+  Hostname 209.250.245.176
+  User deploy
+  IdentityFile ~/.ssh/tbdmarket
+  UseKeychain yes
+
+Host shoppn_prod_root
+  Hostname 209.250.245.176
+  User root
+  IdentityFile ~/.ssh/tbdmarket
+  UseKeychain yes
+
+Host shoppn_staging
+  Hostname 140.82.56.18
+  User deploy
+  IdentityFile ~/.ssh/tbdmarket
+  UseKeychain yes
+
+Host shoppn_staging_root
+  Hostname 140.82.56.18
+  User root
+  IdentityFile ~/.ssh/tbdmarket
+  UseKeychain yes
+
+Host shoppn_cache
+  Hostname 45.32.187.192
+  User deploy
+  IdentityFile ~/.ssh/tbdmarket
+  UseKeychain yes
+
+Host shoppn_cache_root
+  Hostname 45.32.187.192
+  User root
+  IdentityFile ~/.ssh/tbdmarket
+  UseKeychain yes

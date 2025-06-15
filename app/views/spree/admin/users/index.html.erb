@@ -1,0 +1,117 @@
+<%
+  _filter = filter
+  paypal = Spree::PaymentMethod.paypal
+  is_cards_view = (view_mode == 'cards')
+  show_view_options = false
+  sort_params = ( params[:q].try(:[], :s) || '').split(' ').collect(&:downcase)
+  highlight_matched_words = ( params[:keywords] || '')
+-%>
+<% content_for :head do %>
+  <%= stylesheet_link_tag 'spree/record_reviews' -%>
+  <%= javascript_include_tag 'spree/record_reviews' %>
+  <%= javascript_include_tag 'feather.min' %>
+<% end #head -%>
+<% content_for :footer do %>
+  <script>
+    $(function() {
+      var $editableField = new EditableField( $('.editable-field') );
+      feather.replace();
+    });
+  </script>
+<% end # footer -%>
+
+<% content_for :page_title do %>
+  <% if @user_list -%>
+    <%= link_to 'User Lists', admin_user_lists_path %>
+    &gt; <%= @user_list.name %> (<%= @user_list.user_list_users.count %> users)
+  <% else -%>
+    <%= Spree.t(:users) %> &gt;
+    <span class="badge badge-secondary<%= ' badge-active-underlined' if _filter.blank? || _filter=='all' -%>">
+      <%= link_to 'All', admin_users_path %></span>
+    <span class="badge badge-warning<%= ' badge-active-underlined' if _filter=='only_active_sellers' -%>">
+      <%= link_to 'Sellers', admin_sellers_path(params.merge(page: 1)) %></span>
+    <% if debugging? -%>
+      <span class="badge badge-danger<%= ' badge-active-underlined' if _filter=='sellers' -%>">
+        <%= link_to 'ALL Sellers', admin_all_sellers_path %></span>
+    <% end -%>
+    <span class="badge badge-info<%= ' badge-active-underlined' if _filter=='buyers' -%>">
+      <%= link_to 'Buyers', admin_buyers_path('Buyers', params.merge(page: 1)) %></span>
+  <% end -%>
+<% end %>
+
+<% content_for :page_actions do %>
+  <%# = button_link_to Spree.t(:new_user), new_admin_user_path, class: "btn-success", icon: 'add.svg', id: 'admin_new_user_link' if can? :create, Spree::user_class %>
+  <%= search_form_for [:admin, @search], url: spree.admin_users_path do |f| -%>
+    <div class="dropdown mr-3">
+      <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownSortButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Sort Order
+      </button>
+      <% sort_link_class = 'dropdown-item p-1 border-top border-bottom'
+        current_s = params[:q].try(:fetch, :s)
+      -%>
+      <div class="dropdown-menu" aria-labelledby="dropdownSortButton">
+        <%= sort_link @search, 'count_of_transactions desc', 'Transactions Desc', {}, { class: sort_link_class + (current_s == 'count_of_transactions desc' ? ' font-weight-bold' : '') } %>
+        <%= sort_link @search, 'id desc', 'Newest', {}, { class: sort_link_class + (current_s == 'id desc' ? ' font-weight-bold' : '') } %>
+        <%= sort_link @search, 'seller_rank desc', 'Seller Rank Desc', {}, { class: sort_link_class + (current_s == 'seller_rank desc' ? ' font-weight-bold' : '') }  %>
+        <%= sort_link @search, 'last_active_at desc', 'Latest Active Desc', {}, { class: sort_link_class + (current_s == 'last_active_at desc' ? ' font-weight-bold' : '') } %>
+        <%= sort_link @search, 'count_of_products_created desc', 'Products Created Desc', {}, { class: sort_link_class + (current_s == 'count_of_products_created desc' ? ' font-weight-bold' : '') } %>
+        <%= sort_link @search, 'count_of_products_adopted desc', 'Products Adopted Desc', {}, { class: sort_link_class + (current_s == 'count_of_products_adopted desc' ? ' font-weight-bold' : '') } %>
+      </div>
+    </div>
+  <% end -%>
+  <% if false && @collection.is_a?(ActiveRecord::Relation) && @collection.size > 0 && params[:action]&.ends_with?('sellers') -%>
+    <%= link_to 'Download in CSV', make_download_url(request), class:'btn btn-info btn-sm' %>
+  <% end -%>
+<% end  %>
+
+<% if spree_current_user&.admin? -%>
+  <%= render partial: 'table_filter' %>
+<% end -%>
+
+<% if @users.any? %>
+  <% unless view_mode == 'table' -%>
+  <%
+    # Cards view  ====================================
+  -%>
+    <div class="mt-3 mb-3 user-results">
+      <%= render partial:'spree/admin/users/seller_row', collection: @users, as: :user, locals:{ highlight_matched_words: highlight_matched_words, paypal: paypal, show_admin_actions: true } %>
+    </div>
+  <%
+    else # table view =============================
+  -%>
+    <div class="table-responsive">
+      <table class="table" id="listing_users" data-hook>
+        <thead>
+          <tr data-hook="admin_users_index_headers">
+            <th><%= sort_link(@search, :id, 'ID', default_order: :desc) %></th>
+            <th><%= Spree.t(:username) %></th>
+            <th>
+              <%= sort_link @search,:email, Spree.t(:email), {}, {title: 'users_email_title'} %>
+            </th>
+            <th>PP Status</th>
+            <th>Visit From<br/>Email</th>
+            <th><%= sort_link(@search, :last_active_at, 'Last Active', default_order: :desc) %></th>
+            <th><%= Spree.t('country') %></th>
+            <th>
+              <%= sort_link(@search, :count_of_products_created, 'Products Created', default_order: :desc) %>
+            </th>
+            <th>
+              <%= sort_link(@search, :count_of_products_adopted, 'Products Adopted', default_order: :desc) %>
+            </th>
+            <th data-hook="admin_users_index_header_actions" class="actions"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <%= render partial:'spree/admin/users/user_table_row', collection: @users, as: :user, locals:{ paypal: paypal } %>
+        </tbody>
+      </table>
+    </div>
+  <% end # table view -%>
+
+  <%= paginate @users, theme:'twitter-bootstrap-4' %>
+
+<% else %>
+  <div class="alert alert-info no-objects-found">
+    <%= Spree.t(:no_resource_found, resource: plural_resource_name(Spree.user_class)) %>,
+  </div>
+<% end %>

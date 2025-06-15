@@ -1,0 +1,157 @@
+- content_for :head do
+  = stylesheet_link_tag('spree/record_reviews')
+  :css
+    .table-bordered > thead { background-color: #c0c0c0; font-size: 1.2em; }
+    .table-bordered > tbody > tr > th { color: #666666; }
+    .table-bordered > thead > tr > th, .table-bordered > tbody > tr > th, .table-bordered > tbody > tr > td { border-color: #666; }
+    .table-bordered > tbody > tr > td > table > thead { background-color: #d9d9d9; font-size: 1.0em; }
+    .table-bordered > tbody > tr > td > table > tbody { background-color: #f0f0f0; }
+    .table-bordered > tbody > tr > td > table > tbody > tr > td > table > tbody { background-color: #e0e0e0; font-size: 0.8em; }
+    .w-45 { width: 45% !important; }
+  :javascript
+    function highlightAnchorSibling(){
+      if ($(this).attr('href').indexOf('#') == 0) {
+        var anchor = $("a[name='" + $(this).attr('href').substr(1) +"']")
+        $('.success-shadow').removeClass('success-shadow')
+        $( anchor.siblings('table')[0] ).addClass('success-shadow')
+      }
+    }
+
+    function traverseList() {
+      var button = $(this);
+      var list = $( button.attr('for') )
+      var indexOfShown = 0;
+      var shown;
+      list.children().each(function(index){
+        if ( index < list.children().length - 1 && $(this).css('display') != 'none' ) {
+          indexOfShown = index;
+          shown = $(this)
+        }
+      });
+      //console.log("| indexOfShown "+ indexOfShown)
+      if (shown && button.text() == 'Previous' && indexOfShown > 0) {
+        shown.fadeOut(500, function(){
+          $( list.children()[indexOfShown - 1] ).css('display', 'list-item')
+        })
+      }
+      else if (shown && button.text() == 'Next' && indexOfShown < list.children().length - 2) {
+        shown.fadeOut(500, function(){
+          $( list.children()[indexOfShown + 1] ).css('display', 'list-item')
+        })
+      }
+    }
+
+    $(function () {
+      $('[data-toggle="popover"]').popover()
+      $('[data-toggle="tooltip"]').tooltip()
+      $('.traversable-actions button').click( traverseList )
+      $('a').click(highlightAnchorSibling)
+    })
+
+.m-3.float-left
+  %a(name='spree_products')
+  %table(class='table table-bordered')
+    %thead
+      %tr
+        %th(colspan="2") spree_products
+    %tbody
+      - ["id", "name", "slug", "description", "user", "retail_site", "created_at", "updated_at", "available_on", "deleted_at", "tax_category_id", "shipping_category_id", "master_product_id", "view_count", "transaction_count","engagement_count", "gms", "curation_score", "supply_priority", "iqs", "status_code", "last_review_at", "images_count", "avg_rating", "reviews_count", "last_viewed_at"].each do|a|
+        - v = @product.send(a.to_sym)
+        %tr
+          %th
+            - aname = ( v.is_a?(::ActiveRecord::Base) && @product.respond_to?("#{a}_id".to_sym) ) ? "#{a}_id" : a
+            = aname
+          %td
+            - if v.is_a?(::ActiveRecord::Base)
+              %a(href="##{v.class.table_name.singularize}_#{v.id}" data-toggle='tooltip' title="#{v.to_s}")= v.id
+            - else
+              = v
+    %tr
+      %th rep_variant_id
+      %td= @product.rep_variant_id ? link_to(@product.rep_variant_id, "#spree_variant_#{@product.rep_variant_id}") : ''
+    %tr
+      %th best_variant_id
+      %td= @product.best_variant_id ? link_to(@product.best_variant_id, "#spree_variant_#{@product.best_variant_id}") : ''
+- if @product.user
+  .m-3.float-left
+    %a(name='spree_users')
+    %a(name='spree_user_#{@product.user_id}')
+    %table(class='table table-bordered')
+      %thead
+        %tr
+          %th(colspan="2") spree_users
+      %tbody
+        - ['id', 'email', 'remember_token', 'persistence_token', 'reset_password_token', 'perishable_token','sign_in_count', 'failed_attempts', 'current_sign_in_at', 'last_sign_in_at', 'last_active_at', 'current_sign_in_ip', 'last_sign_in_ip', 'login', 'ship_address_id', 'bill_address_id', 'created_at', 'updated_at', 'spree_api_key', 'authentication_token', 'unlock_token', 'locked_at', 'remember_created_at', 'reset_password_sent_at', 'deleted_at', 'confirmation_token', 'confirmed_at', 'confirmation_sent_at', 'supplier_id', 'username', 'display_name', 'country', 'country_code', 'zipcode', 'timezone', 'non_paying_buyer_count', 'gross_merchandise_sales', 'last_email_at', 'seller_rank', 'secondary_email', 'passcode', 'last_passcode_viewed_at', 'count_of_products_created', 'count_of_products_adopted'].each do|a|
+          - v = @product.user.send(a.to_sym)
+          %tr
+            %th= a
+            %td= v
+.m-3.float-left
+  %a(name='spree_products_taxons')
+  %table(class='table table-bordered')
+    %thead
+      %tr
+        %th(style="") spree_products_taxons
+    %tbody
+      %tr
+        %td.p-3
+          - @product.classifications.each do|classif|
+            %a(name='spree_products_taxons_with_taxon_id_#{classif.taxon_id}')
+            %table(class='table-bordered')
+              %tbody
+                %tr
+                  %th product_id
+                  %td= link_to( classif.product_id, '#spree_products' )
+                %tr
+                  %th taxon_id
+                  %td
+                    %button(type='button' data-container='body' data-toggle='popover' data-content="#{classif.taxon.breadcrumb}")= classif.taxon_id
+                %tr
+                  %th poisition
+                  %td= classif.position
+  %br/
+  %br/
+.m-3.float-left
+  %a(name='spree_product_option_types')
+  %table(class='table table-bordered')
+    %thead
+      %tr
+        %th(style="") spree_product_option_types
+    %tbody
+      %tr
+        %td.p-3
+          - @product.product_option_types.each do|pot|
+            %a(name='spree_product_option_types_with_option_type_id_#{pot.option_type_id}')
+            %table(class='table table-bordered')
+              %tbody
+                %tr
+                  %th product_id
+                  %td= link_to( pot.product_id, '#spree_products' )
+                %tr
+                  %th option_type_id
+                  %td
+                    %button(type='button' data-container='body' data-toggle='popover' data-content="#{pot.option_type.name}")= pot.option_type_id
+                %tr
+                  %th poisition
+                  %td= pot.position
+            %br/
+.m-3.float-left
+  %a(name='spree_variants')
+  - common_variants_locals = { extra_css_class: 'mb-1', show_table_head: true }
+  = render partial:'variant_debug_table', locals: common_variants_locals.merge(variant: @product.master)
+  - if @product.rep_variant_id && @product.rep_variant_id != @product.master.id
+    = render partial:'variant_debug_table', locals: common_variants_locals.merge(variant: @product.rep_variant)
+  - user_id_variants_group_shown = 0
+  - @product.variants.group_by(&:user_id).each_pair do|user_id, vars|
+    - next if user_id.nil? || vars.first.user.admin? || vars.first.id == @product.rep_variant_id
+    - if user_id_variants_group_shown < 10
+      - user_id_variants_group_shown += 1
+      %ul(class="traverseable-list list-unstyled w-45 m-3 float-left" id="spree_variants_user_id_#{user_id}")
+        - vars.each_with_index do|v, vindex|
+          %li(style="#{ (vindex > 0 ? 'display: none;' : '') }")
+            = render partial:'variant_debug_table', locals: common_variants_locals.merge(variant: v, table_head_extra_words: " for #{v.user&.to_s}" )
+        - if vars.size > 1
+          %li(class="traversable-actions")
+            Total #{vars.size}
+            %button(type='button' for="#spree_variants_user_id_#{user_id}") Previous
+            %button(type='button' for="#spree_variants_user_id_#{user_id}") Next

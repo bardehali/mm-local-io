@@ -1,0 +1,48 @@
+:ruby
+  # Required locals:
+  #   product <Spree::Product>
+.product-card.card(id="product_card_#{product.id}")
+  .card-body
+    .card-title
+      %h4(data-product-attr='title') #{product.name}
+    .card-subtitle
+      .float-left
+        %h5(data-product-attr='Price')
+          Price:
+          #{product.price ? number_to_currency(product.price) : ''}
+      .float-right
+        - if product.user.try(:store)
+          %h5(data-product-attr='Store ID')
+            %strong Seller:
+            = product.user.store.name
+      .clearfix
+    .row
+      %ul(class="breadcrumbs")
+        - product.categories.each do|category_list|
+          - category_list.each_with_index do|category, category_index|
+            %li= link_to(category.name, spree.nested_taxons_path(category))
+    .container
+      %div.description-text(data-product-attr='description')
+        #{product.description.try(:encode_to_utf8).try(:html_safe) }
+        %br/
+      .clearfix
+    %br/
+    %h4 Images
+    %table.table.image-gallery(data-product-attr='images')
+      %tbody
+        - product.variants_including_master.includes(:option_values, :user).group_by(&:user).each_pair do|user, variants|
+          %tr
+            %td(colspan='2')
+              %strong= user.to_s
+          - variants.each do|variant|
+            %tr
+              %td
+                &nbsp;
+              %td
+                - if variant.is_master
+                  %label All
+                - else
+                  %label.text-sm= variant.sku_and_options_text
+              %td
+                - variant.images.each_with_index do|image|
+                  = image_tag(image.url(:pdp_thumbnail), id:"variant_thumbnail_#{image.id}", class:"product-thumbnail",  'data-toggle'=>'popover', 'data-trigger'=>'hover', 'data-container'=>'body', 'data-html'=>true, 'data-placement'=>'bottom', 'data-content'=> "#{ image_tag(image.url(:large)) }" )

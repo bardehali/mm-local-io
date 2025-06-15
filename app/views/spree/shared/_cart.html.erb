@@ -1,0 +1,8 @@
+<%= link_to spree.cart_path,
+  class: "cart-icon cart-icon--visible-count #{local_assigns[:class]}",
+  'aria-label': Spree.t(:cart) do %>
+  <%= inline_svg_tag('icon/instacons/cart-icon-round.svg', width: size, height: size, class: 'custom-icon', style: '') %>
+
+
+  <div class="font-weight-medium cart-icon-count"><%= item_count %></div>
+<% end %>

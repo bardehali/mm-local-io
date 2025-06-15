@@ -1,0 +1,26 @@
+:ruby
+  # Required locals:
+  #   page [Scraper::Page]
+%tr(id="page_row_#{page.id}" data-page-id="#{page.id}" data-file-status="#{page.file_status}")
+  %td.text-sm=link_to page.id, scraper_page_path(page)
+  %td
+    %i(class="#{page_type_icon_css_class(page.page_type) }" title="Page type: #{page.page_type}")
+    &nbsp;
+    = link_to page.relative_page_url.truncate(60), scraper_page_path(page), target:'_blank', title:'More detail of the page'
+    &nbsp;&nbsp;
+    = link_to page.abs_page_url, target:'_blank', 'data-toggle'=>'tooltip', title:'Visit this page' do
+      %i.fas.fa-external-link-alt 
+  %td
+    - if page.imported_spree_product_ids.present?
+      %p.text-sm
+        - page.imported_spree_product_ids.each_with_index do|product_id, pindex|
+          = ', ' if pindex >= 1
+          = link_to(product_id.to_s, spree.product_path(id: product_id), target:'_blank', title:'Click to View Product')
+    - if page.file_status =~ /\Acancell?ed\Z/i
+      %i.fa.fa-times.text-danger(title='Cancelled') 
+    - elsif page.file_path.present?
+      = link_to(scraper_page_show_product_path(id: page.id), remote:true, method:'get', 'data-toggle'=>'tooltip', title:'Product from parsing') do
+        %i.fa.fa-check
+    - else
+      = link_to(scraper_page_path(page), remote:true, method:'put', title:'Fetch the page') do
+        %i.fa.fa-download.text-info

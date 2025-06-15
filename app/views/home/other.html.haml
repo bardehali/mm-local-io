@@ -1,0 +1,37 @@
+:css
+= image_tag('i-offer-logo.png', alt: "iOffer")
+= form_tag(ioffer_other_site_accounts_path, method:'post') do
+  .container
+    .row
+      .col-10.my-auto.title-container
+        .center-title
+          .py-5.py-md-0
+            %h1.mb-3
+              Transfer items and rating from
+              %b AliExpress
+              and
+              %b DHgate
+            %h5.mb-5
+              Provide us with your seller ID and we will import your rating and items for
+              = succeed "." do
+                %b free
+        .input-group.input-group-newsletter
+          .url-display AliExpress.com/store/&nbsp;
+          %input.form-control{"name"=>"aliexpress_account_id", value:"#{@aliexpress}", "aria-describedby" => "basic-addon", "aria-label" => "Enter information...", :pattern => "[0-9]+", :maxLength => 7, :onkeypress => "validate(event)", :placeholder => "Aliexpress Store ID", :type => "text"}/
+        .input-group.input-group-newsletter.mt-1
+          .url-display DHgate.com/store/&nbsp;
+          %input.form-control{"name"=>"dhgate_account_id", value:"#{@dhgate}", "aria-describedby" => "basic-addon", "aria-label" => "Enter information...", :pattern => "[0-9]+", :maxLength => 8, :onkeypress => "validate(event)", :placeholder => "DHGate Store ID", :type => "text"}/
+  %button.btn.btn-primary.btn-center(type='submit') Submit Seller Information
+  %h1.separator Submit your CSV
+  .row
+    .col-10.my-auto.title-container
+      .center-title
+        %p.mb-5
+          Email us a .CSV file of your products and we will import them into your store automatically for
+          = succeed "." do
+            %b free
+  %a.btn.btn-primary.btn-center.mt-0{:href => "mailto:info@ioffer.com?subject=Reopen%20store%20request.&body=Please%20attach%20your%20item%20CSV%20to%20this%20email%20and%20we%20will%20make%20sure%20to%20import%20your%20items."} Send a .CSV
+  %a.btn.btn-center.mt-1{:href => "#{ioffer_brands_path}"} Next
+%br/
+%br/
+%br/

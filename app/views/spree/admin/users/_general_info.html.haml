@@ -1,0 +1,34 @@
+:ruby
+  # Require locals
+  #   user [Spree::User]
+%div(data-hook="admin_user_general_info" class="card")
+  .card-header
+    %h1(class="card-title mb-0 h5")
+      = Spree.t(:general_info)
+  .card-body
+    %table(class="table table-borderless")
+      %tbody
+        %tr
+          %th.text-right login:
+          %td= user.login
+        %tr
+          %th.text-right username:
+          %td= user.username
+        %tr
+          %th.text-right Email:
+          %td= user.email
+        %tr
+          %th.text-right Name:
+          %td= user.display_name
+        %tr
+          %th.text-right Country:
+          %td= user.country
+        %tr
+          %th.text-right Created Products:
+          %td= link_to user.created_products_count, admin_products_path(q:{ user_id_eq: user.id })
+        %tr
+          %th.text-right Products Adopted:
+          %td= link_to user.adopted_products_count, admin_products_adopted_path(variant_adoptons_user_id_eq: user.id )
+        %tr
+          %th.text-right Seller Rank:
+          %td= user.seller_rank

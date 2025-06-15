@@ -1,0 +1,62 @@
+<style>
+.main-nav-bar-category-button{
+
+}
+.main-nav-bar-category-dropdown{
+  border-style: none;
+  z-index: 20;
+}
+</style>
+
+<% # Replacement of spree_navigation_data
+  cache('main_nav_bar.top_level_categories.ul', expires_in: 1.hour) do
+    if Spree::CategoryTaxon.top_level_categories.any? %>
+    <ul class="nav h-100 pl-3 main-nav-bar">
+      <% Spree::CategoryTaxon.top_level_categories[0,4].each_with_index do|top_category, index| -%>
+        <li class="navbar main-nav-bar-dropdown main-nav-bar-category">
+          <%= link_to top_category.meta_title, seo_url(top_category) + "?utm_medium=dnav", class: "px-2 py-3 main-nav-bar-item main-nav-bar-category-button" %>
+          <% if top_category.children.present? %>
+            <div class="w-100 shadow main-nav-bar-category-dropdown">
+              <div class="container p-0 d-flex justify-content-xl-around mx-auto">
+                <% if top_category.children.present? %>
+                  <div class="row">
+                    <div class="category-links">
+                      <div class="category-links-header text-uppercase">Categories</div>
+                      <ul class="pl-0">
+                        <% top_category.children.each do |item| %>
+                          <li>
+                            <%= link_to item.name, seo_url(item) + "?utm_medium=dnav", class: "text-uppercase main-nav-bar-category-links" %>
+                          </li>
+                        <% end %>
+                      </ul>
+                    </div>
+                  <% end %>
+                  <% if spree_navigation_data.any? %>
+                      <% if spree_navigation_data[index][:promo_banners].present? %>
+                        <% spree_navigation_data[index][:promo_banners].each do |promo_banner| %>
+                          <%= link_to promo_banner[:url], class: "dropdown-item" do %>
+                            <div class="category-image text-center mx-3">
+                              <%= main_nav_image(promo_banner[:image], promo_banner[:title]) %>
+                              <div class="category-box">
+                                <div class="category-box-small-text">
+                                  <%= promo_banner[:subtitle] %>
+                                </div>
+                                <div class="category-box-big-text">
+                                  <%= promo_banner[:title] %>
+                                </div>
+                              </div>
+                            </div>
+                          <% end %>
+                        <% end %>
+                      <% end %>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </li>
+      <% end # each top_category %>
+    </ul>
+<%
+  end # cache -%>
+<% end %>

@@ -1,0 +1,40 @@
+Spree.fetchCart();
+<% if spree_current_user
+  Spree::Product.logger.debug "| payment_method_for_variant size: #{payment_method_for_variant(@variant).size }"
+-%>
+  $(ADD_TO_CART_SELECTOR).prop('disabled', false);
+  <% if payment_method_for_variant(@variant).size > 1 -%>
+  $('#variant_added_wrapper').html("<%= escape_javascript(render(partial: 'spree/shared/variant_added_modal', locals:{ variant: @variant, order: @spree_current_order }) ) %>");
+
+  $(".variant-added-modal input[name='variant_id']").change(function(){
+    var pm_id = $(this).attr('data-payment-method-id');
+    $(".variant-added-modal input[name='payment_method_id']").val(pm_id);
+  });
+
+  $('.variant-added-modal').modal('show');
+
+  <% else # No payment method, simply show product_added_modal
+    image = @variant.images.first || @variant.product.master.images.first
+    # JS code from frontend/app/assets/javascripts/spree/frontend/views/spree/shared/product_added_modal.js
+  -%>
+    var $modal = $('.product-added-modal');
+    var nameSelector = '.product-added-modal-product-details-name'
+    var priceSelector = '.product-added-modal-product-details-price'
+    var imageSelector = '.product-added-modal-product-image-container-image'
+    var modalNoImageClass = 'product-added-modal--no-image'
+
+    $modal.find(nameSelector).text("<%= escape_javascript(@variant.product.name) -%>");
+    $modal.find(priceSelector).html("<%= (@variant.display_price || @variant.product.display_price ).to_html -%>");
+    <% if image -%>
+      $modal.removeClass(modalNoImageClass)
+        .find(imageSelector)
+        .attr('src', "<%= main_app.url_for(image.url(:small)).gsub('http:', 'https:') -%>");
+    <% else # no iamge -%>
+      $modal.addClass(modalNoImageClass);
+    <% end -%>
+    $modal.modal('show');
+  <% end -%>
+
+<% else # guest -%>
+window.location = "<%= cart_path(token: @spree_current_order&.token) -%>";
+<% end -%>

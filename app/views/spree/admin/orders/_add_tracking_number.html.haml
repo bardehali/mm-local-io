@@ -1,0 +1,52 @@
+:ruby
+  # Required locals
+  #   order [Spree::Order]
+  # Optional locals:
+  #   add_or_correct: [String] default: 'add'
+  add_or_correct = 'add' unless defined?(add_or_correct) && add_or_correct == 'correct'
+  critical_response = @critical_response || request.path.starts_with?('/admin/critical_response')
+- order.line_items.includes(:product, variant:[:option_values =>[:option_type] ]).sort{|x,y| y.price <=> x.price }.each_with_index do|line_item, index|
+  - product = line_item.product
+  %div(class="container order-info-table" id="#{index > 0 ? "row_of_#{order.id}_#{line_item.product_id}" : "first_row_of_#{order.id}"}")
+    .row
+      .col-1
+      .col-2
+        - if product
+          - image = default_image_for_product_or_variant(product)
+          = image_tag cdn_image_url(image, :small), style:'max-width: 100%;'
+      .col-8.text-left
+        - if product
+          - size_option_types = line_item.variant.option_values.collect(&:option_type).find_all(&:size?)
+          - uniq_cont_of_option_types = line_item.variant.option_values.collect(&:option_type_id).uniq.size
+          %strong= link_to product.name, product_path(product), target:'_blank'
+          %br/
+          = line_item.variant.option_values.collect(&:presentation).join(' - ')
+          %br/
+        %span.text-secondary= distance_of_time_in_shorts(order.completed_at) + ' ago'
+    .row
+      .col-1
+      .col-2
+        - if order.user&.country_code.present?
+          %span.country-icon(title="#{order.user.country}")
+            = inline_svg_tag "flags/4x3/#{order.user.country_code.downcase}.svg", size: '2.6em*1.3em'
+        - else
+          %span.country-name= order.user&.country
+      .col-8.text-left
+        %strong= link_to(order.user.email)
+        %br/
+        - if (address = order.ship_address)
+          %span #{address.full_name} #{address.last_name}
+          %br/
+          = address.full_address(',<br/>').html_safe
+    = form_tag(order_create_message_path(id: order.number), method: :post, multipart: true) do
+      = hidden_field_tag(:type, "order_#{add_or_correct == 'correct' ? 'corrected' : 'provided'}_tracking_number")
+      - if critical_response
+        = hidden_field_tag(:critical_response, true)
+        = hidden_field_tag(:return_url, "/admin/critical_response?t=#{Time.now.to_i}")
+      .row
+        .col-12
+          = text_field_tag :comment, '', class:'w-100 form-control', style:"margin: 1.0em 0; padding: 1.4em; line-height: 1.2em; border-radius: 0.8em; border-width: 0.2em;", placeholder: t('order.tracking_number'), required: true
+      .row
+        .col-2
+        .col-8
+          = submit_tag('Submit', class:'w-100 btn btn-primary text-uppercase', data: { disable_with:'Sending'})

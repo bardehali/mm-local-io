@@ -1,0 +1,25 @@
+<%  # Optional locals:
+  # stars [Integer] number of stars 'on'
+  if defined? edit_enabled
+    state = ''
+    name  = 'review[rating]'
+  else
+    state = 'disabled'
+    name  = defined?(review).nil? ? Time.now.tv_usec.to_s : "review_#{review}"
+  end
+  stars = 0 unless defined?(stars)
+  stars ||= 0
+-%>
+<span class="star-ratings" title="<%= pluralize(stars, 'star') %> of 5">
+  <% 1.upto(5) do|i|
+      star_on = stars >= i
+  -%>
+    <% if defined?(edit_enabled) && edit_enabled -%>
+      <label class="star-rating star-<%= i -%> star-rating-<%= star_on ? 'on' : 'off' -%>">
+        <input name="<%= name %>" type="radio" value="<%= i %>" <%= state %> <%= 'checked' if i == stars %>>
+      </label>
+    <% else -%>
+    <div class="star-rating-readonly star-rating-<%= star_on ? 'on' : 'off' -%>"></div>
+    <% end -%>
+  <% end %>
+</span>

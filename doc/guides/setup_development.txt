@@ -1,0 +1,219 @@
+=========================================
+Basic Development Tools
+
+----------------------------
+
+----------------------------
+For MacOS
+
+brew install imagemagick
+
+===============================
+Ruby on Rails
+
+Your $RAILS_ROOT is where u place the source code
+
+------------------------------------
+Using rvm
+* more flexible to switch ruby versions
+
+Go to https://rvm.io/
+  and it might have steps like 
+
+gpg2 --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
+\curl -sSL https://get.rvm.io | bash -s stable
+\curl -sSL https://get.rvm.io | bash -s stable --rails
+
+rvm install 2.6.4
+rvm use 2.6.4 --default
+
+cd $RAILS_ROOT
+gem install bundler
+bundle install
+
+--------------------------------------
+Apple ARM based silicon like M1 might have problem installing gems.
+So bundle install together would break, and possibly install broken gem like:
+gem install nokogiri -v '1.12.5' --platform=ruby -- --use-system-libraries --source 'https://rubygems.org/'
+
+Also could have a case on page or assets in Rails server getting:
+"stack level too deep"
+
+Let's try https://clearcove.ca/2013/10/how-to-increase-max-stack-size-for-ruby-2-0-when-experiencing-systemstackerror-stack-level-too-deep/
+
+Set your environment variables like, and run rails
+RUBY_THREAD_VM_STACK_SIZE=2097152 RUBY_THREAD_MACHINE_STACK_SIZE=2000000 rails
+
+--------------------------------------
+View level call to asset causes break "Stack Too Deep" on localhost Rails in development env.
+Try running to prepare assets like production env:
+bundle exec rake --trace assets:precompile
+
+
+########################################################
+Run servers in docker
+* https://www.docker.com/
+
+After running the Docker app,
+
+cd $RAILS_ROOT
+docker-compose build && docker-compose up
+
+Ensure the MySQL has the access user set.  Check MySQL Initialization section.
+
+cd $RAILS_ROOT
+rake db:create
+RAILS_ENV=test db:test:clone
+
+If u have static data, u can run like
+mysql -h127.0.0.1 -uroot -proot -Dshoppn_spree_development < data/sample_db_export.sql
+
+########################################################
+Install servers locally
+
+==============================
+Nginx for binding RoR server to port 80
+
+------------------------
+MacOS
+
+brew install nginx
+
+------------------------
+Setup auto-launch in OS X by linking nginx's config (check ur version of nginx being 1.21.2)
+
+mkdir -p ~/Library/LaunchAgents
+cp /usr/local/Cellar/nginx/1.21.2/homebrew.mxcl.nginx.plist ~/Library/LaunchAgents/
+launchctl load -w ~/Library/LaunchAgents/homebrew.mxcl.nginx.plist
+
+------------------------
+cd $RAILS_ROOT
+sudo cp doc/config/nginx.shoppn_spree.localhost /usr/local/etc/nginx/sites-enabled/shoppn_spree
+
+==========================================
+Puma, the RoR server
+
+cd $RAILS_ROOT
+mkdir -p shared/pids/
+mkdir -p shared/sockets/
+mkdir -p shared/log/
+
+Start in active mode by
+rails s
+
+Start in daemon mode by:
+bundle exec puma -C config/puma.rb --daemon
+
+Stop daemon after finding the master's process ID
+kill -s QUIT 12345
+
+
+====================================
+MySQL Server in OS X
+
+brew install mysql
+
+====================================
+Terminal setup
+add into ~/.bash_profile (or ~/.zshrc for newer MacOS terminal)
+
+export DYLD_LIBRARY_PATH=/opt/local/lib/mysql56/mysql:$DYLD_LIBRARY_PATH
+export PATH=/opt/local/bin:/opt/local/sbin:/usr/local/mysql/bin:~/.bin:$PATH
+
+====================================
+ElasticSearch
+* download from https://www.elastic.co/downloads/elasticsearch
+
+unarchive and 
+cd elasticsearch-FOLDER
+
+Run by
+bin/elasticsearch
+
+====================================
+Optional:
+Redis - server for local cache
+
+Refer to: http://redis.io/topics/quickstart
+and for EC2 AMI https://gist.github.com/FUT/7db4608e4b8ee8423f31
+
+mkdir /tmp/redis && redis-cli CONFIG SET dir /tmp/redis
+redis-cli CONFIG SET dbfilename temp.rdb
+redid-cli config set stop-writes-on-bgsave-error no
+
+If running, set these environment variables:
+
+export REDIS_URL=redis://localhost
+export REDIS_PASSWORD=YOURREDISPASSWORD
+
+====================================
+MinIO - object storage cloud server for hosting images
+
+https://min.io/docs/minio/macos/index.html
+https://min.io/docs/minio/linux/index.html
+
+minio server --console-address :9001 /data
+
+or wherever to keep files saved instead of "/data"
+
+Visit http://127.0.0.1:9001/
+  create a bucket 'ioffer-assets'
+  create some pair of access key
+And set those in environment variables and others:
+
+export MINIO_ROOT_USER=minio
+export MINIO_ROOT_PASSWORD=miniotest
+export MINIO_ACCESS_KEY=MINIOACCESSKEY
+export MINIO_SECRET_KEY=MINIOACCESSSECRET
+export MINIO_HOST=localhost
+export MINIO_ENDPOINT=http://localhost:9000
+
+####################################################
+# Common initial setup
+
+====================================
+MySQL Initialization 
+
+Log into:
+mysql -h127.0.0.1 -uroot -proot
+
+use mysql;
+delete from user where User='scraper';
+CREATE USER scraper@'%' IDENTIFIED BY 'test';
+
+GRANT ALL PRIVILEGES ON *.* TO scraper@'%' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+
+create database shoppn_spree_development;
+create database shoppn_spree_test;
+
+
+-----------------------------
+Populate Static Data: sample database
+
+mysql -uroot -ptest -Dshoppn_spree_development < data/sample_db_export.sql
+
+bundle exec rake db:test:load
+
+-----------------------------
+Populate ElasticSearch by
+
+bundle exec rake es:rebuild_products_index
+bundle exec rake es:rebuild_option_values_index
+
+====================================
+Optional:
+
+Delayed Job, for some delayed background tasks
+
+rails generate delayed_job:active_record
+rake db:migrate
+
+Run daemon by
+bin/delayed_job start
+
+Stop by
+bin/delayed_job stop
+
+
+====================================

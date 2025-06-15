@@ -1,0 +1,57 @@
+:css
+  .input-group {
+    display: block;
+  }
+  .masthead .masthead-content .input-group-newsletter input {
+    width: 100%;
+  }
+
+.page-container
+  .masthead
+    .masthead-bg
+      .container.ml-10
+        .logo-image
+          = image_tag('iOffer_logo_color_plain.png', alt:'iOffer')
+    .container.h-100
+      .row.h-100
+        .col-12.my-auto
+          #register_form_wrapper.masthead-content.text-white.py-5.py-md-0
+            - if @user && @user.id
+              .user-box.mb-2
+                %div
+                  %b #{@user.username}
+                %div
+                  .stars{"aria-label" => "Rating of this product is #{@user.rating.to_f > 0.0 ? ('%.1f' % [@user.rating]) : '0'} out of 5.", :style => "--rating: #{@user.rating.to_f};"}
+                  - if @user.positive.to_i > 0
+                    %b #{ pluralize(@user.positive, 'transaction', {}) }
+                  - else
+                    %b #{ pluralize(@user.transactions_count, 'transaction', {}) }
+                %div
+                  - if @user.items_count > 0
+                    %b #{ pluralize(@user.items_count, 'item') } recovered
+            %h1.mb-3.title-div Start Selling Now!
+            = form_for(@user || Ioffer::User.new(username: params[:username], reset_password_token: params[:reset_password_token]), as: :user, html:{ action: ioffer_users_path, method:'post', class:'user-form'} ) do|f|
+              = f.hidden_field(:reset_password_token)
+              - if f.object.errors.include?(:email)
+                %div.text-danger= f.object.errors[:email].try(:first) || 'Invalid email'
+              .input-group.input-group-newsletter
+                = f.text_field(:email, class:"form-control#{' border-danger' if f.object.errors.include?(:email)}", 'aria-describedby'=>"basic-addon", 'aria-label'=>"Email", placeholder: "Email", type:"email", required: true)
+              - if f.object.errors.include?(:username)
+                %div.text-danger #{f.object.errors[:username].try(:first) || 'Invalid username' }
+              .input-group.input-group-newsletter
+                = f.text_field(:username, class:"form-control#{' border-danger' if f.object.errors.include?(:username)}", 'aria-describedby'=>"basic-addon", 'aria-label'=>"iOffer username", placeholder: "iOffer username", type:"text", required: true)
+              .input-group.input-group-newsletter
+                = f.text_field(:password, class:"form-control#{' border-danger' if f.object.errors.include?(:password)}", 'aria-describedby'=>"basic-addon", 'aria-label'=>"Enter Password", placeholder: "Enter Password", type:"password", required: true)
+              - if f.object.errors.include?(:password_confirmation)
+                %div.text-danger #{f.object.errors[:password_confirmation].first}
+              .input-group.input-group-newsletter
+                = f.text_field(:password_confirmation, class:"form-control#{' border-danger' if f.object.errors.include?(:password_confirmation)}", 'aria-describedby'=>"basic-addon", 'aria-label'=>"Re-enter Password", placeholder: "Re-enter Password", type:"password", required: true)
+                .input-group-append
+                  = f.submit('Submit', class:'btn btn-secondary')
+              - if need_to_captcha_verify?
+                %br/
+                = recaptcha_wrapper(f.object)
+  .globe-image
+    = image_tag('ioffer_globe_boxes_device.png', alt:'iOffer', class:'globe-image-asset')
+  .h2.tagline
+    Millions Of Buyers Can't Wait To See What You Have

@@ -1,0 +1,60 @@
+:ruby
+  # Use of content_for :footer_extra would be able to place its form outside of product form; else, inside form tag just
+  # would not show up.
+  @color_option_type ||= ::Spree::OptionType.color
+  basic_color_names = %w(Red Green Blue Black White Pink Cyan Gray)
+- content_for :footer_extra do
+  .color-picker.ps-fxd.w-100.h-100(style="display: none;")
+    .d-flex.z-9.m-auto
+      .color-palette-wrapper.box-shadow.mt-4.p-3(data-role="admin_product_form_colorpalette" style="display: ;")
+        = form_tag(api_option_type_option_values_path(format:'js', option_type_id: @color_option_type.id), method: :post, remote: true ) do
+          = form_authen_token_hidden_tag id:'color_palette_api_token'
+          .color-palette-heading.d-flex.jc-sb
+            %a.back-btn.csr-ptr.fs-25
+            .title
+              %h6= 'Create your variant color'
+              %span= 'Select up to two colors'
+            %a.close-btn.csr-ptr.fs-25= '×'
+          .color-palette-body.d-flex.mt-3
+            .color-palette.w-35p.h-25p
+              = render partial: 'spree/shared/color_box', |
+                collection: @color_option_type.option_values.where(name: basic_color_names), as: :option_value |
+              .color-wrapper.pr-4px.d-flex.center
+                %a.color-add.m-auto.fs-32px.lh-35px.csr-ptr(style="width: 42px;height: 42px;border: black solid 2px;border-radius: 50px;")= '+'
+            .color-palette-preview.ml-4.ps-rel
+              .color-preview.d-flex
+                %input(type="hidden" name="color_picker_preview_color" id="color_picker_preview_color")
+                %input(type="hidden" name="element_to_update" value="variant-box-body")
+                %input(type="hidden" name="option_value[presentation]" id="color_picker_preview_presentation")
+                %input(type="hidden" name="option_value[extra_value]" id="color_picker_preview_extra_value")
+                .m-auto
+                  %div(style="width: 69px; height: 69px; display: block;")
+                    .color-box
+              .reverse
+                %a.btn.btn-bg-white.w-10
+                  %i.fa.fa-refresh
+              .confirm.ps-abs.rt-0.bt-0
+                %input.btn.btn-bg-black.w-10(type='submit' id='color_palette_confirm' value="#{t('spree.ok')}")
+      .color-picker-wrapper.box-shadow.ml-4.mt-4.p-3(data-hook="admin_product_form_colorpicker" style="display: none;")
+        = form_tag(api_option_type_option_values_path(format:'js', option_type_id: @color_option_type.id), method: :post, remote: true ) do
+          = hidden_field_tag(:element_to_update, 'color-palette')
+          = form_authen_token_hidden_tag id:'color_picker_api_token'
+          %input(type="hidden" name="option_value[name]" id="color_box_name")
+          %input(type="hidden" name="option_value[extra_value]" id="color_box_extra_value")
+          .color-picker-heading.d-flex.jc-sb
+            %a.back-btn.csr-ptr.fs-25
+            .title
+              %h6= 'Create your variant color'
+              %span= 'Select up to two colors'
+            %a.close-btn.csr-ptr.fs-25= '×'
+          .color-picker-body.d-flex.mt-3
+            .color-picker-palette
+            .color-picker-preview.ml-4.ps-rel
+              .color-preview.d-flex
+                .m-auto
+                  = render partial: 'spree/shared/color_box', locals: { color_names: 'Maroon / White', color_values: '#990033,#ffffff', var_ids: '16' }
+              .color-name.field
+                %label.d-block(for="color_name")= 'Name'
+                %input(type="text" style="width: 112px;" name="option_value[presentation]" id="color_name")
+              .confirm.ps-abs.rt-0.bt-0
+                %input.btn.btn-bg-black.w-10(type='submit' id='color_picker_submit' value="#{t('spree.ok')}")

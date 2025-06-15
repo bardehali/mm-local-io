@@ -1,0 +1,5 @@
+<% if params[:status_container].present? %>
+$("#<%= params[:status_container] -%>").html("<i class='glyphicon glyphicon-check text-success'/> <%= t('spree.admin.products.variant_created') %> ");
+$("#<%= params[:status_container] %>").siblings("input[name='variant[price]']").blur().prop('disabled', true);
+$("#product_adoption_card_<%= @variant.product_id -%>").parent().fadeOut("slow")
+<% end # if status_container %>

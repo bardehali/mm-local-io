@@ -1,0 +1,38 @@
+<% # Modded version that checkes for :page_header
+-%>
+<% if content_for?(:content_header_top) -%>
+  <div class="content-header-top content-header mb-2">
+    <%= yield :content_header_top %>
+  </div>
+<% end -%>
+<% if content_for?(:page_title) || content_for?(:page_actions) %>
+  <div class="container-flex content-header <%= "with-page-tabs" if content_for?(:page_tabs) %> page-header">
+    <div class="row align-items-center  <%= if content_for?(:page_tabs) then "pb-0" else "" end %> mb-4">
+      <% if content_for?(:page_title) %>
+        <h1 class="h3 pl-2 pt-2 mb-0 col-12 col-md-5 text-bold">
+          <%= yield :page_title %>
+          <% if content_for?(:page_title_small) %>
+            <small><%= yield :page_title_small %></small>
+          <% end %>
+        </h1>
+      <% end %>
+
+      <% if content_for?(:page_actions) %>
+        <div class="page-actions col-12 col-md-7 pr-0" data-hook="toolbar">
+          <%= yield :page_actions %>
+        </div>
+      <% end %>
+
+      <% if content_for?(:page_tabs) %>
+        <ul class="nav nav-tabs w-100 mt-2">
+          <%= yield :page_tabs %>
+        </ul>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+<% if content_for?(:page_header) # full width -%>
+  <div class="content-header <%= "with-page-tabs" if content_for?(:page_tabs) %> page-header mb-2">
+    <%= yield :page_header %>
+  </div>
+<% end -%>

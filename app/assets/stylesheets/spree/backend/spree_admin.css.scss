@@ -1,0 +1,50 @@
+@import 'global/variables';
+@import 'global/mixins';
+
+@import 'bootstrap';
+@import 'glyphicons';
+@import 'spree/backend/shared/glyphicons_urls_fix';
+@import "spree/frontend/shared/flag-icon";
+
+@import 'components/navbar';
+@import 'components/sidebar';
+@import 'components/tables';
+@import 'components/badges';
+@import 'components/main';
+@import 'components/page_header';
+@import 'components/icons';
+@import 'components/buttons';
+@import 'components/filters';
+@import 'components/navigation';
+@import 'components/taxon_products_view';
+@import 'components/progress';
+@import 'components/spinner';
+
+@import 'spree/backend/plugins/jquery_ui';
+@import 'spree/backend/plugins/flatpickr';
+@import 'spree/backend/plugins/select2_bootstrap4';
+@import 'spree/backend/plugins/select2_custom';
+
+@import 'spree/backend/shared/base';
+@import 'spree/backend/shared/forms';
+@import 'spree/backend/shared/products';
+
+@import '/spree/backend/views/order_payments';
+@import '/spree/backend/views/product_properties';
+@import '/spree/backend/views/prototypes';
+
+@import 'spree/frontend/spree_reviews';
+@import 'spree/record_reviews';
+
+.nav .selected {
+  font-weight: 600;
+  color: black;
+}
+
+.user-role { font-size: 1.0rem; }
+.user-role-phantom, .user-role-curated { color: #A700FF; }
+.user-role-pending { color: red; }
+.user-role-approved, .user-role-hp, .user-role-handpicked { color: grey; }
+.user-role-quarantined { color: black; background-color: yellow; padding: 0 0.3em; }
+
+.sales_state_paid_need_tracking > a { color: #cc0000 !important; }

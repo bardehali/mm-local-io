@@ -1,0 +1,77 @@
+:css
+  .bouncing-arrows-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+  }
+
+  .bouncing-arrow {
+    font-size: 2rem;
+    color: red;
+    margin: 0 1rem; /* Add margin to create spacing */
+    animation: bounce 1s infinite;
+    position: relative;
+  }
+
+  .bounce-up {
+    animation-name: bounce-up;
+    left: -100px;
+  }
+
+  .bounce-down {
+    animation-name: bounce-down;
+    left: 100px;
+  }
+
+  .text-line {
+    padding: 1.0rem;
+    background-color: #F6C323;
+    border-radius: 16px;
+    font-weight: bold;
+    font-size: 2.0rem;
+    color: #black;
+    white-space: nowrap; /* Ensures the text stays on one line */
+    margin: 0.5rem 0;
+    animation: rotate-pulse 1s infinite ease-in-out;
+  }
+
+  @keyframes bounce-up {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes bounce-down {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(10px);
+    }
+  }
+
+  @keyframes rotate-pulse {
+     0%, 100% {
+       transform: rotate(-2deg);
+     }
+     50% {
+       transform: rotate(2deg);
+     }
+   }
+
+:ruby
+%div.bouncing-arrows-container
+  %div.bouncing-arrow.bounce-up
+    %span.arrow ↑
+  %div.text-line
+    %strong Get more sales!
+    .br
+    %strong 抓住更多订单机会！
+  %div.bouncing-arrow.bounce-down
+    %span.arrow ↓

@@ -1,0 +1,65 @@
+test:
+  service: Disk
+  root: <%= Rails.root.join("tmp/storage") %>
+
+local:
+  service: Aliyun
+  endpoint: oss-eu-west-1.aliyuncs.com
+  access_key_id: LTAI4G68tuo9nVmZbmbG2Qcc
+  access_key_secret: IeQ5X6mnd2DU5EexdlWgt5Q6u0GRyI
+  bucket: "ioffer-assets"
+  path: "as"
+  mode: "private"
+
+aliyun:
+  service: Aliyun
+  endpoint: oss-eu-west-1.aliyuncs.com
+  access_key_id: LTAI4G68tuo9nVmZbmbG2Qcc
+  access_key_secret: IeQ5X6mnd2DU5EexdlWgt5Q6u0GRyI
+  bucket: "ioffer-assets"
+  path: "development/storage"
+  mode: "private"
+
+vultr:
+  service: Vultr
+  endpoint: ams1.vultrobjects.com
+  access_key_id: 72A5VCV7Y8O384NLOQYV
+  access_key_secret: sCqgrhKyMTmZLpOv0GXfn4TiPh8cXxr7cXPVFtsE
+  bucket: "ioffer-assets"
+  mode: "private"
+
+aliyun_dev:
+  service: Aliyun
+  endpoint: oss-eu-west-1.aliyuncs.com
+  access_key_id: LTAI4G68tuo9nVmZbmbG2Qcc
+  access_key_secret: IeQ5X6mnd2DU5EexdlWgt5Q6u0GRyI
+  bucket: "ioffer-assets"
+  path: "as"
+  mode: "private"
+
+# Use rails credentials:edit to set the AWS secrets (as aws:access_key_id|secret_access_key)
+# amazon:
+#   service: S3
+#   access_key_id: <%= Rails.application.credentials.dig(:aws, :access_key_id) %>
+#   secret_access_key: <%= Rails.application.credentials.dig(:aws, :secret_access_key) %>
+#   region: us-east-1
+#   bucket: your_own_bucket
+
+# Remember not to checkin your GCS keyfile to a repository
+# google:
+#   service: GCS
+#   project: your_project
+#   credentials: <%= Rails.root.join("path/to/gcs.keyfile") %>
+#   bucket: your_own_bucket
+
+# Use rails credentials:edit to set the Azure Storage secret (as azure_storage:storage_access_key)
+# microsoft:
+#   service: AzureStorage
+#   storage_account_name: your_account_name
+#   storage_access_key: <%= Rails.application.credentials.dig(:azure_storage, :storage_access_key) %>
+#   container: your_container_name
+
+# mirror:
+#   service: Mirror
+#   primary: local
+#   mirrors: [ amazon, google, microsoft ]

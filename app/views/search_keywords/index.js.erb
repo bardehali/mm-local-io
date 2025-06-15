@@ -1,0 +1,47 @@
+<% dropdown_selector = params['dropdown_selector']
+  dropdown_selector = '.search-container .dropdown-menu' if dropdown_selector.blank?
+  is_mobile = (dropdown_selector =~ /mobile/i )
+-%>
+  var dropdown = $("<%= dropdown_selector -%>")
+  dropdown.empty()
+<%
+# Spree::User.logger.debug("| @search_keywords count #{ @search_keywords&.size }, present? #{@search_keywords.present?}")
+
+if @search_keywords.present?
+  @search_keywords.each do|search_keyword|
+    if is_mobile
+      url = spree.md_products_path(keywords: search_keyword.keywords)
+    else
+      url = spree.sd_products_path(keywords: search_keyword.keywords)
+    end
+  -%>
+  dropdown.append("<a class='dropdown-item' href=\"<%= url -%>\" data-keywords=\"<%= search_keyword.keywords.gsub('"', '') %>\"><%= search_keyword.respond_to?(:highlight) ? (raw(search_keyword.highlight.values.to_a.join(' ').upcase) ) : highlight_keywords(search_keyword.keywords.upcase) %><%= " (#{search_keyword.search_count})" if Rails.env.development? -%></a>")
+<% end -%>
+
+$('<%= dropdown_selector -%> a').click( function(){
+  var url = $(this).prop('href')
+  var dataKeywords = $(this).attr('data-keywords')
+  if ( url != undefined && url != '' ){
+    window.location = url
+  } else if (dataKeywords != undefined && dataKeywords != '') {
+    dropdown.siblings('.inline-search-box').val(dataKeywords)
+    if (typeof(timerToSearchKeywordChange) != 'undefined' ) {
+      clearTimeout(timerToSearchKeywordChange)
+    }
+    $('#search_inline_form').submit()
+  }
+})
+  <% if is_mobile -%>
+  mobileShowSearchDropdown()
+  <% else -%>
+  showSearchDropdown()
+  <% end -%>
+<%
+else # no kws %>
+  <% if is_mobile -%>
+  mobileCancelSearchDropdown()
+  <% else -%>
+  cancelSearchDropdown()
+  <% end -%>
+<%
+end -%>

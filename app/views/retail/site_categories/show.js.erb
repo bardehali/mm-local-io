@@ -1,0 +1,17 @@
+<% 
+  category_link_proc = Proc.new{|category_taxon| 
+    link_to(category_taxon.name, retail_site_category_path(resource, site_category:{ mapped_taxon_id: category_taxon.id} ), remote: true, method: :put, role:'button', class: "btn-category #{ ' btn-category-selected' if resource.mapped_taxon&.id == category_taxon.id}", id:"btn_category_#{category_taxon.id}", title:"#{category_taxon.breadcrumb}", 'data-toggle'=>'tooltip')
+  }
+-%>
+$("#select_category_modal .modal-body").html("<%= escape_javascript( render(partial: 'spree/shared/select_taxon_modal_body.html.haml', locals:{ current_taxon: resource.mapped_taxon, recent_category_taxon_ids: @recent_category_taxon_ids, category_link_proc: category_link_proc }) ) %>")
+$("#select_category_modal").modal('show');
+$("#name_for_search_categories").change(updateListOfCategories);
+$(".btn-category-selected").parent().closest('.children-categories').addClass('show');
+$('#search_categories_form input').on('keyup keypress', function(e) {
+  var keyCode = e.keyCode || e.which;
+  if (keyCode === 13) { 
+    e.preventDefault();
+    $('#name_for_search_categories').blur();
+    return false;
+  }
+});

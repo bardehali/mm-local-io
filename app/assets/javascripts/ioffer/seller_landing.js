@@ -1,0 +1,10 @@
+//= require ioffer/modernizr-3.6.0.min.js
+//= require ioffer/popper.min.js
+//= require ioffer/slick.min.js
+//= require ioffer/isotope.pkgd.min.js
+//= require ioffer/imagesloaded.pkgd.min.js
+//= require ioffer/jquery.magnific-popup.min.js
+//= require ioffer/scrolling-nav.js
+//= require ioffer/jquery.easing.min.js
+//= require ioffer/wow.min.js
+//= require ioffer/main.js

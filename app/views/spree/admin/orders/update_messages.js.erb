@@ -1,0 +1,6 @@
+<% if params[:messages_selector].present? -%>
+  $("<%= params[:messages_selector] -%>").hide()
+<% end -%>
+<% if params[:order_info_selector].present? -%>
+  $("<%= params[:order_info_selector] -%>").hide()
+<% end -%>

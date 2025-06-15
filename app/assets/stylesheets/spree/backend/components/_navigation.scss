@@ -1,0 +1,11 @@
+.navbar-toggler {
+  border: none;
+  right: 0;
+  top: 0;
+  cursor: pointer;
+}
+@media screen and (max-width: 575px) {
+  .navbar-toggler {
+    right: auto;
+  }
+}

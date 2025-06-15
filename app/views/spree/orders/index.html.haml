@@ -1,0 +1,29 @@
+:ruby
+  # Buyer version of orders list compared to /admin/orders, so hidden attributes and 
+  # linked to readonly view of order details
+
+  is_admin = spree_current_user&.admin?
+
+- content_for :table_filter do
+  - if is_admin
+    = render partial: 'table_filter', locals:{ search: @search }
+
+.container
+  .row
+    .col.text-center.mb-3
+      %h4= t('spree.my_orders')
+  - if @search.result.count > 0
+    = render partial:'order_row', collection: (@orders || @search.result), as: :order
+
+    .row
+      .col-sm-0.col-md-3
+      .col-sm-12.col-md-6.text-center
+        = render 'spree/admin/shared/index_table_options', collection: @orders, simple: true
+
+  - else
+    .alert.alert-info.no-objects-found
+      = Spree.t(:no_resource_found, resource: plural_resource_name(Spree::Order))
+      ,
+      \#{link_to(Spree.t(:add_one), new_admin_order_url) if can? :create, Spree::Order}!
+
+%br/

@@ -1,0 +1,86 @@
+:ruby
+  payment_method = Spree::PaymentMethod.paypal
+  @store_payment_method ||= @store_payment_methods.find{|spm| spm.payment_method_id == payment_method.id }
+  requires_this_pm = spree_current_user&.full_seller?
+
+- content_for :head do
+  :css
+    .modal-dialog { max-width: 60%; }
+    .modal-body h4, .modal-body h5 { line-height: 1.5em; }
+  :javascript
+    var skipValidate = false;
+    function doubleCheckForm(e) {
+      var form = $(this);
+      var validationInput = $("form#store_payment_methods_form").find("input[name='skip_validation']")[0];
+      var accountIdInput;
+      if (validationInput && validationInput.value != 'true') {
+        var foundAccountId;
+        var foundInstruction;
+        form.find("input,textarea").each(function(index, input)
+        {
+          if (input.value != undefined && input.value.match(/^(\S+)$/) != null) {
+
+            if (input.name.startsWith("payment_method_account_ids") ) {
+              foundAccountId = input.value;
+              accountIdInput = input;
+            }
+            else if (input.name.startsWith("store_payment_method_instruction") ) {
+              foundInstruction = input.value;
+            }
+          }
+        });
+        if (foundAccountId || foundInstruction) {
+
+        } else {
+          $('#payment_form_warning').modal('show');
+          skipValidate = true;
+          if (validationInput) { validationInput.value = 'true'; }
+          if (accountIdInput) { accountIdInput.attr('required', false); }
+          e.preventDefault();
+        }
+      }
+    }
+
+- content_for :footer do
+  :javascript
+    $(function(){
+      $("#store_payment_methods_form").submit(doubleCheckForm);
+    });
+
+- content_for :timeline do
+  = timeline_table do|timeline|
+    - timeline.step 1, t('user.registration'), true
+    - timeline.step 2, t('user.contact_info'), true
+    - timeline.step 3, t('user.payment_methods.payment_options'), true
+    - timeline.step 4, t('store.list_items'), false
+
+.container
+  = render partial:'home/logo_and_timeline'
+  .mt-3 &nbsp;
+  = form_tag(admin_payment_methods_and_retail_stores_path, method:'post', id:'store_payment_methods_form') do
+    = hidden_field_tag('skip_validation', false)
+    = hidden_field_tag('current_path', 'home/payment_options')
+    = hidden_field_tag('next_path', payment_methods_provided_path)
+    %div(class="row")
+      .col-3.col-xs-1
+      %div(id="payment_input_#{payment_method.id}" class="col-6 col-xs-10 payment-input")
+        %h2.mb-5= t('user.payment_methods.buyers_want_to_pay_with', service: payment_method.description)
+        .mb-5.text-center
+          %h5.mb-1= t('user.payment_methods.please_enter_your_email', service: payment_method.description)
+          = email_field_tag("payment_method_account_ids[#{payment_method.id}]", @store_payment_method&.account_id_in_parameters, class:"form-control form-control-lg form-payment highlighted-form#{' is-invalid' if @store_payment_method && @store_payment_method.errors[:account_parameters]&.first }", 'aria-describedby'=>'basic-addon', placeholder: t('user.payment_methods.your_service_email', service: payment_method.description), required: true )
+          - if @store_payment_method && ( warning = @store_payment_method.errors[:account_parameters]&.first ).present?
+            %h6.text-danger.text-dark-warning.mt-2.mb-3= warning
+        .mb-3.text-center
+          %h5.mb-1= t('user.payment_methods.payment_instruction_note')
+          = text_area_tag("store_payment_method_instruction_#{payment_method.id}", @store_payment_method&.instruction, class:'form-control form-control-lg form-payment highlighted-form', 'aria-describedby'=>'basic-addon' )
+
+        %div(style="height: 10%;") &nbsp;
+        .mb-3
+          %h5.font-weight-default= t('user.payment_methods.recommend_setting_up_service', service: payment_method.description)
+        = submit_tag(t('form.submit'), class:'btn btn-primary btn-lg form-control center-in-div', data:{ disable_with: t('form.submitting') } )
+        .mt-5.text-right
+          = link_to(t('payment.other_payment_methods') + ' >>', payment_methods_provided_path)
+      .col-3.col-xs-1
+  .mb-5 &nbsp;
+
+= render partial:'spree/admin/shared/modal.html.haml', locals:{ target:'payment_form_warning', content: "<div class='mt-3 mb-3 p-3'><h4>#{t('user.payment_methods.customers_prefer_payment', service: payment_method.description) }</h4></div>" }

@@ -1,0 +1,167 @@
+:ruby
+  list_item_css_class = 'taxon'
+
+- content_for :head do
+  :css
+    #modal_category_taxon_selectors .category-row {
+      margin: 0.4rem 0;
+    }
+    #modal_category_taxon_selectors > div {
+      padding: 1px 5px 3px 0;
+    }
+    /* #modal_category_taxon_selectors > *:nth-child(even) {
+      background-color: #f0f0f0;
+    } */
+    #modal_category_taxon_selectors .children-categories {
+      margin-left: 5%;
+    }
+    #modal_category_taxon_selectors .children-categories input, .taxon-level-1 {
+      font-size: 1.5rem;
+    }
+    #modal_category_taxon_selectors .children-categories-level-1 input, .taxon-level-2  {
+      font-size: 1.3rem;
+    }
+    #modal_category_taxon_selectors .children-categories-level-2 input, .taxon-level-3 {
+      font-size: 1.1rem !important;
+    }
+    #modal_category_taxon_selectors .children-categories-level-3 input, .taxon-level-4 {
+      font-size: 1.0rem !important;
+    }
+    #modal_category_taxon_selectors .children-categories-level-4 input {
+      font-size: 0.9rem !important;
+    }
+    #recent_selected_categories_list li { margin: 1.0rem 0; }
+
+    .btn-category {
+      box-shadow: 0 1px 1px 0 grey;
+      border: 1px solid transparent;
+      font-size: 1.1rem;
+      padding: 0.3rem;
+      background-color: #f0f0f0;
+    }
+    .btn-category-selected {
+      color: white;
+      background-color: #666666;
+    }
+    .btn-category:hover, .taxon-mapping-button:hover  {
+      border: solid 2px turquoise;
+    }
+
+    .toggle-checkbox { border: solid 1px #333333; display: none; }
+    .toggle-checkbox + label { font-size: 0.8rem; padding: 0.2rem; color: white; }
+    .toggle-checkbox:checked + label { background-color: #2e5f51; }
+    .toggle-checkbox:not(:checked) + label { background-color: grey; }
+
+    .categories-tree ul { list-style: none; }
+    .categories-tree ul li { padding: 0.5rem 0 0.2rem 1.0rem; border-top: dashed 1px #a0a0a0; }
+    .categories-ul > li { background-color: #eeeeee; }
+    .categories-ul > li.site-name { background-color: #333333; }
+    .categories-ul > li.site-name h2 { color: #CCCCCC; }
+    .categories-ul > li > ul > li { background-color: #dfdfdf; }
+    .categories-ul > li > ul > li > ul > li { background-color: #d0d0d0; }
+
+%nav
+  %ul.pagination.justify-content-center
+    %li(style="line-height: 2.3em;") Map Categories for
+    %li &nbsp;
+    %li(class="page-item #{params[:site_name]=='all' ? 'active' : '' }")
+      %a(href="#{retail_site_categories_path(site_name:'all')}" class="page-link") All Sites
+    - @site_names.each do|site_name|
+      %li(class="page-item #{params[:site_name]==site_name ? 'active' : '' }")
+        %a(href="#{retail_site_categories_path(site_name:site_name)}#site_name_#{site_name.downcase}" class="page-link")=site_name
+%p This mapping connects outside category structures to our universal categories, so import of outside products would be able to keep related categories.
+
+
+%br/
+
+#taxonomy_tree.categories-tree
+  %ul.categories-ul
+    - last_site_name = ''
+    - collection.each do|cat|
+      - if last_site_name != cat.site_name.downcase
+        - last_site_name = cat.site_name.downcase
+        %li.site-name
+          %a(name="site_name_#{last_site_name.underscore}")
+          %h2 
+            #{cat.site_name}
+            &nbsp;&nbsp;&nbsp;
+            %input(type='checkbox' name='show_only_unmapped' id='show_only_unmapped_checkbox' class='toggle-checkbox')
+            %label(for='show_only_unmapped_checkbox') Show Only Unmapped
+      %li(data-category-id="#{cat.id}" class="#{cat.mapped_taxon_id ? 'mapped' : 'not-mapped'}")
+        = list_item_for_mapping(cat).html_safe
+        - if cat.children.any?
+          %ul
+            - cat.children.each do|second_cat|
+              %li(data-category-id="#{second_cat.id}" class="#{second_cat.mapped_taxon_id ? 'mapped' : 'not-mapped'}")
+                = list_item_for_mapping(second_cat).html_safe
+                - if second_cat.children.any?
+                  %ul
+                    - second_cat.children.each do|third_cat|
+                      %li(data-category-id="#{third_cat.id}" class="#{third_cat.mapped_taxon_id ? 'mapped' : 'not-mapped'}")
+                        = list_item_for_mapping(third_cat).html_safe
+                        - if third_cat.children.any?
+                          %ul
+                            - third_cat.children.each do|fourth_cat|
+                              %li(data-category-id="#{fourth_cat.id}" class="#{fourth_cat.mapped_taxon_id ? 'mapped' : 'not-mapped'}")
+                                = list_item_for_mapping(fourth_cat).html_safe
+
+
+.modal.select-category-modal(tabindex='-1' role='dialog' id="select_category_modal")
+  .modal-dialog(role='document' style='min-width: 50%;')
+    .modal-content
+      .modal-header
+        .modal-title Choose mapping to our category (#{link_to('from Products > Taxanomies',spree.edit_admin_taxonomy_path(Spree::Taxonomy.categories_taxonomy) ) })
+        %button(type='button' class='close' data-dismiss='modal' aria-label='Close')
+          %span(aria-hidden="true") &times;
+      .modal-body
+
+- content_for :footer do
+  :javascript
+    function updateListOfCategories() {
+      //$(this).preventDefault();
+      var name = $(this).val();
+      if (name == "") {
+        $("#modal_category_taxon_selectors .categories-level-1").css('display', 'block');
+        $("#modal_category_taxon_selectors .children-categories-level-1").addClass('collapse');
+        $("#modal_category_taxon_selectors .category-row").css('margin', '10px 0');
+        $('#select_category_modal .btn-category').css('display', 'inline-block');
+        $('#select_category_modal .btn-category + .input-group-append').css('display', 'flex');
+      } else if (name.length > 2) {
+        const r = new RegExp(name, "i");
+        $("#modal_category_taxon_selectors .categories-level-1").css('display', 'none');
+        $("#modal_category_taxon_selectors .children-categories").removeClass('collapse');
+        $("#modal_category_taxon_selectors .category-row").css('margin', '0');
+        var allCategoryButtons = $('#select_category_modal .btn-category');
+        for (var i = 0; i < allCategoryButtons.length; i++) {
+          var buttonObj = $(allCategoryButtons[i] );
+          var hasMatch = r.test( buttonObj.text() );
+          //console.log("| " + name + " vs " + buttonObj.text() + ' => ' + hasMatch);
+          if (hasMatch) {
+            console.log("| " + name + " vs " + buttonObj.text() + ' => ' + hasMatch + ", id="+ buttonObj.attr('id'));
+            $("#modal_category_taxon_selectors .categories-level-1:has(#"+ buttonObj.attr('id') +")").css('display', 'block');
+            buttonObj.css('display', 'inline-block');
+            buttonObj.siblings().css('display', 'flex');
+            buttonObj.parent().css('margin', '10px 0');
+          } else {
+            buttonObj.css('display', 'none');
+            buttonObj.siblings().css('display', 'none');
+          }
+        }
+      }
+    } // updateListOfCategories
+
+    function switchShowOnlyUnmapped() {
+      console.log("checked? " + $(this).prop('checked') );
+      if ( $(this).prop('checked') ) {
+        $('.categories-tree li.mapped').hide();
+      } else {
+        $('.categories-tree li.mapped').show();
+      }
+    }
+
+    $(function(){
+      $("#name_for_search_categories").change(updateListOfCategories);
+      $("#show_only_unmapped_checkbox").change(switchShowOnlyUnmapped);
+      $('[data-toggle="tooltip"]').tooltip();
+      $('[data-toggle="popover"]').popover();
+    });

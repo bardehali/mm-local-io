@@ -1,0 +1,25 @@
+:ruby
+  # Required locals
+  #   payment_methods [Collection of Spree::PaymentMethod]
+%table.table.table-striped
+  %tbody
+    - payment_methods.each do|payment_method|
+      %tr
+        %td
+          %div(id="payment_input_#{payment_method.id}" class="payment-input #{'payment-input-selected' if payment_method.store_payment_method}")
+            .input-group.input-group-newletter
+              - if payment_method.name == "PayPal"
+                .url-display.payment_display= image_tag('payment_methods/trans/paypal.png', alt: payment_method.name)
+              - elsif payment_method.name == "AliPay"
+                .url-display.payment_display= image_tag('payment_methods/trans/alipay.png', alt: payment_method.name)
+              - elsif payment_method.name == "TransferWise"
+                .url-display.payment_display= image_tag('payment_methods/trans/transferwise.png', alt: payment_method.name)
+              - else
+              = text_field_tag("payment_method_account_ids[#{payment_method.id}]", payment_method.store_payment_method.try(:account_id_in_parameters), class:'form-control form-payment', 'aria-describedby'=>'basic-addon', 'aria-label'=>'Enter account', placeholder:"Enter #{payment_method.description} ID or email" )
+              %a.input-group-text(role='button' data-toggle='collapse' title="#{t('payment.instruction_on_how_to_pay')}" href="#payment_method_instruction_#{payment_method.id}" aria-expanded="false" aria-controls="payment_method_instruction_#{payment_method.id}")
+                %i.glyphicon.glyphicon-triangle-bottom 
+            %div(id="payment_method_instruction_#{payment_method.id}" class="row mt-3 mb-3 #{' collapse' if payment_method.store_payment_method&.instruction.blank?}")
+              .col-1.text-right
+                %label(for="store_payment_method_instruction_#{payment_method.id}")= t('payment.instruction')
+              .col-11
+                = text_area_tag("store_payment_method_instruction_#{payment_method.id}", payment_method.store_payment_method&.instruction, placeholder: t('payment.how_to_pay'), class:'form-control')

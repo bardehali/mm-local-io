@@ -1,0 +1,100 @@
+{
+    "tiles": [
+        {
+            "position": 1,
+            "image_url": "https://imagedelivery.net/PhnzJOsSP4zKYuS1D4e4cQ/8bad9e9f-5dcb-42c5-96f0-5d404f53ff00/public",
+	          "image_title": "Backpacks",
+            "tile_name": "Backpacks",
+            "tile_url": "/products_s?sid=j9lb08&utm_source=home&utm_medium=tile&utm_term=backpacks",
+            "show_on_mobile": true
+        },
+        {
+            "position": 2,
+            "image_url": "https://imagedelivery.net/PhnzJOsSP4zKYuS1D4e4cQ/f30f7a96-bebf-4030-beeb-118fc7d7d500/public",
+	          "image_title": "Purses",
+            "tile_name": "Purses",
+            "tile_url": "/products_s?sid=25a5w8&utm_source=home&utm_medium=tile&utm_term=purses",
+            "show_on_mobile": true
+        },
+        {
+            "position": 3,
+            "image_url": "https://imagedelivery.net/PhnzJOsSP4zKYuS1D4e4cQ/cdb03efc-bb56-40fd-0d0c-67771c5ccf00/public",
+	          "image_title": "Sneakers",
+            "tile_name": "Sneakers",
+            "tile_url": "/products_s?sid=c8my88&utm_source=home&utm_medium=tile&utm_term=sneakers",
+            "show_on_mobile": true
+        },
+        {
+            "position": 4,
+            "image_url": "https://imagedelivery.net/PhnzJOsSP4zKYuS1D4e4cQ/77decd64-0526-4383-9e97-06e7c784ab00/public",
+	          "image_title": "Belts",
+            "tile_name": "Belts",
+            "tile_url": "/products_s?sid=67wf31&utm_source=home&utm_medium=tile&utm_term=belts",
+            "show_on_mobile": true
+        },
+        {
+            "position": 5,
+            "image_url": "https://imagedelivery.net/PhnzJOsSP4zKYuS1D4e4cQ/4535d51b-fa99-48de-680c-48b5b4998000/public",
+	          "image_title": "Wallets",
+            "tile_name": "Wallets",
+            "tile_url": "/products_s?sid=k2r78t&utm_source=home&utm_medium=tile&utm_term=wallets",
+            "show_on_mobile": true
+        },
+        {
+            "position": 6,
+            "image_url": "https://imagedelivery.net/PhnzJOsSP4zKYuS1D4e4cQ/d7af0f7e-3be8-4721-39a3-baf37ef45400/public",
+	          "image_title": "Hats",
+            "tile_name": "Hats",
+            "tile_url": "/products_s?sid=a20165&utm_source=home&utm_medium=tile&utm_term=hats",
+            "show_on_mobile": true
+        },
+        {
+            "position": 7,
+            "image_url": "https://imagedelivery.net/PhnzJOsSP4zKYuS1D4e4cQ/110849d0-06e4-4d60-8e0a-3a4a4fe46200/public",
+	          "image_title": "Watches",
+            "tile_name": "Watches",
+            "tile_url": "/products_s?sid=swt416&utm_source=home&utm_medium=tile&utm_term=watches",
+            "show_on_mobile": true
+        },
+        {
+            "position": 8,
+            "image_url": "https://imagedelivery.net/PhnzJOsSP4zKYuS1D4e4cQ/e8ea6a74-3530-4bc3-09e5-75195bc59600/public",
+	          "image_title": "T-Shirts",
+            "tile_name": "T-Shirts",
+            "tile_url": "/products_s?sid=u5d48y&utm_source=home&utm_medium=tile&utm_term=tshirts",
+            "show_on_mobile": true
+        },
+        {
+            "position": 9,
+            "image_url": "https://imagedelivery.net/PhnzJOsSP4zKYuS1D4e4cQ/62621057-6ca3-4261-c863-f9f20884c000/public",
+	          "image_title": "Totes",
+            "tile_name": "Totes",
+            "tile_url": "/products_s?sid=4x192l&utm_source=home&utm_medium=tile&utm_term=totes",
+            "show_on_mobile": true
+        },
+        {
+            "position": 10,
+            "image_url": "https://imagedelivery.net/PhnzJOsSP4zKYuS1D4e4cQ/16e1377c-10cf-48df-ef2c-5609d6c52700/public",
+	          "image_title": "Sunglasses",
+            "tile_name": "Sunglasses",
+            "tile_url": "/products_s?sid=7225o5&utm_source=home&utm_medium=tile&utm_term=sunglasses",
+            "show_on_mobile": true
+        },
+        {
+            "position": 11,
+            "image_url": "https://imagedelivery.net/PhnzJOsSP4zKYuS1D4e4cQ/2a26c843-af0a-4e78-b26e-9251afa23c00/public",
+	          "image_title": "Women’s Clothing",
+            "tile_name": "Women’s Clothing",
+            "tile_url": "/products_s?sid=tq8352&utm_source=home&utm_medium=tile&utm_term=womens-clothing",
+            "show_on_mobile": true
+        },
+        {
+            "position": 12,
+            "image_url": "https://imagedelivery.net/PhnzJOsSP4zKYuS1D4e4cQ/cbe305ee-f182-4709-c56b-60cdf3dffd00/public",
+	          "image_title": "Women's Shoes and Heels",
+            "tile_name": "Women's Shoes",
+            "tile_url": "/products_s?sid=1m3t9n&utm_source=home&utm_medium=tile&utm_term=womens-shoes",
+            "show_on_mobile": true
+        }
+    ]
+}

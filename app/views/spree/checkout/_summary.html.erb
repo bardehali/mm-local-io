@@ -1,0 +1,108 @@
+<%
+  show_bill_address = false unless defined?(show_bill_address)
+-%>
+<div class="container text-center text-uppercase mt-2 mb-3">
+  <h4><%= Spree.t('order_summary') %></h4>
+</div>
+<div class="container">
+  <div class="mt-2">
+    <dt class="text-uppercase text-center text-lg-left"><%= Spree.t(:address) %></dt>
+    <dd class="text-center text-lg-left">
+      <%= render('spree/shared/address', address: @order.ship_address) if @order.ship_address %>
+    </dd>
+  </div>
+  <% if show_bill_address -%>
+  <div>
+    <dt class="text-uppercase text-center text-lg-left"><%= Spree.t(:billing_address) %></dt>
+    <dd class="text-center text-lg-left">
+      <%= render('spree/shared/address', address: @order.bill_address) if @order.bill_address %>
+    </dd>
+  </div>
+  <% end -%>
+
+  <div id="line_items" class="order-show-line-items d-flex flex-column">
+    <%= render partial: 'spree/shared/line_item_in_dtable_row', collection: @order.line_items, as: :line_item %>
+  </div>
+
+  <div class="w-100 checkout-content-summary-table" data-hook="order_summary">
+    <div class="d-table-cell">
+      <h6 class="text-uppercase"><%= Spree.t(:subtotal) %> (<%= t(pluralize(order.line_items.count, 'item')) -%>) </h6>
+    </div>
+    <div class="d-table-cell text-right">
+      <h5><%= order.display_item_total.to_html %></h5>
+    </div>
+
+    <% if order.line_item_adjustments.nonzero.exists? %>
+      <% order.line_item_adjustments.nonzero.promotion.eligible.group_by(&:label).each do |label, adjustments| %>
+        <div class="d-table-cell"><%= label %></div>
+        <div class="d-table-cell text-right"><%= Spree::Money.new(adjustments.sum(&:amount), currency: order.currency).to_html %></div>
+      <% end %>
+    <% end %>
+
+    <% order.all_adjustments.nonzero.tax.eligible.group_by(&:label).each do |label, adjustments| %>
+      <div class="d-table-cell"><%= label %></div>
+      <% tax_total = Spree::Money.new(adjustments.sum(&:amount), currency: order.currency) %>
+      <div class="d-table-cell text-right"
+           data-hook='tax-total'
+           data-currency='<%= Money::Currency.find(order.currency).symbol %>'
+           data-non-shipment-tax='<%= adjustments.reject{ |adj| adj.adjustable_type== 'Spree::Shipment'}.sum(&:amount) %>'
+           thousands-separator='<%= tax_total.thousands_separator %>'
+           decimal-mark='<%= tax_total.decimal_mark %>'
+           precision='<%= Money::Currency.find(order.currency).exponent %>'
+      >
+        <%= tax_total.to_html %>
+      </div>
+    <% end %>
+
+    <% shipping_total = Spree::Money.new(order.shipments.to_a.sum(&:cost), currency: order.currency) %>
+    <% if order.passed_checkout_step?("address") && shipping_total.money > 0 %>
+      <div class="d-table-cell"><%= Spree.t(:shipping) %>:</div>
+      <div class="d-table-cell text-right"
+           data-hook='shipping-total'
+           data-currency='<%= Money::Currency.find(order.currency).symbol %>'
+           thousands-separator='<%= shipping_total.thousands_separator %>'
+           decimal-mark='<%= shipping_total.decimal_mark %>'
+           precision='<%= Money::Currency.find(order.currency).exponent %>'
+      >
+        <%= shipping_total.to_html %>
+      </div>
+
+      <% if order.shipment_adjustments.nonzero.exists? %>
+        <% order.shipment_adjustments.nonzero.promotion.eligible.group_by(&:label).each do |label, adjustments| %>
+          <div class="d-table-cell"><%= label %>:</div>
+          <div class="d-table-cell text-right">
+            <%= Spree::Money.new(adjustments.sum(&:amount), currency: order.currency).to_html %>
+          </div>
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <% if order.adjustments.nonzero.eligible.exists? %>
+      <% order.adjustments.nonzero.eligible.each do |adjustment| %>
+        <% next if (adjustment.source_type == 'Spree::TaxRate') and (adjustment.amount.zero?) %>
+        <div class="d-table-cell total"><%= adjustment.label %>:</div>
+        <div class="d-table-cell total text-right">
+          <%= adjustment.display_amount.to_html %>
+        </div>
+      <% end %>
+    <% end %>
+
+    <div class="checkout-content-summary-table-order-total">
+      <div class="d-table-cell"><h4 class="text-uppercase"><%= Spree.t(:total) %>:</h4></div>
+      <div class="d-table-cell text-right">
+        <h4 id='summary-order-total' data-currency="<%= Money::Currency.find(order.currency).symbol %>">
+          <%= order.display_total.to_html %>
+        </h4>
+      </div>
+    </div>
+
+    <% if order.using_store_credit? %>
+      <div class="d-table-cell"><%= Spree.t(:store_credit_name) %>:</div>
+      <div class="d-table-cell text-right">
+        <span id='summary-store-credit'>
+          <%= order.display_total_applied_store_credit.to_html %>
+        </span>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,15 @@
+:ruby
+  default_tabs = [
+    ['Home', spree.admin_path],
+    ['TRX', '/admin/msales'],
+    ['Stats', '/admin/stats'],
+    ['Servers', '/admin/servers']
+  ]
+%header.pl-1.pr-1.pt-2.pb-0.alert-secondary.border-bottom.row
+  .col.col-4.text-left
+    %h6 #{Time.now.in_time_zone.to_s(:short)}
+  .col.col-8.text-right
+    - if content_for?(:navbar_right_links)
+      = yield :navbar_right_links
+    - else
+      = tab_links default_tabs, { class:'m-2'}

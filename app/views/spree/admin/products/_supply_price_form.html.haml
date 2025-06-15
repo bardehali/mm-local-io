@@ -1,0 +1,10 @@
+:ruby
+  # Required locals:
+  #   product [Spree::Product]
+  #   f [FormBuilder]
+.row.price-row.justify-content-center.align-items-center
+  %h5.bold-title.text-right.mr-2= t('store.your_price')
+  %div(class="form-group#{' withError' if product.errors.include?(:variant_price)}")
+    = text_field_tag('product[variant_price]', @variant_price ? number_to_currency(@variant_price, unit:'') : '', placeholder: number_to_currency(price_record, unit: '$'), 'data-type'=>'price-only', required: true)
+  %span
+    = hidden_field_tag('prices[0][country_iso]', '')

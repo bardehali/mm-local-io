@@ -1,0 +1,39 @@
+<div id="no-product-available" class="no-product-available-dropdown hide-on-esc">
+  <%= render partial: 'spree/shared/no_product_available' %>
+</div>
+<% if false # Rails.env.development? -%>
+<div class="row">
+  <div class="col-md-6 col-sm-12">
+    <h4>Seller: <%= order_form.object.seller.try(:display_name).present? ? 
+      order_form.object.seller.try(:display_name) : 
+      (order_form.object.seller.try(:username) || order_form.object.seller_user_id) %></h4>
+  </div>
+  <div class="col-md-6 col-sm-12 text-right">
+    <h4><%= "Order (#{order_form.object.id}) #{order_form.object.number}" if Rails.env.development? %></h4>
+  </div>
+</div>
+<hr/>
+<% end -%>
+<div class="d-table table-responsive" id="cart-detail" data-order-id="<%= order_form.object.id %>">
+  <div class="active d-none d-lg-table-row shopping-cart-table-header" data-hook="cart_items_headers">
+    <div class="d-table-cell cart-item-description-header text-uppercase"><%= Spree.t('cart_page.product') %></div>
+    <div class="d-table-cell"></div>
+    <div class="d-table-cell cart-item-price-header text-uppercase"><%= Spree.t(:price) %></div>
+    <div class="d-table-cell cart-item-quantity-header text-uppercase"><%= Spree.t('cart_page.quantity') %></div>
+    <div class="d-table-cell cart-item-total-header text-uppercase"><%= Spree.t(:total) %></div>
+    <div class="d-table-cell cart-item-delete-header"></div>
+  </div>
+  <div id="line_items" class="shopping-cart-table-line-items" data-hook>
+    <%= render partial: 'spree/orders/line_item', collection: order_form.object.line_items, locals: { order_form: order_form } %>
+  </div>
+</div>
+
+<% if @order&.errors&.any? %>
+  <script>
+    window.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('overlay').classList.add('shown');
+      document.getElementById('no-product-available').classList.add('shown');
+      window.scrollTo(0, 0);
+    })
+  </script>
+<% end %>

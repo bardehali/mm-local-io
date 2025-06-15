@@ -1,0 +1,19 @@
+<% # Copied from gem, but modified
+args = params.clone 
+-%>
+<% if defined?(per_page_action) %>
+  <% args[:action] = per_page_action %>
+<% end %>
+
+<div class="row index-pagination-row">
+  <div class="col-sm-12 col-md-6">
+    <%= paginate collection, theme: 'twitter-bootstrap-4' %>
+  </div>
+  <div class="col-sm-12 col-md-6 justify-content-end small-d-none">
+    <div class="pagination-wrap mt-4">
+      <%= form_tag(per_page_dropdown_params(args), { method: :get, class: 'js-per-page-form form-inline justify-content-end' }) do %>
+        <%= per_page_dropdown %>
+      <% end %>
+    </div>
+  </div>
+</div>

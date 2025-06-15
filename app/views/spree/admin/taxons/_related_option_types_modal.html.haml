@@ -1,0 +1,27 @@
+:ruby
+  # Required locals
+  #   taxon [Spree::Taxon]
+  existing_option_type_ids = taxon.related_option_types.collect(&:option_type_id)
+.modal(tabindex="-1" role="dialog" id="select_option_types_modal" data-taxon-id="#{taxon.id}")
+  = form_for(taxon, url: admin_taxonomy_taxon_path(taxonomy_id: taxon.taxonomy_id, id: taxon.id), remote: true) do|f|
+    = f.hidden_field(:meta_title)
+    .modal-dialog.modal-lg(role="document")
+      .modal-content
+        .modal-header
+          %h5.modal-title Choose Related Options for #{taxon.root.name} &gt; #{taxon.name}
+          %button(type="button" class="close" data-dismiss="modal" aria-label="Close")
+            %span(aria-hidden="true") &times;
+        .modal-body
+          .container
+            %p These are mappings of what options should be related to certain category or taxon.
+            %ul.list-unstyled
+              - Spree::OptionType.all.each do|option_type|
+                %li
+                  %label(title='Show as "#{option_type.presentation}"')
+                    = check_box_tag('option_type_id[]', option_type.id, existing_option_type_ids.include?(option_type.id) )
+                    #{option_type.name}
+                  &nbsp;&nbsp;
+                  = link_to '', edit_admin_option_type_path(id: option_type.id), class:'fa fa-edit', title: 'See its detail and values'
+        .modal-footer
+          %button(type='button' data-dismiss="modal") Cancel
+          %button(type='submit') Save

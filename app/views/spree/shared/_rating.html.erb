@@ -1,0 +1,18 @@
+<% # Required locals:
+  # product [Spree::Product]
+  stars = product.stars
+  @reviews_count ||= (spree_current_user&.id == product.user_id) ? product.reviews.not_by_unreal_users.count : product.reviews_count
+  is_shortened = shortened
+-%>
+
+<div class="ratings">
+    <span>
+      &#8203;
+      <%= render 'spree/reviews/stars', stars: stars %>
+    </span>
+    (<%= if is_shortened then
+      Spree.t(:based_upon_review_count_short, count: @reviews_count)
+    else
+      Spree.t(:based_upon_review_count, count: @reviews_count)
+    end %>)
+</div>

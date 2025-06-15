@@ -1,0 +1,138 @@
+<%
+is_admin = spree_current_user.try(:admin?)
+-%>
+
+<% content_for :page_title do %>
+  <%= @page_title || plural_resource_name(Spree::Product) %>
+<% end if !is_admin || @user.nil? %>
+
+<% content_for :head do %>
+  <%= stylesheet_link_tag 'spree/record_reviews' -%>
+<%
+  if is_admin
+  paypal = Spree::PaymentMethod.paypal
+-%>
+  <style>
+    .table td { font-size: 1.1em; }
+    .table .text-secondary a { color: darkcyan; }
+    .text-secondary .icon { opacity: 0.4; }
+    .table a.icon { color: #333333; }
+    .text-secondary .icon:hover { opacity: 1.0; }
+    .user-label { border-right: solid 1px #cccccc; padding: 0.2em 0.3em 0.2em 0.5em; }
+    .user-label:last-child { border: 0; }
+    .not-real-user { opacity: 0.5; }
+    .product-row h6 { font-weight: 500; }
+    .toggle-adopted-by { margin-left: 5em; padding: 0.3em; background-color: #eee;}
+    .payment-methods { margin-left: 2em; font-weight: 700; color:dodgerblue; }
+    .less-detail > span { display: inline; }
+    .less-detail .icon, .less-detail .price, .less-detail .payment-methods { display: none; }
+    .more-detail > span { display: block; }
+    .more-detail .icon, .more-detail .price, .more-detail .payment-methods { display: inline; }
+  </style>
+  <script type="text/javascript">
+    $(function(){
+      $('.toggle-adopted-by').click(function(){
+        if ($(this).text() == 'More') {
+          $(this).text('Less');
+          $(this).siblings('.users-adopted').removeClass('less-detail').addClass('more-detail');
+        } else {
+          $(this).text('More');
+          $(this).siblings('.users-adopted').removeClass('more-detail').addClass('less-detail');
+        }
+      });
+    });
+  </script>
+<% end # is_admin -%>
+<% end # :head -%>
+
+<% if @wanted_products.present? -%>
+  <% content_for :content_header_top do -%>
+    <div class="row mb-4">
+      <div class="col-0 col-md-1"></div>
+      <div class="col-12 col-md-12">
+        <h4 class="text-bold"><%= t('seller.items_you_should_be_selling') %></h4>
+        <%= render partial: 'spree/shared/carousel/scroller', locals: {
+          line_items: @recent_transactions_of_wanted_products&.first&.is_a?(::Spree::LineItem) ?
+                      @recent_transactions_of_wanted_products :
+                      @recent_transactions_of_wanted_products&.map(&:line_item),
+          id: 'wanted_products'
+        } if @recent_transactions_of_wanted_products.present? %>
+      </div>
+    </div>
+  <% end # page_header -%>
+<% end -%>
+
+<% content_for :page_actions do %>
+  <% unless is_admin %>
+    <%= button_link_to Spree.t(:new_product), new_object_url, { class: "btn-success", icon: 'add', id: 'admin_new_product' } %>
+  <% end -%>
+<% end if can?(:create, Spree::Product) %>
+
+<% if is_admin && @user # instead of :page_title or :page_actions -%>
+  <% content_for :page_header do -%>
+    <%= render partial: 'spree/admin/users/seller_info_navbar', locals:{ user: @user } %>
+  <% end -%>
+<% end -%>
+
+<% content_for :table_filter_old do %>
+  <div data-hook="admin_products_sidebar">
+
+    <%= search_form_for [:admin, @search] do |f| %>
+      <%- locals = {f: f} %>
+      <div data-hook="admin_products_index_search" class="row">
+        <div class="col-12 col-lg-6">
+          <div class="form-group">
+            <%= f.label :name_cont, Spree.t(:name) %>
+            <%= f.text_field :name_cont, size: 15, class: "form-control js-quick-search-target js-filterable" %>
+          </div>
+        </div>
+        <div class="col-12 col-lg-6">
+          <div class="form-group">
+            <%= f.label :variants_including_master_sku_cont, Spree.t(:sku) %>
+            <%= f.text_field :variants_including_master_sku_cont, size: 15, class: "form-control js-filterable" %>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="field checkbox mb-2">
+            <label>
+              <%= f.check_box :deleted_at_null, {checked: params[:q][:deleted_at_null] == '0'}, '0', '1' %>
+              <%= Spree.t(:show_deleted) %>
+            </label>
+          </div>
+
+          <div class="field checkbox mb-2">
+            <label>
+              <%= f.check_box :not_discontinued, {checked: params[:q][:not_discontinued] == '0'}, '0', '1' %>
+              <%= Spree.t(:show_discontinued ) %>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div data-hook="admin_products_index_search_buttons" class="form-actions">
+        <%= button Spree.t(:search), 'search' %>
+      </div>
+    <% end %>
+
+  </div>
+<% end %>
+
+<% if @collection.any?
+  using_adopted_admin = %w(adopted other_listings).include?(params[:action])
+  if spree_current_user&.admin?
+    @products ||= @collection
+-%>
+    <div class='mb-2'></div>
+    <%= render partial:'spree/shared/products.html.haml', locals:{ products: @products, specific_seller: @user, thumbnail_type:'simple' } %>
+<%
+  else # normal user ########################
+-%>
+    <%= render partial:'products_listed_table', locals:{ products: @collection } %>
+  <% end # normal user -%>
+<% else %>
+  <div class="alert alert-info no-objects-found">
+    <%= Spree.t(:no_resource_found, resource: plural_resource_name(Spree::Product)) %>,
+    <%= link_to Spree.t(:add_one), new_object_url if can?(:create, Spree::Product) %>!
+  </div>
+<% end %>
+
+<%= render partial: 'spree/admin/shared/index_table_options', locals: { collection: @collection } %>

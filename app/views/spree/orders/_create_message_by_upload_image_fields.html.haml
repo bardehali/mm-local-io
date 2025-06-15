@@ -1,0 +1,32 @@
+:ruby
+  # Independent, general create message form by only uploading image without comment.  If given 
+  # image, would display the image instead of file upload field
+  # Required locals:
+  #   order [Spree::Order]
+  #   type [String] the type_id of User::Message, for example 'order_help_with_payment'; 
+  #     if not specified would turn into 'order_complaint'
+  # Optional locals:
+  #   image [ImageUploader]
+  #   instruction [String] words below Upload Image field
+  # params checked to use:
+  #   :references [String]
+  type = 'order_complaint' unless defined?(type) && !type.blank?
+  image = nil unless defined?(image)
+  instruction = nil unless defined?(instruction)
+- if image && (thumb_url = image.url(:thumb) ).present?
+  - image_modal_id = "order_proof_of_payment_modal_#{order.id}"
+  %p
+    = link_to '#', title:"Click to see full image", class:'m-3', data:{ toggle:'modal', target: "##{image_modal_id}"} do
+      %img(src="#{thumb_url}" alt="Uploaded image")
+  %br/
+  = render partial:'spree/shared/full_modal', locals:{ target: image_modal_id, content: image_tag( image.url, alt:'Message picture', class:'mw-100')  }
+- else
+  %div.file-upload.mt-3
+    %label(for="image" class="btn w-100")
+      = t('form.upload_image') 
+      &nbsp;&nbsp;
+      %span(class='glyphicon glyphicon-camera')
+      %br/
+    = file_field_tag :image, class:'auto-upload-file form-field w-100', accept:'image/*', required: (type=='order_need_tracking_number')
+  - if type == 'order_help_with_payment' && instruction.present?
+    %p.text-secondary.text-right= instruction.html_safe
